@@ -1,0 +1,1814 @@
+/* =====================================================================
+   Glamora application styling (plain CSS, koi library nahi)
+   Saare class naam "gl-" se shuru hote hain, taaki login.css se na takraayein.
+   Rang sabse pehle "variables" me likhe hain: ek jagah badlo, poore app me badal jaye.
+
+   Fehrist (contents):
+   1. Base   2. Sidebar   3. Header + popups   4. Buttons, forms, modal, toast
+   5. Cards  6. Dashboard (hero, stats, table, chart...)   7. Animations   8. Responsive
+   ===================================================================== */
+
+/* ---------- 1. Base ---------- */
+.gl-app {
+  --gl-espresso: #2e1b0f; /* sabse gehra brown: sidebar */
+  --gl-brown: #5c3b22;
+  --gl-brown-mid: #8b5e3c;
+  --gl-gold: #c9a24a;
+  --gl-gold-deep: #a97f2a;
+  --gl-gold-soft: #f3e7c9;
+  --gl-cream: #faf6f1;
+  --gl-beige: #efe3d3;
+  --gl-line: #eadfd3;
+  --gl-ink: #3a2415;
+  --gl-muted: #6f5a47; /* halka text, cream par bhi saaf padhne layak */
+  --gl-green: #2f6b3a;
+  --gl-green-soft: #e6f3e8;
+  --gl-red: #9b1c1c;
+  --gl-radius: 16px;
+  --gl-shadow: 0 1px 2px rgba(58, 36, 21, 0.05), 0 10px 28px rgba(58, 36, 21, 0.07);
+  --gl-shadow-lg: 0 18px 48px rgba(46, 27, 15, 0.22);
+  --gl-heading-font: 'Playfair Display', Georgia, serif;
+
+  display: grid;
+  grid-template-columns: 264px minmax(0, 1fr); /* left 264px sidebar, baaki jagah main */
+  min-height: 100vh;
+  background: var(--gl-cream);
+  color: var(--gl-ink);
+  font-family: 'Inter', system-ui, 'Segoe UI', Roboto, sans-serif;
+}
+
+.gl-app *,
+.gl-app *::before,
+.gl-app *::after {
+  box-sizing: border-box;
+}
+
+/* :where() = "kam taakat" wala selector. Browser ke default margin hataata hai,
+   par baad me likhe gaye margin (jaise .gl-stat__value) ko dabata nahi. */
+:where(.gl-app) :where(h1, h2, h3, h4, p, ul) {
+  margin: 0;
+}
+
+/* Keyboard se chalne walon ko dikhna chahiye ki kaun sa button/link active hai */
+.gl-app a:focus-visible,
+.gl-app button:focus-visible,
+.gl-app select:focus-visible,
+.gl-app input:focus-visible,
+.gl-app textarea:focus-visible {
+  outline: 3px solid var(--gl-gold);
+  outline-offset: 2px;
+}
+
+/* ---------- 2. Sidebar ---------- */
+.gl-sidebar {
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+  scrollbar-width: none; /* Firefox: scroll bar chhupa, scroll chalta rahega */
+  background:
+    radial-gradient(120% 60% at 0% 0%, rgba(201, 162, 74, 0.14) 0%, rgba(201, 162, 74, 0) 60%),
+    linear-gradient(180deg, #3a2312 0%, var(--gl-espresso) 100%);
+  border-right: 1px solid rgba(201, 162, 74, 0.18);
+  color: #e9dccd;
+  padding: 20px 14px;
+}
+
+/* Chrome / Edge: scroll bar chhupa */
+.gl-sidebar::-webkit-scrollbar {
+  display: none;
+}
+
+.gl-brand {
+  display: grid;
+  grid-template-columns: auto 1fr auto; /* logo | naam | menu button */
+  column-gap: 12px;
+  align-items: center;
+  margin-bottom: 14px;
+  padding: 0 6px 18px;
+  border-bottom: 1px solid rgba(201, 162, 74, 0.2); /* brand aur menu ke beech patli line */
+}
+
+.gl-brand__mark {
+  grid-row: 1 / 3;
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  border-radius: 14px;
+  background: linear-gradient(145deg, #e3c26f, var(--gl-gold-deep));
+  color: var(--gl-espresso);
+  font-family: var(--gl-heading-font);
+  font-size: 1.6rem;
+  font-weight: 700;
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.3);
+}
+
+.gl-brand__name {
+  font-family: var(--gl-heading-font);
+  font-size: 1.65rem;
+  font-weight: 700;
+  color: var(--gl-gold);
+  line-height: 1.05;
+}
+
+.gl-brand__sub {
+  font-size: 0.68rem;
+  letter-spacing: 0.14em;
+  color: rgba(233, 220, 205, 0.7);
+}
+
+.gl-switcher {
+  display: grid;
+  gap: 6px;
+  margin: 0 12px 16px;
+  font-size: 0.8rem;
+  color: rgba(233, 220, 205, 0.8);
+}
+
+.gl-switcher select {
+  min-height: 44px;
+  padding: 0 10px;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.06);
+  color: #fff;
+  font: inherit;
+}
+
+.gl-switcher option {
+  color: var(--gl-ink);
+}
+
+.gl-nav ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.gl-nav__heading {
+  margin: 20px 12px 8px;
+  font-size: 0.7rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: rgba(233, 220, 205, 0.55);
+}
+
+.gl-nav__link {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-height: 42px; /* mobile par neeche 44px */
+  padding: 0 14px;
+  margin-bottom: 4px;
+  border-radius: 12px;
+  color: #e9dccd;
+  font-size: 1rem;
+  font-weight: 500;
+  letter-spacing: 0.01em;
+  text-decoration: none;
+  transition: background 0.18s ease, color 0.18s ease, transform 0.18s ease;
+}
+
+/* Mobile/tablet: ungli se dabane layak (kam se kam 44px) */
+@media (max-width: 1023px) {
+  .gl-nav__link {
+    min-height: 44px;
+    font-size: 1rem;
+  }
+}
+
+.gl-nav__link svg {
+  flex: none;
+  opacity: 0.85;
+  transition: opacity 0.18s ease, transform 0.18s ease;
+}
+
+.gl-nav__link:hover {
+  background: rgba(255, 255, 255, 0.08);
+  color: #fff;
+  transform: translateX(3px);
+}
+
+.gl-nav__link:hover svg {
+  opacity: 1;
+  transform: scale(1.08);
+}
+
+/* NavLink jis page par ho, use "active" class mil jaati hai */
+.gl-nav__link.active {
+  background: linear-gradient(90deg, rgba(201, 162, 74, 0.28), rgba(201, 162, 74, 0.1));
+  box-shadow: inset 0 0 0 1px rgba(201, 162, 74, 0.28), 0 4px 14px rgba(0, 0, 0, 0.2);
+  color: #f0d58a;
+  font-weight: 600;
+}
+
+.gl-nav__link.active svg {
+  opacity: 1;
+}
+
+.gl-nav__link.active::before {
+  content: '';
+  position: absolute;
+  left: -14px; /* sidebar ke kinare se chipka hua */
+  top: 9px;
+  bottom: 9px;
+  width: 4px;
+  border-radius: 0 4px 4px 0;
+  background: var(--gl-gold);
+  box-shadow: 0 0 10px rgba(201, 162, 74, 0.6);
+}
+
+.gl-nav__link--muted {
+  margin-top: 12px;
+  color: rgba(233, 220, 205, 0.75);
+  border: 1px dashed rgba(255, 255, 255, 0.25);
+}
+
+/* ---------- 3. Header + popups ---------- */
+.gl-main {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.gl-header {
+  position: sticky;
+  top: 0;
+  z-index: 20;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 12px 32px;
+  background: rgba(250, 246, 241, 0.92);
+  backdrop-filter: blur(8px);
+  border-bottom: 1px solid var(--gl-line);
+}
+
+.gl-header__title {
+  flex: 1;
+  min-width: 0;
+}
+
+.gl-header__title h1 {
+  font-family: var(--gl-heading-font);
+  font-size: 1.5rem;
+  color: var(--gl-brown);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.gl-header__title p {
+  font-size: 0.85rem;
+  color: var(--gl-muted);
+}
+
+/* .gl-app ke saath likha taaki .gl-iconbtn ke display se na dabe. Sirf mobile/tablet par dikhta hai. */
+.gl-app .gl-header__menu {
+  display: none;
+}
+
+/* Sidebar me Glamora ke neeche hide/show button (sirf desktop par) */
+.gl-sidebar__toggle {
+  display: grid;
+  place-items: center;
+  flex: none;
+  grid-column: 3;
+  grid-row: 1 / 3;
+  width: 36px;
+  height: 36px;
+  margin: 0;
+  border: 1px solid rgba(201, 162, 74, 0.35);
+  border-radius: 10px;
+  background: rgba(201, 162, 74, 0.1);
+  color: var(--gl-gold);
+  cursor: pointer;
+  transition: background 0.2s ease, border-color 0.2s ease, color 0.2s ease, transform 0.15s ease, box-shadow 0.2s ease;
+}
+
+.gl-sidebar__toggle:hover {
+  background: rgba(201, 162, 74, 0.22);
+  border-color: var(--gl-gold);
+  color: #f3e7c9;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
+}
+
+.gl-sidebar__toggle:active {
+  transform: scale(0.92);
+}
+
+@media (max-width: 1023px) {
+  .gl-sidebar__toggle {
+    display: none;
+  }
+}
+
+/* Desktop par sidebar chhupa hua: poori chaudai content ko mil jaati hai */
+@media (min-width: 1024px) {
+  /* Band hone par bhi patli patti rehti hai jisme sirf icons dikhte hain */
+  .gl-app--collapsed {
+    grid-template-columns: 76px minmax(0, 1fr);
+  }
+
+  .gl-app--collapsed .gl-sidebar {
+    padding: 24px 10px;
+    overflow-x: hidden;
+  }
+
+  .gl-app--collapsed .gl-brand {
+    grid-template-columns: 1fr;
+    justify-items: center;
+    padding: 0 0 14px;
+  }
+
+  .gl-app--collapsed .gl-brand__name,
+  .gl-app--collapsed .gl-brand__sub,
+  .gl-app--collapsed .gl-switcher,
+  .gl-app--collapsed .gl-nav__heading,
+  .gl-app--collapsed .gl-nav__link span {
+    display: none;
+  }
+
+  .gl-app--collapsed .gl-nav__link {
+    justify-content: center;
+    padding: 0;
+  }
+
+  /* Band hone par patti me jagah nahi, isliye button logo ke neeche aa jata hai */
+  .gl-app--collapsed .gl-sidebar__toggle {
+    grid-column: 1;
+    grid-row: auto;
+    margin-top: 14px;
+  }
+}
+
+.gl-header__actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.gl-search {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: min(340px, 100%);
+  min-height: 44px;
+  padding: 0 14px;
+  border: 1px solid var(--gl-line);
+  border-radius: 12px;
+  background: #fff;
+  color: var(--gl-muted);
+  transition: border-color 0.15s, box-shadow 0.15s;
+}
+
+.gl-search:focus-within {
+  border-color: var(--gl-gold);
+  box-shadow: 0 0 0 3px rgba(201, 162, 74, 0.25);
+}
+
+.gl-search input {
+  flex: 1;
+  min-width: 0;
+  border: 0;
+  background: transparent;
+  color: var(--gl-ink);
+  font: inherit;
+  font-size: 0.92rem;
+}
+
+/* MUI input ka border khud focus dikhata hai, to upar se gold outline ring nahi chahiye */
+.gl-app .MuiOutlinedInput-root input:focus-visible,
+.gl-app .MuiOutlinedInput-root textarea:focus-visible {
+  outline: none;
+}
+
+/* search box ke andar apna focus ring alag se nahi chahiye (poora box already chamakta hai) */
+.gl-app .gl-search input:focus-visible {
+  outline: none;
+}
+
+.gl-iconbtn,
+.gl-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: 44px;
+  border: 0;
+  cursor: pointer;
+  font: inherit;
+  font-weight: 600;
+  transition: background 0.18s, box-shadow 0.18s, transform 0.18s, border-color 0.18s;
+}
+
+.gl-iconbtn {
+  position: relative;
+  min-width: 44px;
+  border-radius: 12px;
+  background: #fff;
+  color: var(--gl-brown);
+  border: 1px solid var(--gl-line);
+}
+
+.gl-iconbtn:hover {
+  background: var(--gl-beige);
+}
+
+.gl-iconbtn--flat {
+  background: transparent;
+  border-color: transparent;
+}
+
+.gl-iconbtn__dot {
+  position: absolute;
+  top: 9px;
+  right: 10px;
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background: var(--gl-gold);
+  border: 2px solid #fff;
+}
+
+/* Popup (bell, profile) */
+.gl-pop {
+  position: relative;
+}
+
+.gl-pop__panel {
+  position: absolute;
+  top: calc(100% + 10px);
+  right: 0;
+  z-index: 50;
+  width: 270px;
+  max-width: calc(100vw - 24px);
+  border: 1px solid var(--gl-line);
+  border-radius: 16px;
+  background: #fff;
+  box-shadow: var(--gl-shadow-lg);
+  animation: gl-pop-in 0.16s ease-out;
+}
+
+.gl-pop__panel--wide {
+  width: min(340px, calc(100vw - 24px));
+}
+
+.gl-pop__head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 14px 16px;
+  border-bottom: 1px solid var(--gl-line);
+}
+
+.gl-pop__head--stack {
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 2px;
+}
+
+.gl-pop__head--stack span:not(.gl-pill) {
+  font-size: 0.82rem;
+  color: var(--gl-muted);
+  word-break: break-all;
+}
+
+.gl-pop__foot {
+  padding: 10px 16px;
+  border-top: 1px solid var(--gl-line);
+  font-size: 0.78rem;
+  color: var(--gl-muted);
+}
+
+.gl-notes {
+  list-style: none;
+  padding: 0;
+  max-height: 300px;
+  overflow-y: auto;
+}
+
+.gl-note {
+  padding: 12px 16px;
+  border-bottom: 1px solid var(--gl-line);
+  font-size: 0.9rem;
+}
+
+.gl-note span {
+  font-size: 0.78rem;
+  color: var(--gl-muted);
+}
+
+.gl-note--unread {
+  background: #fdf8ec;
+  box-shadow: inset 3px 0 0 var(--gl-gold);
+}
+
+.gl-menu {
+  list-style: none;
+  padding: 8px;
+}
+
+.gl-menu a,
+.gl-menu button {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  min-height: 44px;
+  padding: 0 10px;
+  border: 0;
+  border-radius: 10px;
+  background: transparent;
+  color: var(--gl-ink);
+  font: inherit;
+  font-size: 0.92rem;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.gl-menu a:hover,
+.gl-menu button:hover {
+  background: var(--gl-beige);
+}
+
+.gl-profilebtn {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 48px;
+  padding: 0 12px 0 6px;
+  border: 1px solid var(--gl-line);
+  border-radius: 14px;
+  background: #fff;
+  color: var(--gl-ink);
+  font: inherit;
+  cursor: pointer;
+  transition: background 0.18s;
+}
+
+.gl-profilebtn:hover {
+  background: var(--gl-beige);
+}
+
+.gl-header__who {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  line-height: 1.25;
+  font-size: 0.85rem;
+  text-align: left;
+}
+
+.gl-header__who span {
+  color: var(--gl-muted);
+  font-size: 0.78rem;
+}
+
+.gl-link {
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--gl-brown-mid);
+  font: inherit;
+  font-weight: 600;
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+.gl-pill {
+  display: inline-block;
+  margin-left: 8px;
+  padding: 2px 10px;
+  border-radius: 999px;
+  background: var(--gl-gold-soft);
+  color: var(--gl-brown);
+  font-size: 0.72rem;
+  font-weight: 700;
+}
+
+.gl-pop__head--stack .gl-pill {
+  margin: 8px 0 0;
+}
+
+.gl-banner {
+  margin: 16px 32px 0;
+  padding: 12px 16px;
+  border: 1.5px solid var(--gl-red);
+  border-radius: 12px;
+  background: #fdecec;
+  color: #7a1414;
+}
+
+.gl-content {
+  padding: 28px 32px 56px;
+}
+
+/* ---------- 4. Buttons, forms, modal, toast ---------- */
+.gl-btn {
+  padding: 0 18px;
+  border-radius: 12px;
+}
+
+.gl-btn--ghost {
+  background: #fff;
+  color: var(--gl-brown);
+  border: 1px solid var(--gl-line);
+}
+
+.gl-btn--ghost:hover {
+  background: var(--gl-beige);
+}
+
+/* Gold = sabse zaroori kaam (jaise "New appointment") */
+.gl-btn--gold {
+  background: linear-gradient(180deg, #d8b45a, var(--gl-gold));
+  color: var(--gl-espresso);
+  box-shadow: 0 6px 16px rgba(169, 127, 42, 0.35);
+}
+
+.gl-btn--gold:hover {
+  background: linear-gradient(180deg, #e0be68, #d1ab50);
+  transform: translateY(-1px);
+  box-shadow: 0 10px 22px rgba(169, 127, 42, 0.4);
+}
+
+.gl-btn--gold:active {
+  transform: none;
+}
+
+.gl-avatar {
+  display: inline-grid;
+  place-items: center;
+  flex: none;
+  border-radius: 50%;
+  font-weight: 700;
+}
+
+.gl-avatar--md {
+  width: 40px;
+  height: 40px;
+  font-size: 0.9rem;
+}
+
+.gl-avatar--sm {
+  width: 34px;
+  height: 34px;
+  font-size: 0.78rem;
+}
+
+.gl-avatar--gold {
+  background: var(--gl-gold);
+  color: var(--gl-espresso);
+}
+
+.gl-avatar--beige {
+  background: var(--gl-beige);
+  color: var(--gl-brown);
+}
+
+/* Forms */
+.gl-form {
+  display: grid;
+  gap: 16px;
+  padding: 4px 24px 24px;
+}
+
+.gl-form__intro {
+  padding: 10px 12px;
+  border-radius: 10px;
+  background: var(--gl-gold-soft);
+  color: var(--gl-brown);
+  font-size: 0.85rem;
+}
+
+.gl-form__row {
+  display: grid;
+  gap: 16px;
+  grid-template-columns: 1fr 1fr;
+}
+
+.gl-form__actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  margin-top: 4px;
+}
+
+.gl-field {
+  display: grid;
+  gap: 6px;
+}
+
+.gl-field label {
+  font-size: 0.88rem;
+  font-weight: 600;
+}
+
+.gl-input {
+  width: 100%;
+  min-height: 46px;
+  padding: 0 14px;
+  border: 1.5px solid #cdb9a4; /* saaf dikhne wala border */
+  border-radius: 10px;
+  background: #fff;
+  color: var(--gl-ink);
+  font: inherit;
+  transition: border-color 0.15s, box-shadow 0.15s;
+}
+
+.gl-input:hover {
+  border-color: var(--gl-brown-mid);
+}
+
+.gl-input:focus {
+  border-color: var(--gl-brown-mid);
+  box-shadow: 0 0 0 3px rgba(201, 162, 74, 0.3);
+}
+
+.gl-select {
+  appearance: none;
+  padding-right: 40px;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%238b5e3c' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 14px center;
+}
+
+.gl-textarea {
+  padding: 12px 14px;
+  resize: vertical;
+  min-height: 84px;
+}
+
+.gl-field--error .gl-input {
+  border-color: var(--gl-red);
+}
+
+.gl-field__error {
+  font-size: 0.84rem;
+  color: var(--gl-red);
+}
+
+.gl-field__hint {
+  font-size: 0.8rem;
+  color: var(--gl-muted);
+}
+
+/* Modal */
+.gl-modal-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  display: grid;
+  place-items: center;
+  padding: 16px;
+  background: rgba(46, 27, 15, 0.6);
+  backdrop-filter: blur(2px);
+  animation: gl-overlay-in 0.18s ease-out;
+}
+
+.gl-modal {
+  width: min(540px, 100%);
+  max-height: calc(100vh - 32px);
+  overflow-y: auto;
+  border-radius: 22px;
+  background: #fff;
+  box-shadow: var(--gl-shadow-lg);
+  animation: gl-pop-in 0.22s ease-out;
+}
+
+.gl-modal__head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20px 24px 12px;
+}
+
+.gl-modal__head h2 {
+  font-family: var(--gl-heading-font);
+  font-size: 1.5rem;
+  color: var(--gl-brown);
+}
+
+/* Toast */
+.gl-toast {
+  position: fixed;
+  left: 50%;
+  bottom: 24px;
+  z-index: 120;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  max-width: calc(100vw - 24px);
+  padding: 14px 18px;
+  border-radius: 14px;
+  background: var(--gl-espresso);
+  color: #f6ecdf;
+  font-size: 0.92rem;
+  box-shadow: var(--gl-shadow-lg);
+  transform: translateX(-50%);
+  animation: gl-toast-in 0.25s ease-out;
+}
+
+.gl-toast svg {
+  flex: none;
+  color: var(--gl-gold);
+}
+
+/* ---------- 5. Cards ---------- */
+.gl-card {
+  background: #fff;
+  border: 1px solid var(--gl-line);
+  border-radius: var(--gl-radius);
+  box-shadow: var(--gl-shadow);
+}
+
+.gl-card--hover {
+  transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+}
+
+.gl-card--hover:hover {
+  transform: translateY(-3px);
+  border-color: #e0cfba;
+  box-shadow: 0 2px 4px rgba(58, 36, 21, 0.05), 0 18px 36px rgba(58, 36, 21, 0.11);
+}
+
+/* Khaali haal (empty state) */
+.gl-empty-state {
+  display: grid;
+  justify-items: center;
+  gap: 8px;
+  padding: 32px 16px;
+  text-align: center;
+}
+
+.gl-empty-state__icon {
+  display: grid;
+  place-items: center;
+  width: 60px;
+  height: 60px;
+  margin-bottom: 4px;
+  border-radius: 50%;
+  background: var(--gl-gold-soft);
+  color: var(--gl-brown-mid);
+}
+
+.gl-empty-state h3 {
+  font-family: var(--gl-heading-font);
+  font-size: 1.25rem;
+  color: var(--gl-brown);
+}
+
+.gl-empty-state p {
+  max-width: 38ch;
+  color: var(--gl-muted);
+}
+
+.gl-empty-state .gl-btn {
+  margin-top: 10px;
+}
+
+.gl-empty {
+  padding: 16px 0;
+  color: var(--gl-muted);
+}
+
+/* ---------- 6. Dashboard ---------- */
+.gl-dashboard {
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+/* Salon ki photo (Unsplash, free license) + upar gehra parda, taaki text saaf padhe.
+   background-color fallback: photo na aaye tab bhi sundar dikhe. */
+.gl-hero {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 20px;
+  flex-wrap: wrap;
+  padding: 36px 36px;
+  border-radius: 22px;
+  color: #fff;
+  background-color: var(--gl-espresso);
+  background-image:
+    linear-gradient(100deg, rgba(46, 27, 15, 0.94) 0%, rgba(46, 27, 15, 0.76) 55%, rgba(46, 27, 15, 0.5) 100%),
+    url('https://images.unsplash.com/photo-1626383137804-ff908d2753a2?fm=jpg&q=60&w=1400&auto=format&fit=crop');
+  background-size: cover;
+  background-position: center;
+  box-shadow: 0 14px 34px rgba(46, 27, 15, 0.28);
+}
+
+.gl-hero__date {
+  font-size: 0.78rem;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--gl-gold);
+}
+
+.gl-hero h2 {
+  margin-top: 6px;
+  font-family: var(--gl-heading-font);
+  font-size: clamp(1.7rem, 3vw, 2.4rem);
+}
+
+.gl-hero__text {
+  margin-top: 6px;
+  color: #f1e6d9;
+}
+
+.gl-sample-note {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 16px 0 20px;
+  padding: 10px 14px;
+  border: 1px dashed var(--gl-gold);
+  border-radius: 12px;
+  background: var(--gl-gold-soft);
+  font-size: 0.86rem;
+  color: var(--gl-brown);
+}
+
+.gl-sample-note svg {
+  flex: none;
+  color: var(--gl-gold-deep);
+}
+
+/* 4 stat cards */
+.gl-stats {
+  display: grid;
+  gap: 16px;
+  /* 4 cards hamesha ek line me; bahut chhoti (phone) screen par hi neeche aate hain */
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  margin-bottom: 24px;
+}
+
+.gl-stat {
+  padding: 20px;
+}
+
+.gl-stat__top {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  /* Jagah kam ho to badge icon ke neeche aa jaye, card se bahar na kate */
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 14px;
+}
+
+.gl-stat__icon {
+  display: grid;
+  place-items: center;
+  width: 46px;
+  height: 46px;
+  border-radius: 14px;
+  background: var(--gl-gold-soft);
+  color: var(--gl-brown-mid);
+}
+
+.gl-trend {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 10px;
+  border-radius: 999px;
+  font-size: 0.74rem;
+  font-weight: 700;
+  white-space: nowrap;
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.gl-trend--up {
+  background: var(--gl-green-soft);
+  color: var(--gl-green);
+}
+
+.gl-trend--down {
+  background: #fdecec;
+  color: var(--gl-red);
+}
+
+.gl-stat__label {
+  font-size: 0.88rem;
+  color: var(--gl-muted);
+}
+
+.gl-stat__value {
+  margin-top: 4px;
+  font-family: var(--gl-heading-font);
+  font-size: 2.1rem;
+  font-weight: 700;
+  color: var(--gl-brown);
+}
+
+.gl-stat__note {
+  margin-top: 4px;
+  font-size: 0.82rem;
+  color: var(--gl-muted);
+}
+
+/* Panels */
+.gl-grid {
+  display: grid;
+  gap: 20px;
+  align-items: stretch; /* ek line ke dono panel barabar unche */
+  grid-template-columns: minmax(0, 1.75fr) minmax(0, 1fr);
+}
+
+.gl-side {
+  display: grid;
+  gap: 20px;
+}
+
+.gl-panel {
+  display: flex;
+  flex-direction: column;
+  padding: 22px;
+}
+
+.gl-panel h3,
+.gl-block__title {
+  font-family: var(--gl-heading-font);
+  font-size: 1.2rem;
+  color: var(--gl-brown);
+}
+
+.gl-panel > h3 {
+  margin-bottom: 14px;
+}
+
+.gl-panel__head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-bottom: 14px;
+}
+
+.gl-panel__sub {
+  margin-top: 2px;
+  font-size: 0.84rem;
+  color: var(--gl-muted);
+}
+
+.gl-block {
+  margin-top: 28px;
+}
+
+.gl-block__title {
+  margin-bottom: 14px;
+}
+
+.gl-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.gl-list > li + li {
+  border-top: 1px solid var(--gl-line);
+}
+
+/* Appointments table */
+.gl-tablewrap {
+  overflow-x: auto;
+}
+
+.gl-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.92rem;
+}
+
+.gl-table th {
+  padding: 10px 12px;
+  border-bottom: 1px solid var(--gl-line);
+  background: #fbf7f2;
+  color: var(--gl-muted);
+  font-size: 0.74rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-align: left;
+  text-transform: uppercase;
+}
+
+.gl-table th:first-child {
+  border-radius: 10px 0 0 10px;
+}
+
+.gl-table th:last-child {
+  border-radius: 0 10px 10px 0;
+}
+
+.gl-table td {
+  padding: 12px;
+  border-bottom: 1px solid var(--gl-line);
+  vertical-align: middle;
+}
+
+.gl-table tbody tr {
+  transition: background 0.15s;
+}
+
+.gl-table tbody tr:hover {
+  background: #fdfaf5;
+}
+
+.gl-table tbody tr:last-child td {
+  border-bottom: 0;
+}
+
+.gl-time {
+  display: block;
+  color: var(--gl-brown-mid);
+  white-space: nowrap;
+}
+
+.gl-table__sub {
+  font-size: 0.76rem;
+  color: var(--gl-muted);
+}
+
+.gl-person {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-weight: 600;
+  white-space: nowrap; /* naam ek hi line me */
+}
+
+/* Status badges: rang + chhota dot + likha hua text */
+.gl-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 12px 4px 10px;
+  border-radius: 999px;
+  font-size: 0.76rem;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.gl-badge__dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: currentColor;
+}
+
+.gl-badge--confirmed,
+.gl-badge--available {
+  background: var(--gl-green-soft);
+  color: var(--gl-green);
+}
+
+.gl-badge--waiting {
+  background: var(--gl-gold-soft);
+  color: #7a5400;
+}
+
+.gl-badge--in-service {
+  background: #efe0d0;
+  color: var(--gl-brown);
+}
+
+.gl-badge--completed {
+  background: #e8efe9;
+  color: #4b6b53;
+}
+
+.gl-badge--on-leave {
+  background: #efe9e2;
+  color: #6f5a47;
+}
+
+.gl-badge--cancelled {
+  background: #fdecec;
+  color: var(--gl-red);
+}
+
+/* Today's schedule */
+.gl-summary__total {
+  font-family: var(--gl-heading-font);
+  font-size: 1.8rem;
+  font-weight: 700;
+  color: var(--gl-brown);
+}
+
+.gl-summary__total span {
+  font-family: 'Inter', system-ui, sans-serif;
+  font-size: 0.85rem;
+  font-weight: 500;
+  color: var(--gl-muted);
+}
+
+.gl-summary__bar {
+  display: flex;
+  gap: 3px;
+  height: 12px;
+  margin: 12px 0 14px;
+}
+
+.gl-seg {
+  min-width: 6px;
+  border-radius: 6px;
+}
+
+.gl-seg--completed {
+  background: #7f9f86;
+}
+
+.gl-seg--in-service {
+  background: var(--gl-brown-mid);
+}
+
+.gl-seg--confirmed {
+  background: var(--gl-gold);
+}
+
+.gl-seg--waiting {
+  background: #e7d3a0;
+}
+
+.gl-summary__legend {
+  display: grid;
+  gap: 8px;
+  grid-template-columns: 1fr 1fr;
+  list-style: none;
+  padding: 0;
+  font-size: 0.86rem;
+}
+
+.gl-summary__legend li {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.gl-summary__legend strong {
+  margin-left: auto;
+}
+
+.gl-summary__dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+}
+
+/* Staff list */
+.gl-staff {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 0;
+}
+
+.gl-staff__body {
+  flex: 1;
+  min-width: 0;
+}
+
+.gl-staff__name {
+  font-size: 0.92rem;
+  font-weight: 600;
+}
+
+.gl-staff__role {
+  font-size: 0.78rem;
+  color: var(--gl-muted);
+}
+
+/* Activity */
+.gl-activity {
+  display: flex;
+  gap: 14px;
+  align-items: flex-start;
+  padding: 12px 0;
+}
+
+.gl-activity__icon {
+  flex: none;
+  display: grid;
+  place-items: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: var(--gl-beige);
+  color: var(--gl-brown-mid);
+}
+
+.gl-activity__text {
+  font-size: 0.92rem;
+}
+
+.gl-activity__time {
+  margin-top: 2px;
+  font-size: 0.8rem;
+  color: var(--gl-muted);
+}
+
+/* Revenue chart */
+.gl-chart__head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-bottom: 18px;
+}
+
+.gl-chart__total {
+  font-family: var(--gl-heading-font);
+  font-size: 1.7rem;
+  font-weight: 700;
+  color: var(--gl-brown);
+}
+
+.gl-chart__total span {
+  font-family: 'Inter', system-ui, sans-serif;
+  font-size: 0.85rem;
+  font-weight: 500;
+  color: var(--gl-muted);
+}
+
+.gl-chart__root {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+}
+
+.gl-chart {
+  display: grid;
+  flex: 1; /* panel ke bachi hui jagah me failta hai */
+  min-height: 210px;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 12px;
+}
+
+.gl-chart__col {
+  display: grid;
+  grid-template-rows: 1fr auto;
+  gap: 8px;
+  justify-items: center;
+}
+
+.gl-chart__track {
+  position: relative;
+  display: flex;
+  align-items: flex-end;
+  width: 100%;
+  min-height: 170px;
+  border-radius: 10px;
+  /* peeche halki aadi lakeeren (gridlines) */
+  background: repeating-linear-gradient(to top, transparent 0 calc(25% - 1px), var(--gl-line) calc(25% - 1px) 25%);
+}
+
+.gl-chart__bar {
+  width: 100%;
+  border-radius: 10px 10px 4px 4px;
+  background: linear-gradient(to top, var(--gl-brown-mid), #b58862);
+  transform-origin: bottom;
+  animation: gl-grow 0.7s ease-out both;
+  animation-delay: var(--delay, 0ms);
+  transition: filter 0.15s;
+}
+
+.gl-chart__col:hover .gl-chart__bar {
+  filter: brightness(1.12);
+}
+
+.gl-chart__bar--today {
+  background: linear-gradient(to top, #b8892a, #e0be68);
+}
+
+/* Hover par exact rakam */
+.gl-chart__tip {
+  position: absolute;
+  top: -34px;
+  left: 50%;
+  z-index: 2;
+  padding: 4px 9px;
+  border-radius: 8px;
+  background: var(--gl-espresso);
+  color: #fff;
+  font-size: 0.74rem;
+  font-weight: 600;
+  white-space: nowrap;
+  opacity: 0;
+  pointer-events: none;
+  transform: translateX(-50%) translateY(4px);
+  transition: opacity 0.15s, transform 0.15s;
+}
+
+.gl-chart__col:hover .gl-chart__tip {
+  opacity: 1;
+  transform: translateX(-50%);
+}
+
+.gl-chart__day {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--gl-muted);
+}
+
+/* Popular services (photo cards) */
+.gl-services {
+  display: grid;
+  gap: 16px;
+  grid-template-columns: repeat(auto-fit, minmax(min(240px, 100%), 1fr));
+}
+
+.gl-service {
+  position: relative;
+  overflow: hidden;
+  aspect-ratio: 4 / 3;
+  border-radius: var(--gl-radius);
+  background: var(--gl-espresso);
+  box-shadow: var(--gl-shadow);
+}
+
+.gl-service img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.5s ease;
+}
+
+.gl-service:hover img {
+  transform: scale(1.06);
+}
+
+.gl-service__shade {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to top, rgba(46, 27, 15, 0.88) 0%, rgba(46, 27, 15, 0.1) 60%);
+}
+
+.gl-service__body {
+  position: absolute;
+  left: 18px;
+  right: 18px;
+  bottom: 16px;
+  color: #fff;
+}
+
+.gl-service__body h4 {
+  font-family: var(--gl-heading-font);
+  font-size: 1.15rem;
+}
+
+.gl-service__body p {
+  margin-top: 2px;
+  font-size: 0.84rem;
+  color: #f1e6d9;
+}
+
+/* Jo pages abhi bane nahi */
+.gl-soon {
+  max-width: 640px;
+  padding: 24px;
+}
+
+/* ---------- 7. Animations (halke aur tez) ---------- */
+@keyframes gl-fade-up {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes gl-grow {
+  from {
+    transform: scaleY(0);
+  }
+  to {
+    transform: scaleY(1);
+  }
+}
+
+@keyframes gl-pop-in {
+  from {
+    opacity: 0;
+    transform: translateY(-6px) scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes gl-overlay-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes gl-toast-in {
+  from {
+    opacity: 0;
+    transform: translateX(-50%) translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(-50%);
+  }
+}
+
+.gl-fade-up {
+  animation: gl-fade-up 0.5s ease-out both;
+  animation-delay: var(--delay, 0ms);
+}
+
+/* Jinhe animation se dikkat hoti hai (phone/computer ki "reduce motion" setting), unke liye sab band */
+@media (prefers-reduced-motion: reduce) {
+  .gl-app *,
+  .gl-app *::before,
+  .gl-app *::after,
+  .gl-modal-overlay,
+  .gl-toast {
+    animation: none !important;
+    transition: none !important;
+  }
+}
+
+/* ---------- 8. Responsive ---------- */
+
+/* Chhote laptop aur tablet: panels ek ke neeche ek */
+@media (max-width: 1099px) {
+  .gl-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .gl-side {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+/* Tablet aur mobile: sidebar chhup jaata hai aur hamburger se khulta hai */
+@media (max-width: 1023px) {
+  .gl-app {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .gl-sidebar {
+    position: fixed;
+    inset: 0 auto 0 0;
+    z-index: 40;
+    width: 280px;
+    max-width: 85vw;
+    height: 100dvh;
+    transform: translateX(-100%);
+    /* Band drawer ke links tab/screen-reader se bhi na milen */
+    visibility: hidden;
+    transition: transform 0.25s ease, visibility 0s linear 0.25s;
+  }
+
+  .gl-sidebar--open {
+    transform: none;
+    visibility: visible;
+    transition: transform 0.25s ease, visibility 0s;
+  }
+
+  .gl-backdrop {
+    position: fixed;
+    inset: 0;
+    z-index: 30;
+    border: 0;
+    background: rgba(46, 27, 15, 0.55);
+  }
+
+  .gl-app .gl-header__menu {
+    display: inline-flex;
+  }
+
+  .gl-header {
+    flex-wrap: wrap;
+    padding: 12px 20px;
+  }
+
+  /* Search box neeche ki line me poori chaudai me */
+  .gl-search {
+    order: 3;
+    width: 100%;
+    flex: 1 1 100%;
+  }
+
+  .gl-content {
+    padding: 20px 20px 40px;
+  }
+
+  .gl-banner {
+    margin: 16px 20px 0;
+  }
+}
+
+/* Mobile */
+@media (max-width: 720px) {
+  .gl-side {
+    grid-template-columns: 1fr;
+  }
+
+  .gl-form__row {
+    grid-template-columns: 1fr;
+  }
+
+  /* Table ki jagah har row ek card: thead chhup jaata hai, har cell ke aage uska naam (data-label) dikhta hai */
+  .gl-table thead {
+    position: absolute;
+    left: -9999px;
+  }
+
+  .gl-table,
+  .gl-table tbody,
+  .gl-table tr,
+  .gl-table td {
+    display: block;
+    width: 100%;
+  }
+
+  .gl-table tr {
+    margin-bottom: 12px;
+    padding: 6px 14px;
+    border: 1px solid var(--gl-line);
+    border-radius: 14px;
+    background: #fff;
+  }
+
+  .gl-table tbody tr:hover {
+    background: #fff;
+  }
+
+  .gl-table td {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
+    padding: 10px 0;
+    text-align: right;
+  }
+
+  .gl-table td::before {
+    content: attr(data-label);
+    flex: none;
+    font-size: 0.74rem;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--gl-muted);
+  }
+
+  .gl-table tbody tr:last-child td {
+    border-bottom: 1px solid var(--gl-line);
+  }
+
+  .gl-table tr td:last-child {
+    border-bottom: 0;
+  }
+}
+
+@media (max-width: 599px) {
+  .gl-header {
+    padding: 10px 12px;
+    gap: 10px;
+  }
+
+  .gl-header__title h1 {
+    font-size: 1.25rem;
+  }
+
+  .gl-content {
+    padding: 16px 12px 32px;
+  }
+
+  .gl-banner {
+    margin: 12px 12px 0;
+  }
+
+  /* Naam ka text chhupa do; sirf gola aur teer rakho */
+  .gl-header__who {
+    display: none;
+  }
+
+  .gl-hero {
+    padding: 24px 18px;
+  }
+
+  .gl-hero__action,
+  .gl-hero__action .gl-btn {
+    width: 100%;
+  }
+
+  .gl-panel {
+    padding: 16px;
+  }
+
+  .gl-panel__head .gl-btn {
+    width: 100%;
+  }
+
+  .gl-chart {
+    gap: 6px;
+  }
+
+  .gl-chart__track {
+    min-height: 120px;
+  }
+
+  .gl-pop__panel--wide {
+    position: fixed;
+    top: 72px;
+    left: 12px;
+    right: 12px;
+    width: auto;
+  }
+}
+
+/* ---------- Responsive MUI tables (components/ResponsiveTable.jsx) ----------
+   720px se kam: thead chhup jata he, har row ek card, har cell ke aage uska header (data-label). */
+@media (max-width: 720px) {
+  .MuiTableContainer-root:has(> .gl-rtable) {
+    background: transparent;
+    box-shadow: none;
+    border: 0;
+    overflow: visible;
+  }
+
+  .gl-rtable thead {
+    position: absolute;
+    left: -9999px;
+  }
+
+  .gl-rtable,
+  .gl-rtable tbody,
+  .gl-rtable tr,
+  .gl-rtable td {
+    display: block;
+    width: 100%;
+  }
+
+  .gl-rtable tr {
+    margin-bottom: 12px;
+    padding: 4px 14px;
+    border: 1px solid var(--gl-line, #eadfd3);
+    border-radius: 14px;
+    background: #fff;
+  }
+
+  .gl-rtable td.MuiTableCell-root {
+    display: flex;
+    flex-direction: row; /* MUI align=right cells ko row-reverse deta he */
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
+    padding: 10px 0;
+    border-bottom: 1px solid var(--gl-line, #eadfd3);
+    text-align: right;
+    overflow-wrap: anywhere;
+    white-space: normal;
+  }
+
+  .gl-rtable td.MuiTableCell-root:last-child {
+    border-bottom: 0;
+  }
+
+  .gl-rtable td[data-label]::before {
+    content: attr(data-label);
+    flex: none;
+    max-width: 45%;
+    font-size: 0.74rem;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    text-align: left;
+    text-transform: uppercase;
+    color: var(--gl-muted, #7a6150);
+  }
+
+  /* Bina header wale cell (actions) poori chaudai me, buttons wrap hon */
+  .gl-rtable td.MuiTableCell-root:not([data-label]) {
+    flex-wrap: wrap;
+    justify-content: flex-end;
+  }
+}
+
+/* Tablet aur chhota laptop (721-1279px): table ko container me samane ke liye cell padding thodi kam */
+@media (min-width: 721px) and (max-width: 1279px) {
+  .gl-rtable .MuiTableCell-root {
+    padding-inline: 8px;
+  }
+}

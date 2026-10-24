@@ -1,0 +1,30 @@
+{
+  "expo": {
+    "name": "Glamora",
+    "slug": "glamora-mobile",
+    "scheme": "glamora",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/icon.png",
+    "userInterfaceStyle": "light",
+    "backgroundColor": "#faf6f1",
+    "android": {
+      "package": "com.glamora.salon",
+      "allowBackup": false,
+      "adaptiveIcon": {
+        "backgroundColor": "#2e1b0f",
+        "foregroundImage": "./assets/android-icon-foreground.png",
+        "backgroundImage": "./assets/android-icon-background.png",
+        "monochromeImage": "./assets/android-icon-monochrome.png"
+      }
+    },
+    "web": {
+      "favicon": "./assets/favicon.png"
+    },
+    "plugins": [
+      "expo-secure-store",
+      "expo-font",
+      "expo-status-bar"
+    ]
+  }
+}

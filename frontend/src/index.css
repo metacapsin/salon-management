@@ -1,0 +1,13 @@
+/* Poore page ki basic styling, har page par lagti hai. */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: system-ui, 'Segoe UI', Roboto, sans-serif;
+  background: #faf6f1;
+  color: #5c3b22;
+}

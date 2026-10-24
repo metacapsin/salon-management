@@ -1,0 +1,1330 @@
+/* =====================================================================
+   Glamora landing page (public website) styling. Plain CSS.
+   Saare class naam "lp-" se shuru hote hain (landing page), taaki baaki app ki CSS se na takraayein.
+   Rang pehle "variables" me: ek jagah badlo, poori website me badal jaye.
+
+   Fehrist: 1 Base  2 Buttons  3 Navbar  4 Hero  5 Preview window  6 Sections (features, services, benefits, about)
+            7 CTA  8 Contact  9 Footer  10 Reveal animation  11 Responsive
+   ===================================================================== */
+
+/* Menu ke link dabane par page jhatke se nahi, narmi se scroll ho */
+html:has(.lp) {
+  scroll-behavior: smooth;
+}
+
+/* ---------- 1. Base ---------- */
+.lp {
+  --lp-espresso: #2e1b0f;
+  --lp-brown: #5c3b22;
+  --lp-brown-mid: #8b5e3c;
+  --lp-gold: #c9a24a;
+  --lp-gold-deep: #a97f2a;
+  --lp-gold-soft: #f3e7c9;
+  --lp-cream: #faf6f1;
+  --lp-beige: #f1e7da;
+  --lp-line: #eadfd3;
+  --lp-ink: #3a2415;
+  --lp-muted: #6f5a47;
+  --lp-heading: 'Playfair Display', Georgia, serif;
+
+  background: var(--lp-cream);
+  color: var(--lp-ink);
+  font-family: 'Inter', system-ui, 'Segoe UI', Roboto, sans-serif;
+  line-height: 1.6;
+  overflow-x: clip;
+}
+
+.lp *,
+.lp *::before,
+.lp *::after {
+  box-sizing: border-box;
+}
+
+:where(.lp) :where(h1, h2, h3, p, ul) {
+  margin: 0;
+}
+
+:where(.lp) ul {
+  padding: 0;
+  list-style: none;
+}
+
+.lp img {
+  display: block;
+  max-width: 100%;
+}
+
+.lp a {
+  color: inherit;
+}
+
+.lp-container {
+  width: 100%;
+  max-width: 1180px;
+  margin: 0 auto;
+  padding: 0 24px;
+}
+
+/* Keyboard se chalne walon ko dikhna chahiye ki focus kahan hai */
+.lp a:focus-visible,
+.lp button:focus-visible,
+.lp input:focus-visible,
+.lp textarea:focus-visible {
+  outline: 3px solid var(--lp-gold);
+  outline-offset: 3px;
+}
+
+.lp-skip {
+  position: absolute;
+  left: 16px;
+  top: -60px;
+  z-index: 100;
+  padding: 10px 16px;
+  border-radius: 10px;
+  background: var(--lp-gold);
+  color: var(--lp-espresso);
+  font-weight: 700;
+  text-decoration: none;
+  transition: top 0.15s;
+}
+
+.lp-skip:focus {
+  top: 12px;
+}
+
+/* Section ke andar common cheezein */
+.lp-section {
+  padding: 96px 0;
+  scroll-margin-top: 72px; /* navbar ke neeche chhup na jaye */
+}
+
+.lp-section--beige {
+  background: var(--lp-beige);
+}
+
+.lp-section--dark {
+  background: radial-gradient(1200px 500px at 80% -10%, rgba(201, 162, 74, 0.16), transparent 60%), var(--lp-espresso);
+  color: #f1e6d9;
+}
+
+.lp-section-head {
+  max-width: 680px;
+  margin-bottom: 48px;
+}
+
+.lp-section-head--center {
+  margin-left: auto;
+  margin-right: auto;
+  text-align: center;
+}
+
+.lp-section-head h2,
+.lp-about__copy h2,
+.lp-contact__copy h2 {
+  font-family: var(--lp-heading);
+  font-size: clamp(1.9rem, 3.6vw, 2.8rem);
+  line-height: 1.2;
+  color: var(--lp-brown);
+}
+
+.lp-section--dark .lp-section-head h2 {
+  color: #fff;
+}
+
+.lp-section-head p:not(.lp-eyebrow) {
+  margin-top: 14px;
+  font-size: 1.08rem;
+  color: var(--lp-muted);
+}
+
+.lp-section--dark .lp-section-head p:not(.lp-eyebrow) {
+  color: #e4d4c2;
+}
+
+.lp-eyebrow {
+  margin-bottom: 12px;
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--lp-gold);
+}
+
+.lp-eyebrow--dark {
+  color: var(--lp-gold-deep);
+}
+
+/* ---------- 2. Buttons ---------- */
+.lp-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: 46px; /* ungli se dabane layak */
+  padding: 0 22px;
+  border: 1.5px solid transparent;
+  border-radius: 999px;
+  font: inherit;
+  font-weight: 600;
+  text-decoration: none;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: transform 0.18s ease, box-shadow 0.18s ease, background 0.18s ease, border-color 0.18s ease;
+}
+
+.lp-btn--sm {
+  min-height: 44px;
+  padding: 0 20px;
+  font-size: 0.92rem;
+}
+
+.lp-btn--lg {
+  min-height: 54px;
+  padding: 0 30px;
+  font-size: 1.02rem;
+}
+
+/* Gold = sabse zaroori button (Get Started) */
+.lp-btn--gold {
+  background: linear-gradient(180deg, #dcb961, var(--lp-gold));
+  color: var(--lp-espresso);
+  box-shadow: 0 8px 22px rgba(169, 127, 42, 0.38);
+}
+
+.lp-btn--gold:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 14px 30px rgba(169, 127, 42, 0.46);
+}
+
+.lp-btn--glass {
+  border-color: rgba(255, 255, 255, 0.5);
+  background: rgba(255, 255, 255, 0.1);
+  color: #fff;
+  backdrop-filter: blur(6px);
+}
+
+.lp-btn--glass:hover {
+  background: rgba(255, 255, 255, 0.2);
+  transform: translateY(-2px);
+}
+
+.lp-btn--outline {
+  border-color: var(--lp-line);
+  background: #fff;
+  color: var(--lp-brown);
+}
+
+.lp-btn--dark {
+  background: var(--lp-espresso);
+  color: #fff;
+}
+
+.lp-btn--dark:hover {
+  background: var(--lp-brown);
+  transform: translateY(-2px);
+}
+
+/* ---------- 3. Navbar ---------- */
+.lp-nav {
+  position: fixed;
+  inset: 0 0 auto 0;
+  z-index: 50;
+  color: #fff;
+  transition: background 0.25s ease, box-shadow 0.25s ease;
+}
+
+.lp-nav--solid {
+  background: rgba(46, 27, 15, 0.94);
+  backdrop-filter: blur(10px);
+  box-shadow: 0 6px 24px rgba(0, 0, 0, 0.18);
+}
+
+.lp-nav__inner {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+  min-height: 72px;
+}
+
+.lp-nav__brand {
+  text-decoration: none;
+}
+
+.lp-logo {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.lp-logo__mark {
+  display: grid;
+  place-items: center;
+  width: 38px;
+  height: 38px;
+  border-radius: 12px;
+  background: linear-gradient(145deg, #e3c26f, var(--lp-gold-deep));
+  color: var(--lp-espresso);
+  font-family: var(--lp-heading);
+  font-size: 1.4rem;
+  font-weight: 700;
+}
+
+.lp-logo__name {
+  font-family: var(--lp-heading);
+  font-size: 1.6rem;
+  font-weight: 700;
+  color: #fff;
+}
+
+.lp-nav__links {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  margin: 0 auto;
+}
+
+.lp-nav__links > a {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  padding: 0 14px;
+  border-radius: 999px;
+  font-size: 0.95rem;
+  font-weight: 500;
+  text-decoration: none;
+  color: rgba(255, 255, 255, 0.9);
+  transition: background 0.18s, color 0.18s;
+}
+
+.lp-nav__links > a:hover {
+  background: rgba(255, 255, 255, 0.12);
+  color: var(--lp-gold);
+}
+
+.lp-nav__mobile-actions {
+  display: none;
+}
+
+.lp-nav__actions {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.lp-nav__login {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  padding: 0 6px;
+  font-weight: 600;
+  text-decoration: none;
+  color: #fff;
+}
+
+.lp-nav__login:hover {
+  color: var(--lp-gold);
+}
+
+.lp-nav__toggle {
+  display: none;
+  place-items: center;
+  width: 46px;
+  height: 46px;
+  margin-left: auto;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  border-radius: 12px;
+  background: transparent;
+  color: #fff;
+  cursor: pointer;
+}
+
+/* ---------- 4. Hero ---------- */
+.lp-hero {
+  position: relative;
+  display: flex;
+  align-items: center;
+  min-height: max(100vh, 680px);
+  padding: 120px 0 96px;
+  color: #fff;
+  background: var(--lp-espresso);
+  overflow: hidden;
+  scroll-margin-top: 0;
+}
+
+.lp-hero__image {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+}
+
+/* Gehra parda: left me zyada (text ke neeche), right me kam (photo dikhe) */
+.lp-hero__shade {
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(100deg, rgba(36, 21, 11, 0.94) 0%, rgba(36, 21, 11, 0.78) 45%, rgba(36, 21, 11, 0.35) 100%),
+    linear-gradient(to top, rgba(36, 21, 11, 0.7), transparent 35%);
+}
+
+.lp-hero__inner {
+  position: relative;
+  display: grid;
+  grid-template-columns: minmax(0, 1.25fr) minmax(0, 0.75fr);
+  gap: 48px;
+  align-items: center;
+}
+
+.lp-hero h1 {
+  font-family: var(--lp-heading);
+  font-size: clamp(2.6rem, 6.2vw, 4.8rem);
+  font-weight: 700;
+  line-height: 1.08;
+  letter-spacing: -0.01em;
+}
+
+.lp-hero h1 em {
+  display: block;
+  color: var(--lp-gold);
+  font-style: italic;
+}
+
+.lp-hero__text {
+  max-width: 560px;
+  margin-top: 22px;
+  font-size: 1.15rem;
+  color: #f1e6d9;
+}
+
+.lp-hero__buttons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 14px;
+  margin-top: 34px;
+}
+
+.lp-hero__ticks {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 24px;
+  margin-top: 28px;
+  font-size: 0.92rem;
+  color: #e8d9c6;
+}
+
+.lp-hero__ticks li {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.lp-hero__ticks svg {
+  color: var(--lp-gold);
+}
+
+/* Sajawati glass card */
+.lp-hero__card {
+  justify-self: end;
+  width: min(360px, 100%);
+  padding: 22px;
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  border-radius: 24px;
+  background: rgba(255, 255, 255, 0.12);
+  backdrop-filter: blur(14px);
+  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.35);
+  animation: lp-float 6s ease-in-out infinite;
+}
+
+.lp-hero__card-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 14px;
+  font-weight: 600;
+  color: var(--lp-gold);
+}
+
+.lp-hero__card li {
+  display: grid;
+  grid-template-columns: 52px 1fr auto;
+  align-items: center;
+  gap: 10px;
+  padding: 11px 0;
+  border-top: 1px solid rgba(255, 255, 255, 0.16);
+}
+
+.lp-hero__card li span {
+  font-weight: 700;
+  color: #f3e1b3;
+}
+
+.lp-hero__card li strong,
+.lp-hero__card li small {
+  display: block;
+}
+
+.lp-hero__card li small {
+  font-size: 0.78rem;
+  color: #e4d4c2;
+}
+
+.lp-hero__card li em {
+  padding: 3px 10px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.18);
+  font-size: 0.72rem;
+  font-style: normal;
+  font-weight: 700;
+}
+
+.lp-hero__card-note {
+  margin-top: 8px;
+  font-size: 0.72rem;
+  color: #d8c6b2;
+}
+
+/* ---------- 5. Preview window ---------- */
+.lp-preview {
+  padding: 96px 0 24px;
+  scroll-margin-top: 72px;
+}
+
+.lp-window {
+  max-width: 980px;
+  margin: 0 auto;
+  overflow: hidden;
+  border: 1px solid var(--lp-line);
+  border-radius: 22px;
+  background: #fff;
+  box-shadow: 0 30px 70px rgba(46, 27, 15, 0.2);
+}
+
+.lp-window__bar {
+  display: flex;
+  gap: 7px;
+  padding: 14px 18px;
+  background: #f4ece1;
+  border-bottom: 1px solid var(--lp-line);
+}
+
+.lp-window__bar span {
+  width: 11px;
+  height: 11px;
+  border-radius: 50%;
+  background: #d9c8b3;
+}
+
+.lp-window__body {
+  display: grid;
+  grid-template-columns: 64px minmax(0, 1fr);
+  min-height: 340px;
+}
+
+.lp-window__side {
+  display: grid;
+  align-content: start;
+  justify-items: center;
+  gap: 14px;
+  padding: 18px 0;
+  background: var(--lp-espresso);
+  color: #cdb99f;
+}
+
+.lp-window__side b {
+  display: grid;
+  place-items: center;
+  width: 34px;
+  height: 34px;
+  margin-bottom: 6px;
+  border-radius: 10px;
+  background: var(--lp-gold);
+  color: var(--lp-espresso);
+  font-family: var(--lp-heading);
+}
+
+.lp-window__side i:first-of-type {
+  color: var(--lp-gold);
+}
+
+.lp-window__main {
+  display: grid;
+  gap: 14px;
+  padding: 18px;
+  background: var(--lp-cream);
+}
+
+.lp-window__tiles {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 12px;
+}
+
+.lp-tile {
+  display: grid;
+  gap: 2px;
+  padding: 12px;
+  border: 1px solid var(--lp-line);
+  border-radius: 14px;
+  background: #fff;
+  color: var(--lp-brown-mid);
+}
+
+.lp-tile small,
+.lp-panel > small {
+  font-size: 0.7rem;
+  color: var(--lp-muted);
+}
+
+.lp-tile strong {
+  font-family: var(--lp-heading);
+  font-size: 1.25rem;
+  color: var(--lp-brown);
+}
+
+.lp-window__panels {
+  display: grid;
+  grid-template-columns: 1.3fr 1fr;
+  gap: 12px;
+}
+
+.lp-panel {
+  padding: 14px;
+  border: 1px solid var(--lp-line);
+  border-radius: 14px;
+  background: #fff;
+}
+
+.lp-row {
+  display: grid;
+  grid-template-columns: 44px 1fr auto;
+  align-items: center;
+  gap: 8px;
+  padding: 9px 0;
+  border-top: 1px solid var(--lp-line);
+  font-size: 0.82rem;
+}
+
+.lp-row > span {
+  font-weight: 700;
+  color: var(--lp-brown-mid);
+}
+
+.lp-row strong,
+.lp-row small {
+  display: block;
+}
+
+.lp-row small {
+  font-size: 0.7rem;
+  color: var(--lp-muted);
+}
+
+.lp-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+}
+
+.lp-dot--brown {
+  background: var(--lp-brown-mid);
+}
+
+.lp-dot--green {
+  background: #2f6b3a;
+}
+
+.lp-dot--gold {
+  background: var(--lp-gold);
+}
+
+.lp-bars {
+  display: flex;
+  align-items: flex-end;
+  gap: 8px;
+  height: 130px;
+  margin-top: 10px;
+}
+
+.lp-bars i {
+  flex: 1;
+  border-radius: 6px 6px 3px 3px;
+  background: linear-gradient(to top, var(--lp-brown-mid), #b58862);
+}
+
+.lp-bars i.is-gold {
+  background: linear-gradient(to top, #b8892a, #e0be68);
+}
+
+.lp-caption {
+  margin-top: 14px;
+  text-align: center;
+  font-size: 0.82rem;
+  color: var(--lp-muted);
+}
+
+/* ---------- 6. Sections ---------- */
+/* Features */
+.lp-features {
+  display: grid;
+  gap: 24px;
+  grid-template-columns: repeat(auto-fit, minmax(min(310px, 100%), 1fr));
+}
+
+.lp-features .lp-reveal {
+  display: flex;
+}
+
+.lp-feature {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  padding: 30px;
+  border: 1px solid var(--lp-line);
+  border-radius: 22px;
+  background: #fff;
+  box-shadow: 0 1px 2px rgba(58, 36, 21, 0.04), 0 14px 32px rgba(58, 36, 21, 0.06);
+  transition: transform 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease;
+}
+
+.lp-feature:hover {
+  transform: translateY(-6px);
+  border-color: #dfc9a4;
+  box-shadow: 0 2px 4px rgba(58, 36, 21, 0.05), 0 26px 50px rgba(58, 36, 21, 0.13);
+}
+
+.lp-feature__icon,
+.lp-benefit__icon {
+  display: grid;
+  place-items: center;
+  width: 54px;
+  height: 54px;
+  margin-bottom: 20px;
+  border-radius: 16px;
+  background: var(--lp-gold-soft);
+  color: var(--lp-brown-mid);
+}
+
+.lp-feature h3 {
+  font-family: var(--lp-heading);
+  font-size: 1.35rem;
+  color: var(--lp-brown);
+}
+
+.lp-feature p {
+  margin-top: 10px;
+  color: var(--lp-muted);
+}
+
+.lp-feature ul {
+  display: grid;
+  gap: 8px;
+  margin-top: auto;
+  padding-top: 20px;
+  font-size: 0.93rem;
+  font-weight: 500;
+}
+
+.lp-feature li {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.lp-feature li svg {
+  flex: none;
+  color: var(--lp-gold-deep);
+}
+
+/* Services: photo cards */
+.lp-types {
+  display: grid;
+  gap: 20px;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+
+.lp-type {
+  position: relative;
+  overflow: hidden;
+  aspect-ratio: 3 / 4;
+  border-radius: 22px;
+  background: var(--lp-espresso);
+  box-shadow: 0 14px 34px rgba(58, 36, 21, 0.18);
+}
+
+.lp-type img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.6s ease;
+}
+
+.lp-type:hover img {
+  transform: scale(1.07);
+}
+
+.lp-type__shade {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to top, rgba(36, 21, 11, 0.92) 0%, rgba(36, 21, 11, 0.25) 55%, transparent 100%);
+}
+
+.lp-type__body {
+  position: absolute;
+  inset: auto 20px 20px 20px;
+  color: #fff;
+}
+
+.lp-type__body h3 {
+  font-family: var(--lp-heading);
+  font-size: 1.35rem;
+}
+
+.lp-type__body p {
+  margin-top: 6px;
+  font-size: 0.9rem;
+  color: #f1e6d9;
+}
+
+/* Benefits */
+.lp-benefits {
+  display: grid;
+  gap: 20px;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.lp-benefits .lp-reveal {
+  display: flex;
+}
+
+.lp-benefit {
+  flex: 1;
+  padding: 28px;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 22px;
+  background: rgba(255, 255, 255, 0.05);
+  transition: background 0.25s, border-color 0.25s, transform 0.25s;
+}
+
+.lp-benefit:hover {
+  transform: translateY(-4px);
+  border-color: rgba(201, 162, 74, 0.5);
+  background: rgba(255, 255, 255, 0.09);
+}
+
+.lp-benefit__icon {
+  background: rgba(201, 162, 74, 0.18);
+  color: var(--lp-gold);
+}
+
+.lp-benefit h3 {
+  font-family: var(--lp-heading);
+  font-size: 1.25rem;
+  color: #fff;
+}
+
+.lp-benefit p {
+  margin-top: 8px;
+  color: #e4d4c2;
+}
+
+/* About */
+.lp-about {
+  display: grid;
+  gap: 64px;
+  align-items: center;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+}
+
+.lp-about__photo {
+  position: relative;
+  width: min(100%, 360px); /* photo thodi chhoti: column se badi nahi hoti */
+  margin-inline: auto; /* column ke beech me */
+}
+
+.lp-about__photo img {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  aspect-ratio: 4 / 4.4; /* photo portrait hai: ratio uske kareeb, taaki kate nahi */
+  object-fit: cover;
+  object-position: center 40%;
+  border-radius: 28px;
+  box-shadow: 0 26px 60px rgba(58, 36, 21, 0.22);
+}
+
+.lp-about__copy p:not(.lp-eyebrow) {
+  margin-top: 16px;
+  font-size: 1.05rem;
+  color: var(--lp-muted);
+}
+
+.lp-about__facts {
+  display: grid;
+  gap: 12px;
+  margin-top: 26px;
+  font-weight: 600;
+}
+
+.lp-about__facts li {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.lp-about__facts svg {
+  flex: none;
+  padding: 4px;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: var(--lp-gold-soft);
+  color: var(--lp-gold-deep);
+}
+
+/* ---------- 7. CTA ---------- */
+.lp-cta {
+  padding: 24px 0 96px;
+}
+
+.lp-cta__box {
+  padding: 64px 32px;
+  border-radius: 32px;
+  text-align: center;
+  color: #fff;
+  background:
+    radial-gradient(700px 300px at 85% 0%, rgba(201, 162, 74, 0.35), transparent 60%),
+    linear-gradient(135deg, var(--lp-espresso), var(--lp-brown));
+  box-shadow: 0 30px 70px rgba(46, 27, 15, 0.3);
+}
+
+.lp-cta__box h2 {
+  max-width: 640px;
+  margin: 0 auto;
+  font-family: var(--lp-heading);
+  font-size: clamp(1.9rem, 4vw, 3rem);
+  line-height: 1.2;
+}
+
+.lp-cta__box p {
+  margin-top: 14px;
+  font-size: 1.1rem;
+  color: #f1e6d9;
+}
+
+.lp-cta__buttons {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 14px;
+  margin-top: 32px;
+}
+
+/* ---------- 8. Contact ---------- */
+.lp-contact {
+  display: grid;
+  gap: 56px;
+  align-items: start;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+}
+
+.lp-contact__copy p:not(.lp-eyebrow) {
+  margin-top: 16px;
+  font-size: 1.05rem;
+  color: var(--lp-muted);
+}
+
+.lp-contact__list {
+  display: grid;
+  gap: 12px;
+  margin-top: 24px;
+  font-weight: 600;
+}
+
+.lp-contact__list li {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  color: var(--lp-brown);
+}
+
+.lp-contact__list svg {
+  color: var(--lp-gold-deep);
+}
+
+.lp-form {
+  display: grid;
+  gap: 20px;
+  width: 100%;
+  min-width: 0;
+  padding: 36px;
+  border: 1px solid var(--lp-line);
+  border-top: 4px solid var(--lp-gold);
+  border-radius: 24px;
+  background: #fff;
+  box-shadow: 0 24px 56px rgba(58, 36, 21, 0.12);
+}
+
+.lp-form__notice {
+  padding: 12px 14px;
+  border: 1.5px solid var(--lp-gold);
+  border-radius: 12px;
+  background: var(--lp-gold-soft);
+  font-size: 0.92rem;
+  color: var(--lp-brown);
+}
+
+.lp-form__notice--error {
+  border-color: #9b1c1c;
+  background: #fdecec;
+  color: #7a1616;
+}
+
+/* Email + Phone ek line me. minmax(0, 1fr) se dono barabar chaudai lete hain aur labels/inputs kabhi ek-dusre par nahi chadhte */
+.lp-form__row {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 20px;
+}
+
+.lp-field {
+  display: grid;
+  gap: 8px;
+  min-width: 0;
+}
+
+.lp-field label {
+  font-size: 0.88rem;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  line-height: 1.3;
+  color: var(--lp-brown);
+}
+
+/* Honeypot: screen par nahi dikhta (display:none nahi, taaki bot ise asli field samjhe) */
+.lp-hp {
+  position: absolute;
+  left: -9999px;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+}
+
+/* Saare input aur textarea: ek jaisi chaudai, unchai (52px) aur kone (14px) */
+.lp-field input,
+.lp-field select,
+.lp-field textarea {
+  display: block;
+  width: 100%;
+  min-width: 0;
+  min-height: 52px;
+  padding: 13px 16px;
+  border: 1.5px solid #dccbb8;
+  border-radius: 14px;
+  background: var(--lp-cream);
+  color: var(--lp-ink);
+  font: inherit;
+  line-height: 1.4;
+  transition: border-color 0.15s, box-shadow 0.15s, background 0.15s;
+}
+
+.lp-field textarea {
+  min-height: 140px;
+  resize: vertical;
+}
+
+.lp-field input:hover,
+.lp-field select:hover,
+.lp-field textarea:hover {
+  border-color: var(--lp-brown-mid);
+}
+
+.lp-field input:focus,
+.lp-field select:focus,
+.lp-field textarea:focus {
+  outline: none;
+  border-color: var(--lp-gold-deep);
+  background: #fff;
+  box-shadow: 0 0 0 4px rgba(201, 162, 74, 0.28);
+}
+
+.lp-field--error input,
+.lp-field--error select,
+.lp-field--error textarea {
+  border-color: #9b1c1c;
+}
+
+.lp-field__error {
+  font-size: 0.85rem;
+  line-height: 1.4;
+  color: #9b1c1c;
+}
+
+/* Send message button: poori chaudai, gold kinara, narm chamak */
+.lp-form .lp-btn {
+  width: 100%;
+  min-height: 56px;
+  margin-top: 4px;
+  border-color: var(--lp-gold);
+  background: linear-gradient(180deg, #3d2615, var(--lp-espresso));
+  color: var(--lp-gold-soft);
+  font-size: 1.02rem;
+  letter-spacing: 0.04em;
+  box-shadow: 0 12px 28px rgba(46, 27, 15, 0.28);
+}
+
+.lp-form .lp-btn:hover:not(:disabled) {
+  background: linear-gradient(180deg, #dcb961, var(--lp-gold));
+  color: var(--lp-espresso);
+  box-shadow: 0 16px 34px rgba(169, 127, 42, 0.4);
+}
+
+.lp-form .lp-btn:focus-visible {
+  outline: 3px solid var(--lp-gold);
+  outline-offset: 3px;
+}
+
+.lp-form .lp-btn:disabled {
+  opacity: 0.7;
+  cursor: progress;
+  transform: none;
+}
+
+/* ---------- 9. Footer ---------- */
+.lp-footer {
+  padding: 64px 0 28px;
+  background: var(--lp-espresso);
+  color: #d8c6b2;
+}
+
+.lp-footer__grid {
+  display: grid;
+  gap: 40px;
+  grid-template-columns: 2fr 1fr 1fr;
+}
+
+.lp-footer__brand p {
+  max-width: 340px;
+  margin-top: 16px;
+}
+
+.lp-footer h3 {
+  margin-bottom: 14px;
+  font-size: 0.78rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--lp-gold);
+}
+
+.lp-footer li a {
+  display: inline-flex;
+  align-items: center;
+  min-height: 36px;
+  text-decoration: none;
+  transition: color 0.15s;
+}
+
+.lp-footer li a:hover {
+  color: var(--lp-gold);
+}
+
+.lp-footer__bottom {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-top: 48px;
+  padding-top: 22px;
+  border-top: 1px solid rgba(255, 255, 255, 0.12);
+  font-size: 0.88rem;
+}
+
+.lp-footer__bottom a {
+  text-decoration: none;
+}
+
+.lp-footer__bottom a:hover {
+  color: var(--lp-gold);
+}
+
+/* ---------- 10. Animations ---------- */
+.lp-reveal {
+  opacity: 0;
+  transform: translateY(26px);
+  transition: opacity 0.7s ease, transform 0.7s ease;
+  transition-delay: var(--delay, 0ms);
+}
+
+.lp-reveal.is-visible {
+  opacity: 1;
+  transform: none;
+}
+
+@keyframes lp-float {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-8px);
+  }
+}
+
+/* Jinhe animation se dikkat hoti hai ("reduce motion" setting), unke liye sab band aur sab seedha dikhe */
+@media (prefers-reduced-motion: reduce) {
+  html:has(.lp) {
+    scroll-behavior: auto;
+  }
+  .lp *,
+  .lp *::before,
+  .lp *::after {
+    animation: none !important;
+    transition: none !important;
+  }
+  .lp-reveal {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/* ---------- 11. Responsive ---------- */
+
+/* Chhote laptop / tablet */
+@media (max-width: 1100px) {
+  .lp-types {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .lp-benefits {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .lp-hero__inner {
+    grid-template-columns: 1fr;
+  }
+  .lp-hero__card {
+    display: none; /* sirf sajawat hai, jagah kam ho to hata do */
+  }
+}
+
+/* Tablet aur mobile: links hamburger menu me */
+@media (max-width: 900px) {
+  .lp-nav__toggle {
+    display: grid;
+  }
+
+  .lp-nav__actions {
+    display: none;
+  }
+
+  .lp-nav__links {
+    position: absolute;
+    inset: 72px 0 auto 0;
+    display: none;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 2px;
+    margin: 0;
+    padding: 12px 24px 24px;
+    /* Landscape phone me menu screen se lamba na ho: andar scroll */
+    max-height: calc(100dvh - 72px);
+    overflow-y: auto;
+    background: rgba(46, 27, 15, 0.98);
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+  }
+
+  .lp-nav__links--open {
+    display: flex;
+  }
+
+  .lp-nav__links > a {
+    min-height: 48px;
+    border-radius: 12px;
+  }
+
+  .lp-nav__mobile-actions {
+    display: grid;
+    gap: 10px;
+    margin-top: 12px;
+  }
+
+  .lp-about,
+  .lp-contact {
+    grid-template-columns: 1fr;
+    gap: 48px;
+  }
+
+  .lp-about__photo {
+    width: min(100%, 320px); /* tablet/phone: ek column me, beech me */
+  }
+
+  .lp-footer__grid {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .lp-footer__brand {
+    grid-column: 1 / -1;
+  }
+
+  .lp-section {
+    padding: 72px 0;
+  }
+}
+
+/* Mobile */
+@media (max-width: 600px) {
+  .lp-container {
+    padding: 0 18px;
+  }
+
+  .lp-hero {
+    padding: 104px 0 72px;
+  }
+
+  .lp-hero__buttons .lp-btn {
+    width: 100%;
+  }
+
+  .lp-types,
+  .lp-benefits {
+    grid-template-columns: 1fr;
+  }
+
+  .lp-type {
+    aspect-ratio: 4 / 3.4;
+  }
+
+  .lp-window__body {
+    grid-template-columns: 44px minmax(0, 1fr);
+  }
+
+  .lp-window__tiles {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .lp-window__panels {
+    grid-template-columns: 1fr;
+  }
+
+  .lp-cta__box {
+    padding: 44px 20px;
+    border-radius: 24px;
+  }
+
+  .lp-cta__buttons .lp-btn {
+    width: 100%;
+  }
+
+  .lp-form {
+    padding: 22px 18px;
+    gap: 18px;
+  }
+
+  .lp-form__row {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 18px;
+  }
+
+  .lp-footer__grid {
+    grid-template-columns: 1fr;
+  }
+}
