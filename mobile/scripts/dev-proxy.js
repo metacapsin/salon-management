@@ -30,7 +30,9 @@ http
     delete headers.origin
     delete headers.referer
     const upstream = http.request(
-      { hostname: TARGET.hostname, port: TARGET.port, path: req.url, method: req.method, headers },
+      // agent: false = a fresh connection every time. The backend closes idle connections after a few seconds, and reusing
+      // such a dead one made the first request after a pause fail with 502 ("server is not responding").
+      { hostname: TARGET.hostname, port: TARGET.port, path: req.url, method: req.method, headers, agent: false },
       (up) => {
         // Drop the backend's own CORS headers (they name the website's origin); ours replace them.
         const kept = Object.fromEntries(Object.entries(up.headers).filter(([name]) => !name.startsWith('access-control-')))

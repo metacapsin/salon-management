@@ -1,5 +1,5 @@
 import { useEffect, useLayoutEffect, useState } from 'react'
-import { ActivityIndicator, FlatList, Pressable, StyleSheet, Text, TextInput, View } from 'react-native'
+import { ActivityIndicator, FlatList, Pressable, StyleSheet, Text, View } from 'react-native'
 import { useInfiniteQuery, useQuery } from '@tanstack/react-query'
 import { fetchBillingSummary } from '../../api/dashboardApi'
 import { fetchInvoices } from '../../api/billingApi'
@@ -7,9 +7,10 @@ import { friendlyError } from '../../api/client'
 import { useAuth } from '../../auth/AuthContext'
 import { roleCan } from '../../auth/permissions'
 import { FilterChips, StatusBadge } from '../../components/Chips'
-import { Card, ErrorNote, StatCard } from '../../components/Screen'
+import { Card, ErrorNote } from '../../components/Screen'
+import { SearchBox, SummaryPanel } from '../../components/Summary'
 import { EmptyState, LoadingState } from '../../components/States'
-import { COLORS, TOUCH_MIN } from '../../config/theme'
+import { COLORS } from '../../config/theme'
 import { formatPaise } from '../../utils/formatPaise'
 
 // Each chip is a ready-made set of server filters. "Void" bills are cancelled bills.
@@ -66,21 +67,17 @@ export default function BillingScreen({ navigation }) {
 
   const header = (
     <View>
-      <View style={styles.stats}>
-        <StatCard label="Total billed" value={formatPaise(s?.billed)} loading={summary.isLoading} />
-        <StatCard label="Received" value={formatPaise(s?.received)} loading={summary.isLoading} />
-        <StatCard label="Pending" value={formatPaise(s?.pending)} loading={summary.isLoading} hint={s ? `${s.pendingCount} unpaid bills` : undefined} />
-      </View>
-      <TextInput
-        accessibilityLabel="Search bills"
-        value={text}
-        onChangeText={setText}
-        placeholder="Bill number, name or phone"
-        placeholderTextColor="#a8978a"
-        autoCapitalize="none"
-        autoCorrect={false}
-        style={styles.search}
+      <SummaryPanel
+        icon="receipt"
+        label="Total billed"
+        value={formatPaise(s?.billed)}
+        loading={summary.isLoading}
+        tiles={[
+          { icon: 'checkmark-done', label: 'Received', value: formatPaise(s?.received) },
+          { icon: 'hourglass', label: 'Pending', value: formatPaise(s?.pending), hint: s ? `${s.pendingCount} unpaid` : undefined },
+        ]}
       />
+      <SearchBox accessibilityLabel="Search bills" value={text} onChangeText={setText} placeholder="Bill number, name or phone" />
       <FilterChips options={FILTERS} value={filter} onChange={setFilter} inset={0} />
       {query.isError ? <ErrorNote message={friendlyError(query.error)} onRetry={query.refetch} /> : null}
     </View>
@@ -127,8 +124,6 @@ export default function BillingScreen({ navigation }) {
 const styles = StyleSheet.create({
   screen: { flex: 1, backgroundColor: COLORS.cream },
   list: { padding: 16, paddingBottom: 24 },
-  stats: { flexDirection: 'row', flexWrap: 'wrap', gap: 12, marginBottom: 12 },
-  search: { minHeight: TOUCH_MIN, borderWidth: 1, borderColor: COLORS.line, borderRadius: 10, backgroundColor: '#fff', paddingHorizontal: 14, fontSize: 16, color: COLORS.ink },
   add: { minHeight: 44, minWidth: 44, justifyContent: 'center', paddingHorizontal: 12 },
   addText: { color: COLORS.gold, fontSize: 16, fontWeight: '700' },
   loader: { marginTop: 24 },
