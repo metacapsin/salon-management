@@ -1,11 +1,12 @@
 import { useState } from 'react'
-import { ActivityIndicator, Pressable, StyleSheet, Text, TextInput, View } from 'react-native'
+import { Pressable, StyleSheet, Text, TextInput, View } from 'react-native'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { fetchPlatformSalon, setPlatformSalonStatus } from '../../api/platformApi'
 import { friendlyError } from '../../api/client'
 import Button from '../../components/Button'
 import { StatusBadge } from '../../components/Chips'
 import { Card, ErrorNote, Screen } from '../../components/Screen'
+import { LoadingState } from '../../components/States'
 import { COLORS } from '../../config/theme'
 
 function Field({ label, children }) {
@@ -46,7 +47,7 @@ export default function AdminSalonDetailScreen({ route }) {
 
   return (
     <Screen onRefresh={query.refetch} refreshing={query.isRefetching}>
-      {query.isLoading ? <ActivityIndicator color={COLORS.brown} style={{ marginTop: 24 }} /> : null}
+      {query.isLoading ? <LoadingState /> : null}
       {query.isError ? <ErrorNote message={friendlyError(query.error)} onRetry={query.refetch} /> : null}
 
       {salon ? (

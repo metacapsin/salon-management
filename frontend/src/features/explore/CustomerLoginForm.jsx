@@ -5,6 +5,7 @@ import { requestOtp, verifyOtp } from '../../api/customerApi'
 import { useCustomer } from '../../customer/CustomerAuthContext'
 
 const PHONE = /^(91)?[6-9]\d{9}$/
+const EMAIL = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
 const NAME = /^\p{L}[\p{L} .'-]*$/u
 const onlyDigits = (v, max) => v.replace(/\D/g, '').slice(0, max)
 const onlyNameChars = (v) => v.replace(/[^\p{L} .'-]/gu, '').replace(/^[^\p{L}]+/u, '').slice(0, 60)
@@ -21,6 +22,8 @@ export default function CustomerLoginForm({ onDone, intro }) {
   const { signedIn } = useCustomer()
   const [step, setStep] = useState('phone') // phone | otp | name
   const [phone, setPhone] = useState('')
+  const [email, setEmail] = useState('')
+  const [sentTo, setSentTo] = useState('') // masked email jahan code gaya
   const [otp, setOtp] = useState('')
   const [name, setName] = useState('')
   const [devOtp, setDevOtp] = useState('')
@@ -52,9 +55,14 @@ export default function CustomerLoginForm({ onDone, intro }) {
       setErrors({ phone: 'Enter a 10 digit mobile number (or 12 digits with 91).' })
       return
     }
+    if (!EMAIL.test(email.trim())) {
+      setErrors({ email: 'Enter a valid email address. We will send the code there.' })
+      return
+    }
     setBusy(true)
     try {
-      const result = await requestOtp(phone)
+      const result = await requestOtp(phone, email.trim())
+      setSentTo(result.sentTo ?? '')
       setDevOtp(result.devOtp ?? '')
       setSecondsLeft(result.resendAfterSec)
       setOtp('')
@@ -101,7 +109,7 @@ export default function CustomerLoginForm({ onDone, intro }) {
       </Typography>
       <Typography color="text.secondary" sx={{ mt: 0.5, mb: 3 }}>
         {step === 'phone' && (intro ?? 'Log in with your mobile number to find and book salons near you.')}
-        {step === 'otp' && `We sent a 6 digit code to +91 ${shownPhone}.`}
+        {step === 'otp' && (sentTo ? `We emailed a 6 digit code to ${sentTo}. Check your inbox (and spam).` : `We sent a 6 digit code to +91 ${shownPhone}.`)}
         {step === 'name' && 'Welcome! Tell us your name so the salon knows who is coming.'}
       </Typography>
 
@@ -121,9 +129,18 @@ export default function CustomerLoginForm({ onDone, intro }) {
             onChange={(e) => setPhone(onlyDigits(e.target.value, 12))}
             onKeyDown={blockNonDigits}
             error={Boolean(errors.phone)}
-            helperText={errors.phone ?? '10 digits (or 12 with 91). We will send you a one time code.'}
+            helperText={errors.phone ?? '10 digits (or 12 with 91).'}
             autoComplete="tel-national"
             slotProps={{ htmlInput: { inputMode: 'numeric' } }}
+          />
+          <TextField
+            label="Email"
+            type="email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value.trim().slice(0, 254))}
+            error={Boolean(errors.email)}
+            helperText={errors.email ?? 'We will email you a one time code.'}
+            autoComplete="email"
           />
           <Button type="submit" variant="contained" size="large" disabled={busy} sx={{ py: 1.3, textTransform: 'none', fontWeight: 700 }}>
             {busy ? 'Sending…' : 'Send OTP'}
@@ -135,7 +152,7 @@ export default function CustomerLoginForm({ onDone, intro }) {
         <Box component="form" onSubmit={submitCode} noValidate sx={{ display: 'grid', gap: 2 }}>
           {devOtp && (
             <Alert severity="info" action={<Button color="inherit" size="small" onClick={() => setOtp(devOtp)}>Use it</Button>}>
-              Development mode: SMS is not connected yet. Your code is <strong>{devOtp}</strong>.
+              Development mode: email/SMS is not connected yet. Your code is <strong>{devOtp}</strong>.
             </Alert>
           )}
           <TextField
@@ -165,7 +182,7 @@ export default function CustomerLoginForm({ onDone, intro }) {
           </Button>
           <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
             <Button size="small" onClick={() => { setStep('phone'); setFormError(''); setErrors({}); setDevOtp('') }} sx={{ textTransform: 'none' }}>
-              Change number
+              Change number or email
             </Button>
             <Button size="small" onClick={sendCode} disabled={busy || secondsLeft > 0} sx={{ textTransform: 'none' }}>
               {secondsLeft > 0 ? `Resend code in ${secondsLeft}s` : 'Resend code'}

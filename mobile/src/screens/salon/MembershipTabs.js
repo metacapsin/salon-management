@@ -5,6 +5,7 @@ import { fetchMembers, fetchPlans } from '../../api/membershipsApi'
 import { friendlyError } from '../../api/client'
 import { FilterChips, StatusBadge } from '../../components/Chips'
 import { Card, ErrorNote } from '../../components/Screen'
+import { EmptyState, LoadingState } from '../../components/States'
 import { COLORS, TOUCH_MIN } from '../../config/theme'
 import { formatDate, formatMoney } from '../../utils/formatMoney'
 
@@ -47,7 +48,7 @@ export function PlansTab({ navigation, canWrite, salonId }) {
           {query.isError ? <ErrorNote message={friendlyError(query.error)} onRetry={query.refetch} /> : null}
         </View>
       }
-      ListEmptyComponent={query.isLoading ? <ActivityIndicator style={styles.loader} color={COLORS.brown} /> : !query.isError ? <Text style={styles.empty}>No membership plans yet.</Text> : null}
+      ListEmptyComponent={query.isLoading ? <LoadingState /> : !query.isError ? <EmptyState title="No membership plans yet" /> : null}
       renderItem={({ item }) => {
         const card = (
           <Card style={!item.active && styles.stopped}>
@@ -114,7 +115,7 @@ export function MembersTab({ navigation, salonId }) {
           {query.isError ? <ErrorNote message={friendlyError(query.error)} onRetry={query.refetch} /> : null}
         </View>
       }
-      ListEmptyComponent={query.isLoading ? <ActivityIndicator style={styles.loader} color={COLORS.brown} /> : !query.isError ? <Text style={styles.empty}>No members here.</Text> : null}
+      ListEmptyComponent={query.isLoading ? <LoadingState /> : !query.isError ? <EmptyState title="No members here" /> : null}
       ListFooterComponent={query.isFetchingNextPage ? <ActivityIndicator color={COLORS.brown} /> : null}
       renderItem={({ item }) => (
         <Pressable accessibilityRole="button" accessibilityLabel={`Open ${item.planName} of ${item.customerName}`} onPress={() => navigation.navigate('CustomerMembershipDetail', { id: item.id, title: item.planName })}>

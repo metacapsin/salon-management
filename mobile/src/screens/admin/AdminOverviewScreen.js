@@ -16,11 +16,11 @@ export default function AdminOverviewScreen() {
       {query.isError ? <ErrorNote message={friendlyError(query.error)} onRetry={query.refetch} /> : null}
 
       <View style={styles.grid}>
-        <StatCard label="Registered salons" value={stats?.total} loading={loading} />
-        <StatCard label="Active" value={stats?.active} loading={loading} />
-        <StatCard label="Suspended" value={stats?.suspended} loading={loading} />
-        <StatCard label="Public booking on" value={stats?.published} loading={loading} />
-        <StatCard label="New in 30 days" value={stats?.newLast30Days} loading={loading} />
+        <StatCard icon="storefront-outline" label="Registered salons" value={stats?.total} loading={loading} />
+        <StatCard icon="checkmark-circle-outline" label="Active" value={stats?.active} loading={loading} />
+        <StatCard icon="pause-circle-outline" label="Suspended" value={stats?.suspended} loading={loading} />
+        <StatCard icon="globe-outline" label="Public booking on" value={stats?.published} loading={loading} />
+        <StatCard icon="sparkles-outline" label="New in 30 days" value={stats?.newLast30Days} loading={loading} />
       </View>
 
       <SectionTitle>Recently registered</SectionTitle>

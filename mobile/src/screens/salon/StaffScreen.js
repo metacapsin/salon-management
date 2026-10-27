@@ -1,5 +1,5 @@
 import { useLayoutEffect, useState } from 'react'
-import { ActivityIndicator, FlatList, Pressable, StyleSheet, Text, View } from 'react-native'
+import { FlatList, Pressable, StyleSheet, Text, View } from 'react-native'
 import { useQuery } from '@tanstack/react-query'
 import { fetchStaff } from '../../api/salonApi'
 import { friendlyError } from '../../api/client'
@@ -7,6 +7,7 @@ import { useAuth } from '../../auth/AuthContext'
 import { roleCan } from '../../auth/permissions'
 import { FilterChips, StatusBadge } from '../../components/Chips'
 import { Card, ErrorNote } from '../../components/Screen'
+import { EmptyState, LoadingState } from '../../components/States'
 import { COLORS } from '../../config/theme'
 
 const VIEWS = [
@@ -60,7 +61,7 @@ export default function StaffScreen({ navigation }) {
   return (
     <View style={styles.screen}>
       {canWrite ? <FilterChips options={VIEWS} value={includeInactive} onChange={setIncludeInactive} /> : null}
-      {query.isLoading ? <ActivityIndicator style={styles.loader} color={COLORS.brown} /> : null}
+      {query.isLoading ? <LoadingState /> : null}
       {query.isError ? (
         <View style={styles.pad}>
           <ErrorNote message={friendlyError(query.error)} onRetry={query.refetch} />
@@ -72,7 +73,7 @@ export default function StaffScreen({ navigation }) {
         contentContainerStyle={styles.list}
         refreshing={query.isRefetching}
         onRefresh={query.refetch}
-        ListEmptyComponent={!query.isLoading && !query.isError ? <Text style={styles.empty}>No staff yet.</Text> : null}
+        ListEmptyComponent={!query.isLoading && !query.isError ? <EmptyState title="No staff yet" /> : null}
         renderItem={({ item }) => {
           const card = (
             <Card style={!item.active && styles.stopped}>

@@ -59,10 +59,10 @@ export default function BillingPage() {
   const filtered = Object.values(filters).some(Boolean)
 
   return (
-    <Box sx={{ maxWidth: 1100 }}>
-      <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 2, flexWrap: 'wrap' }}>
-        <Typography variant="h4" component="h1" sx={{ fontWeight: 800, color: 'primary.main', flexGrow: 1 }}>
-          Billing
+    <Box>
+      <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5, mb: 1.5, flexWrap: 'wrap' }}>
+        <Typography variant="body2" color="text.secondary" sx={{ flexGrow: 1 }}>
+          Create bills and keep track of payments.
         </Typography>
         {canWrite && (
           <Button variant="contained" onClick={() => navigate('/billing/new')}>

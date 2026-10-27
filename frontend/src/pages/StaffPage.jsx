@@ -34,6 +34,7 @@ import { roleCan } from '../auth/permissions'
 import QueryState from '../components/QueryState'
 import { NAME_ERROR, NAME_PATTERN, PHONE_ERROR, isValidPhone } from '../utils/validators'
 import ResponsiveTable from '../components/ResponsiveTable'
+import EditIcon from '@mui/icons-material/EditOutlined'
 
 const DAYS = [
   ['mon', 'Monday'],
@@ -263,10 +264,10 @@ export default function StaffPage() {
   const serviceName = (id) => servicesQuery.data?.services.find((s) => s.id === id)?.name
 
   return (
-    <Box sx={{ maxWidth: 1000 }}>
-      <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 2, flexWrap: 'wrap' }}>
-        <Typography variant="h4" component="h1" sx={{ fontWeight: 800, color: 'primary.main', flexGrow: 1 }}>
-          Staff
+    <Box>
+      <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5, mb: 1.5, flexWrap: 'wrap' }}>
+        <Typography variant="body2" color="text.secondary" sx={{ flexGrow: 1 }}>
+          Your team members and the services each one offers.
         </Typography>
         {canWrite && (
           <Button variant="contained" onClick={() => setEditing(null)}>
@@ -329,13 +330,13 @@ export default function StaffPage() {
                     />
                   </TableCell>
                   {canWrite && (
-                    <TableCell align="right">
-                      <Button size="small" onClick={() => setEditing(s)}>
-                        Edit
-                      </Button>
-                      <Button size="small" color="error" onClick={() => setDeleting(s)}>
-                        Delete
-                      </Button>
+                    <TableCell align="right" sx={{ whiteSpace: 'nowrap', width: 88 }}>
+                      <IconButton size="small" aria-label="Edit" title="Edit" sx={{ minWidth: 36, minHeight: 36 }} onClick={() => setEditing(s)}>
+                        <EditIcon fontSize="small" />
+                      </IconButton>
+                      <IconButton size="small" color="error" aria-label="Delete" title="Delete" sx={{ minWidth: 36, minHeight: 36 }} onClick={() => setDeleting(s)}>
+                        <DeleteIcon fontSize="small" />
+                      </IconButton>
                     </TableCell>
                   )}
                 </TableRow>

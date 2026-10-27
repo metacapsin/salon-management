@@ -115,10 +115,10 @@ export default function TeamPage() {
   const pageCount = Math.max(1, Math.ceil((team.data?.meta?.total ?? 0) / 20))
 
   return (
-    <Box sx={{ maxWidth: 1000 }}>
-      <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 2, flexWrap: 'wrap' }}>
-        <Typography variant="h4" component="h1" sx={{ fontWeight: 800, color: 'primary.main', flexGrow: 1 }}>
-          Team
+    <Box>
+      <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5, mb: 1.5, flexWrap: 'wrap' }}>
+        <Typography variant="body2" color="text.secondary" sx={{ flexGrow: 1 }}>
+          People who can sign in to this salon.
         </Typography>
         {canManage && (
           <Button variant="contained" onClick={() => setInviteOpen(true)}>

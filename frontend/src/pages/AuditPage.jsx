@@ -15,9 +15,9 @@ export default function AuditPage() {
   const pageCount = Math.max(1, Math.ceil((query.data?.meta?.total ?? 0) / 20))
 
   return (
-    <Box sx={{ maxWidth: 1000 }}>
-      <Typography variant="h4" component="h1" sx={{ fontWeight: 800, color: 'primary.main', mb: 2 }}>
-        Audit history
+    <Box>
+      <Typography variant="body2" color="text.secondary" sx={{ mb: 1.5 }}>
+        A record of who changed what in your salon.
       </Typography>
       <QueryState query={query} isEmpty={events.length === 0}>
         <TableContainer component={Paper}>

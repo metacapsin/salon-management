@@ -9,7 +9,7 @@ export function SwitchRow({ label, value, onValueChange, hint }) {
         <Text style={styles.rowLabel}>{label}</Text>
         {hint ? <Text style={styles.hint}>{hint}</Text> : null}
       </View>
-      <Switch value={value} onValueChange={onValueChange} trackColor={{ true: COLORS.brown, false: COLORS.line }} thumbColor="#fff" />
+      <Switch value={value} onValueChange={onValueChange} trackColor={{ true: COLORS.espresso, false: COLORS.line }} thumbColor="#fff" />
     </Pressable>
   )
 }

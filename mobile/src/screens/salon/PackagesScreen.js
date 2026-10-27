@@ -7,6 +7,7 @@ import { useAuth } from '../../auth/AuthContext'
 import { roleCan } from '../../auth/permissions'
 import { FilterChips, Segmented, StatusBadge } from '../../components/Chips'
 import { Card, ErrorNote } from '../../components/Screen'
+import { EmptyState, LoadingState } from '../../components/States'
 import { COLORS, TOUCH_MIN } from '../../config/theme'
 import { MembersTab, PlansTab } from './MembershipTabs'
 import { formatDate, formatMoney } from '../../utils/formatMoney'
@@ -55,7 +56,7 @@ function TemplatesTab({ navigation, canWrite, salonId }) {
           {query.isError ? <ErrorNote message={friendlyError(query.error)} onRetry={query.refetch} /> : null}
         </View>
       }
-      ListEmptyComponent={query.isLoading ? <ActivityIndicator style={styles.loader} color={COLORS.brown} /> : !query.isError ? <Text style={styles.empty}>No packages yet.</Text> : null}
+      ListEmptyComponent={query.isLoading ? <LoadingState /> : !query.isError ? <EmptyState title="No packages yet" /> : null}
       renderItem={({ item }) => {
         const card = (
           <Card style={!item.active && styles.stopped}>
@@ -123,7 +124,7 @@ function SoldTab({ navigation, salonId }) {
           {query.isError ? <ErrorNote message={friendlyError(query.error)} onRetry={query.refetch} /> : null}
         </View>
       }
-      ListEmptyComponent={query.isLoading ? <ActivityIndicator style={styles.loader} color={COLORS.brown} /> : !query.isError ? <Text style={styles.empty}>No packages here.</Text> : null}
+      ListEmptyComponent={query.isLoading ? <LoadingState /> : !query.isError ? <EmptyState title="No packages here" /> : null}
       ListFooterComponent={query.isFetchingNextPage ? <ActivityIndicator color={COLORS.brown} /> : null}
       renderItem={({ item }) => (
         <Pressable accessibilityRole="button" accessibilityLabel={`Open ${item.packageName} of ${item.customerName}`} onPress={() => navigation.navigate('CustomerPackageDetail', { id: item.id, title: item.packageName })}>

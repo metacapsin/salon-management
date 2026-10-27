@@ -35,6 +35,7 @@ import { formatMoney } from '../utils/formatMoney'
 import { applyServerFieldErrors, offerSchema } from '../utils/formSchemas'
 import { field } from '../utils/muiForm'
 import ResponsiveTable from '../components/ResponsiveTable'
+import EditIcon from '@mui/icons-material/EditOutlined'
 
 const today = () => new Date().toLocaleDateString('en-CA') // YYYY-MM-DD
 const EMPTY = {
@@ -196,10 +197,10 @@ export default function OffersPage() {
   const serviceNames = (o) => (o.serviceIds.length === 0 ? 'All services' : o.serviceIds.map((id) => services.find((s) => s.id === id)?.name ?? 'Removed service').join(', '))
 
   return (
-    <Box sx={{ maxWidth: 1000 }}>
-      <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 2, flexWrap: 'wrap' }}>
-        <Typography variant="h4" component="h1" sx={{ fontWeight: 800, color: 'primary.main', flexGrow: 1 }}>
-          Offers
+    <Box>
+      <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5, mb: 1.5, flexWrap: 'wrap' }}>
+        <Typography variant="body2" color="text.secondary" sx={{ flexGrow: 1 }}>
+          Discounts that customers can pick while booking.
         </Typography>
         {canWrite && (
           <Button variant="contained" onClick={() => setEditing(null)}>
@@ -274,9 +275,9 @@ export default function OffersPage() {
                     </TableCell>
                     {canWrite && (
                       <TableCell align="right">
-                        <Button size="small" onClick={() => setEditing(o)}>
-                          Edit
-                        </Button>
+                        <IconButton size="small" aria-label="Edit" title="Edit" sx={{ minWidth: 36, minHeight: 36 }} onClick={() => setEditing(o)}>
+                          <EditIcon fontSize="small" />
+                        </IconButton>
                       </TableCell>
                     )}
                   </TableRow>

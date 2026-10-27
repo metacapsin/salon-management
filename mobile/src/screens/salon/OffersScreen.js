@@ -1,5 +1,5 @@
 import { useLayoutEffect } from 'react'
-import { ActivityIndicator, FlatList, Pressable, StyleSheet, Text, View } from 'react-native'
+import { FlatList, Pressable, StyleSheet, Text, View } from 'react-native'
 import { useQuery } from '@tanstack/react-query'
 import { fetchOffers } from '../../api/salonApi'
 import { friendlyError } from '../../api/client'
@@ -7,6 +7,7 @@ import { useAuth } from '../../auth/AuthContext'
 import { roleCan } from '../../auth/permissions'
 import { StatusBadge } from '../../components/Chips'
 import { Card, ErrorNote } from '../../components/Screen'
+import { EmptyState, LoadingState } from '../../components/States'
 import { COLORS } from '../../config/theme'
 import { todayString } from '../../utils/dates'
 import { formatDate } from '../../utils/formatMoney'
@@ -40,7 +41,7 @@ export default function OffersScreen({ navigation }) {
 
   return (
     <View style={styles.screen}>
-      {query.isLoading ? <ActivityIndicator style={styles.loader} color={COLORS.brown} /> : null}
+      {query.isLoading ? <LoadingState /> : null}
       {query.isError ? (
         <View style={styles.pad}>
           <ErrorNote message={friendlyError(query.error)} onRetry={query.refetch} />
@@ -52,7 +53,7 @@ export default function OffersScreen({ navigation }) {
         contentContainerStyle={styles.list}
         refreshing={query.isRefetching}
         onRefresh={query.refetch}
-        ListEmptyComponent={!query.isLoading && !query.isError ? <Text style={styles.empty}>No offers yet.</Text> : null}
+        ListEmptyComponent={!query.isLoading && !query.isError ? <EmptyState title="No offers yet" /> : null}
         renderItem={({ item }) => {
           const card = (
             <Card>

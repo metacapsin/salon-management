@@ -103,3 +103,60 @@ test('a salon owner token does not work as a customer login, and the customer co
   assert.match(cookie, /HttpOnly/i)
   assert.match(cookie, /SameSite=Lax/i)
 })
+
+test('email OTP: the code goes to the email (not SMS), is masked in the reply, and a known customer always gets it on the saved email', async () => {
+  const mail = require('../src/utils/mailer').outbox
+  const agent = h.request.agent(h.app)
+  const asked = await agent.post(api('/customer/auth/request-otp')).send({ phone: '9810020010', email: 'Kavya@Example.com' })
+  assert.equal(asked.status, 200)
+  assert.equal(asked.body.data.sentTo, 'k***@example.com')
+  const code = asked.body.data.devOtp
+  const sent = mail.find((m) => m.to === 'kavya@example.com' && m.text.includes(code))
+  assert.ok(sent, 'email should carry the code')
+  assert.ok(!outbox.some((m) => m.to === '+919810020010'), 'no SMS when email is used')
+
+  const done = await verify(agent, { phone: '9810020010', otp: code, name: 'Kavya Sharma' })
+  assert.equal(done.status, 200, JSON.stringify(done.body))
+  assert.equal((await h.models.Customer.findOne({ phone: '9810020010' })).email, 'kavya@example.com')
+
+  // koi aur apna email daal kar isi number ka code apne email par nahi mangwa sakta
+  await h.models.CustomerOtp.deleteMany({ phone: '9810020010' })
+  const again = await h.request.agent(h.app).post(api('/customer/auth/request-otp')).send({ phone: '9810020010', email: 'other@example.com' })
+  assert.equal(again.body.data.sentTo, 'k***@example.com')
+  assert.ok(!mail.some((m) => m.to === 'other@example.com'))
+})
+
+test('mobile app: OTP to email, token in JSON, Bearer works on /me, no duplicate customer, browsers and wrong token types refused', async () => {
+  const agent = h.request.agent(h.app)
+  const phone = '9810020077'
+  const asked = await agent.post(api('/customer/auth/request-otp')).send({ phone, email: 'mobile.cust@example.com' })
+  assert.equal(asked.status, 200)
+  const code = asked.body.data.devOtp
+  const mobileVerify = (body, set = {}) => agent.post(api('/customer/auth/mobile/verify-otp')).set(set).send(body)
+
+  // a browser (Origin header) never gets the token
+  assert.equal((await mobileVerify({ phone, otp: code, name: 'Mobile Cust' }, { Origin: 'https://evil.example' })).status, 403)
+
+  const done = await mobileVerify({ phone, otp: code, name: 'Mobile Cust' })
+  assert.equal(done.status, 200, JSON.stringify(done.body))
+  const token = done.body.data.accessToken
+  assert.ok(token)
+  assert.equal(done.headers['set-cookie'], undefined)
+
+  const plain = h.request(h.app)
+  assert.equal((await plain.get(api('/customer/me'))).status, 401)
+  const me = await plain.get(api('/customer/me')).set('Authorization', `Bearer ${token}`)
+  assert.equal(me.status, 200)
+  assert.equal(me.body.data.customer.phone, phone)
+  assert.equal((await plain.get(api('/customer/me')).set('Authorization', 'Bearer not-a-token')).status, 401)
+
+  // customer token is useless on salon-staff endpoints
+  assert.equal((await plain.get(api('/me')).set('Authorization', `Bearer ${token}`)).status, 401)
+
+  // same phone logs in again -> same customer, no duplicate
+  await h.models.CustomerOtp.deleteMany({ phone })
+  const again = await agent.post(api('/customer/auth/request-otp')).send({ phone })
+  const second = await mobileVerify({ phone, otp: again.body.data.devOtp })
+  assert.equal(second.status, 200)
+  assert.equal(await h.models.Customer.countDocuments({ phone }), 1)
+})

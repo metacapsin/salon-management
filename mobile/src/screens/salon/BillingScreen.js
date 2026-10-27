@@ -8,6 +8,7 @@ import { useAuth } from '../../auth/AuthContext'
 import { roleCan } from '../../auth/permissions'
 import { FilterChips, StatusBadge } from '../../components/Chips'
 import { Card, ErrorNote, StatCard } from '../../components/Screen'
+import { EmptyState, LoadingState } from '../../components/States'
 import { COLORS, TOUCH_MIN } from '../../config/theme'
 import { formatPaise } from '../../utils/formatPaise'
 
@@ -99,7 +100,7 @@ export default function BillingScreen({ navigation }) {
       }}
       onEndReached={() => query.hasNextPage && !query.isFetchingNextPage && query.fetchNextPage()}
       onEndReachedThreshold={0.4}
-      ListEmptyComponent={query.isLoading ? <ActivityIndicator style={styles.loader} color={COLORS.brown} /> : !query.isError ? <Text style={styles.empty}>No bills found.</Text> : null}
+      ListEmptyComponent={query.isLoading ? <LoadingState /> : !query.isError ? <EmptyState title="No bills found" /> : null}
       ListFooterComponent={query.isFetchingNextPage ? <ActivityIndicator color={COLORS.brown} /> : null}
       renderItem={({ item }) => (
         <Pressable accessibilityRole="button" accessibilityLabel={`Open bill ${item.invoiceNumber}`} onPress={() => navigation.navigate('InvoiceDetail', { id: item.id, number: item.invoiceNumber })}>

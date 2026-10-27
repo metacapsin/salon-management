@@ -60,12 +60,20 @@ export const theme = createTheme({
     },
     // Chhote screen par dialog poori width le, margin kam ho aur andar ka content scroll ho.
     // Kai dialogs me content+buttons <form> ke andar hote hain; form ko flex column banao taaki content scroll ho aur buttons hamesha dikhen.
-    MuiDialog: { styleOverrides: { paper: { '& > form': { display: 'flex', flexDirection: 'column', flex: '1 1 auto', minHeight: 0, overflow: 'hidden' }, margin: 16, maxWidth: 'calc(100% - 32px)', maxHeight: 'calc(100% - 32px)', '@media (max-width:599px)': { margin: 8, maxWidth: 'calc(100% - 16px)', maxHeight: 'calc(100% - 16px)', '&.MuiDialog-paperFullWidth': { width: 'calc(100% - 16px)' } }, '&.MuiDialog-paperFullScreen': { margin: 0, width: '100%', maxWidth: '100%', maxHeight: 'none', '@media (max-width:599px)': { margin: 0, width: '100%', maxWidth: '100%', maxHeight: 'none' } } } } },
+    MuiDialog: { styleOverrides: { paper: { '& > form': { display: 'flex', flexDirection: 'column', flex: '1 1 auto', minHeight: 0, overflow: 'hidden' }, margin: 16, maxHeight: 'calc(100% - 32px)', '@media (max-width:599px)': { margin: 8, maxWidth: 'calc(100% - 16px)', maxHeight: 'calc(100% - 16px)', '&.MuiDialog-paperFullWidth': { width: 'calc(100% - 16px)' } }, '&.MuiDialog-paperFullScreen': { margin: 0, width: '100%', maxWidth: '100%', maxHeight: 'none', '@media (max-width:599px)': { margin: 0, width: '100%', maxWidth: '100%', maxHeight: 'none' } } } } },
     MuiDialogContent: { styleOverrides: { root: { overflowY: 'auto' } } },
     // Chhote screen par 2-3 buttons ek line me na samayen to neeche wrap hon, bahar na nikalen.
     MuiDialogActions: { styleOverrides: { root: { flexWrap: 'wrap', rowGap: 8 } } },
     MuiTab: { styleOverrides: { root: { minHeight: 44 } } },
-    MuiTableCell: { styleOverrides: { head: { fontWeight: 600, color: COLORS.brownDark, backgroundColor: '#fbf7f2' } } },
+    // Saari tables ek jaisi: card jaisa border, gold-cream header, compact rows, hover par halka cream
+    MuiTableContainer: { styleOverrides: { root: { '&.MuiPaper-root': { borderRadius: 14, border: `1px solid ${COLORS.line}`, boxShadow: '0 1px 2px rgba(58,36,21,0.04), 0 8px 24px rgba(58,36,21,0.05)' } } } },
+    MuiTableCell: {
+      styleOverrides: {
+        root: { padding: '8px 12px', verticalAlign: 'middle', borderBottomColor: COLORS.line },
+        head: { padding: '8px 12px', fontSize: '0.68rem', fontWeight: 800, letterSpacing: '0.08em', textTransform: 'uppercase', whiteSpace: 'nowrap', color: '#4a2f1b', backgroundColor: COLORS.goldSoft, borderBottom: '1px solid #e6d3a3' },
+      },
+    },
+    MuiTableRow: { styleOverrides: { root: { '&:hover:not(.MuiTableRow-head)': { backgroundColor: '#fdfaf6' }, '.MuiTableBody-root > &:last-child > .MuiTableCell-root': { borderBottom: 0 } } } },
     MuiChip: { styleOverrides: { root: { fontWeight: 600 } } },
   },
 })

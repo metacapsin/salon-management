@@ -1,11 +1,12 @@
-import { StyleSheet, Text, View } from 'react-native'
+import { Pressable, StyleSheet, Text, View } from 'react-native'
+import { Ionicons } from '@expo/vector-icons'
 import { useQuery } from '@tanstack/react-query'
 import { fetchBillingSummary, fetchPendingAppointmentCount } from '../../api/dashboardApi'
 import { friendlyError } from '../../api/client'
 import { useAuth } from '../../auth/AuthContext'
 import { ROLE_LABELS, roleCan } from '../../auth/permissions'
 import { Card, ErrorNote, Screen, SectionTitle, StatCard } from '../../components/Screen'
-import { COLORS } from '../../config/theme'
+import { COLORS, FONT, RADIUS, SHADOW } from '../../config/theme'
 import { formatPaise } from '../../utils/formatPaise'
 
 // Local date as YYYY-MM-DD (the server reads it in the salon's own timezone).
@@ -15,12 +16,25 @@ function todayString() {
   return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`
 }
 
+function QuickAction({ icon, label, onPress }) {
+  return (
+    <Pressable onPress={onPress} accessibilityRole="button" accessibilityLabel={label} style={({ pressed }) => [styles.action, pressed && { opacity: 0.85 }]}>
+      <View style={styles.actionIcon}>
+        <Ionicons name={icon} size={20} color={COLORS.espresso} />
+      </View>
+      <Text style={styles.actionText}>{label}</Text>
+    </Pressable>
+  )
+}
+
 // Salon dashboard. Each block is fetched only if the role may read it, so a receptionist or staff
 // member never even asks for numbers they cannot see (and the server would answer 403 anyway).
-export default function DashboardScreen() {
+export default function DashboardScreen({ navigation }) {
   const { user, role, activeSalon, activeSalonId } = useAuth()
   const canBilling = roleCan(role, 'billing.read')
   const canAppointments = roleCan(role, 'appointments.read')
+  const canNew = roleCan(role, 'appointments.write')
+  const canBill = roleCan(role, 'billing.write')
   const today = todayString()
 
   const todayQuery = useQuery({
@@ -46,10 +60,21 @@ export default function DashboardScreen() {
 
   return (
     <Screen onRefresh={refetchAll} refreshing={refreshing}>
-      <Text style={styles.hello}>Hello, {user?.name?.split(' ')[0]}</Text>
-      <Text style={styles.muted}>
-        {activeSalon?.salonName} · {ROLE_LABELS[role] ?? role}
-      </Text>
+      <View style={styles.hero}>
+        <Text style={styles.heroHello}>Hello, {user?.name?.split(' ')[0]}</Text>
+        <Text style={styles.heroSalon} numberOfLines={2}>{activeSalon?.salonName}</Text>
+        <View style={styles.rolePill}>
+          <Ionicons name="shield-checkmark-outline" size={14} color={COLORS.gold} />
+          <Text style={styles.roleText}>{ROLE_LABELS[role] ?? role}</Text>
+        </View>
+      </View>
+
+      {canNew || canBill ? (
+        <View style={styles.quick}>
+          {canNew ? <QuickAction icon="calendar-outline" label="New appointment" onPress={() => navigation.navigate('NewAppointment')} /> : null}
+          {canBill ? <QuickAction icon="receipt-outline" label="New bill" onPress={() => navigation.navigate('CreateBill')} /> : null}
+        </View>
+      ) : null}
 
       {activeSalon?.salonStatus === 'suspended' ? (
         <Card style={styles.warning}>
@@ -63,14 +88,14 @@ export default function DashboardScreen() {
         <>
           <SectionTitle>Today</SectionTitle>
           <View style={styles.grid}>
-            <StatCard label="Bills" value={todayQuery.data?.invoices} loading={todayQuery.isLoading} />
-            <StatCard label="Billed" value={formatPaise(todayQuery.data?.billed)} loading={todayQuery.isLoading} />
-            <StatCard label="Received" value={formatPaise(todayQuery.data?.received)} loading={todayQuery.isLoading} />
+            <StatCard icon="receipt-outline" label="Bills" value={todayQuery.data?.invoices} loading={todayQuery.isLoading} />
+            <StatCard icon="cash-outline" label="Billed" value={formatPaise(todayQuery.data?.billed)} loading={todayQuery.isLoading} />
+            <StatCard icon="checkmark-done-outline" label="Received" value={formatPaise(todayQuery.data?.received)} loading={todayQuery.isLoading} />
           </View>
           <SectionTitle>Overall</SectionTitle>
           <View style={styles.grid}>
-            <StatCard label="Amount pending" value={formatPaise(allQuery.data?.pending)} loading={allQuery.isLoading} hint={allQuery.data ? `${allQuery.data.pendingCount} unpaid bills` : undefined} />
-            <StatCard label="Total billed" value={formatPaise(allQuery.data?.billed)} loading={allQuery.isLoading} />
+            <StatCard icon="hourglass-outline" label="Amount pending" value={formatPaise(allQuery.data?.pending)} loading={allQuery.isLoading} hint={allQuery.data ? `${allQuery.data.pendingCount} unpaid bills` : undefined} />
+            <StatCard icon="trending-up-outline" label="Total billed" value={formatPaise(allQuery.data?.billed)} loading={allQuery.isLoading} />
           </View>
         </>
       ) : null}
@@ -79,7 +104,7 @@ export default function DashboardScreen() {
         <>
           <SectionTitle>Appointments</SectionTitle>
           <View style={styles.grid}>
-            <StatCard label="Waiting for confirmation" value={pendingQuery.data} loading={pendingQuery.isLoading} />
+            <StatCard icon="time-outline" label="Waiting for confirmation" value={pendingQuery.data} loading={pendingQuery.isLoading} />
           </View>
         </>
       ) : null}
@@ -94,7 +119,15 @@ export default function DashboardScreen() {
 }
 
 const styles = StyleSheet.create({
-  hello: { fontSize: 24, fontWeight: '700', color: COLORS.ink, fontFamily: 'serif' },
+  hero: { backgroundColor: COLORS.espresso, borderRadius: RADIUS.xl, padding: 20, marginBottom: 16, ...SHADOW },
+  heroHello: { color: COLORS.goldSoft, fontSize: 14 },
+  heroSalon: { color: COLORS.cream, fontSize: 24, fontWeight: '700', fontFamily: FONT.heading, marginTop: 2 },
+  rolePill: { flexDirection: 'row', alignItems: 'center', gap: 6, alignSelf: 'flex-start', marginTop: 12, paddingHorizontal: 12, paddingVertical: 5, borderRadius: RADIUS.pill, borderWidth: 1, borderColor: 'rgba(230,199,103,0.5)' },
+  roleText: { color: COLORS.gold, fontSize: 13, fontWeight: '600' },
+  quick: { flexDirection: 'row', gap: 12, marginBottom: 4 },
+  action: { flex: 1, flexDirection: 'row', alignItems: 'center', gap: 8, minHeight: 56, backgroundColor: COLORS.surface, borderRadius: RADIUS.lg, borderWidth: 1, borderColor: COLORS.line, padding: 10 },
+  actionIcon: { width: 36, height: 36, borderRadius: 12, backgroundColor: COLORS.gold, alignItems: 'center', justifyContent: 'center' },
+  actionText: { flex: 1, fontSize: 13, fontWeight: '700', color: COLORS.ink },
   muted: { fontSize: 14, color: COLORS.muted, marginBottom: 8 },
   grid: { flexDirection: 'row', flexWrap: 'wrap', gap: 12 },
   warning: { borderColor: COLORS.gold, backgroundColor: COLORS.goldSoft },

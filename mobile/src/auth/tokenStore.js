@@ -9,6 +9,8 @@ import * as SecureStore from 'expo-secure-store'
 // in window.name, but only in a development build running on localhost. window.name survives a page refresh in the
 // same tab even when storage is blocked. A production build (__DEV__ is false) never uses window.name.
 const KEY = 'glamora_refresh_token'
+// A customer's long-lived login token is kept the same way (SecureStore on a phone).
+const CUSTOMER_KEY = 'glamora_customer_token'
 const NAME_PREFIX = 'glamora_dev_rt='
 const isWeb = Platform.OS === 'web'
 
@@ -88,6 +90,40 @@ export async function clearRefreshToken() {
     } else {
       await SecureStore.deleteItemAsync(KEY)
     }
+  } catch {
+    // nothing more we can do
+  }
+}
+
+const memoryCustomer = { token: null }
+
+export async function getCustomerToken() {
+  try {
+    if (isWeb) return webStorage()?.getItem(CUSTOMER_KEY) ?? memoryCustomer.token
+    return await SecureStore.getItemAsync(CUSTOMER_KEY)
+  } catch {
+    return isWeb ? memoryCustomer.token : null
+  }
+}
+
+export async function saveCustomerToken(token) {
+  if (isWeb) {
+    memoryCustomer.token = token
+    try {
+      webStorage().setItem(CUSTOMER_KEY, token)
+    } catch {
+      // blocked storage: it stays in memory until the page is refreshed
+    }
+    return
+  }
+  return SecureStore.setItemAsync(CUSTOMER_KEY, token)
+}
+
+export async function clearCustomerToken() {
+  memoryCustomer.token = null
+  try {
+    if (isWeb) webStorage()?.removeItem(CUSTOMER_KEY)
+    else await SecureStore.deleteItemAsync(CUSTOMER_KEY)
   } catch {
     // nothing more we can do
   }

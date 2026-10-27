@@ -6,11 +6,10 @@ import { SafeAreaProvider } from 'react-native-safe-area-context'
 import { ApiError } from './src/api/client'
 import { AuthProvider, useAuth } from './src/auth/AuthContext'
 import { COLORS } from './src/config/theme'
-import RootNavigator from './src/navigation/RootNavigator'
-import LoginScreen from './src/screens/auth/LoginScreen'
+import RootNavigator, { GuestNavigator } from './src/navigation/RootNavigator'
 
 function Root() {
-  const { status, login } = useAuth()
+  const { status } = useAuth()
   if (status === 'loading') {
     return (
       <View style={{ flex: 1, backgroundColor: COLORS.espresso, alignItems: 'center', justifyContent: 'center' }}>
@@ -18,7 +17,8 @@ function Root() {
       </View>
     )
   }
-  if (status === 'anonymous') return <LoginScreen onSubmit={({ email, password }) => login(email, password)} />
+  // Not signed in: the first page is Find a Salon. Login is asked only when a salon is opened, or from the "Salon login" button.
+  if (status === 'anonymous') return <GuestNavigator />
   return <RootNavigator />
 }
 

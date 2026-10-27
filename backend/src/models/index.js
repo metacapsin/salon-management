@@ -237,6 +237,7 @@ const customerSchema = new Schema(
   {
     phone: { type: String, required: true, unique: true }, // hamesha 10 digit (91 hata kar)
     name: { type: String, required: true, trim: true, maxlength: 100 },
+    email: { type: String, default: '', trim: true, lowercase: true, maxlength: 254 }, // OTP isi email par jaata he
     lastLoginAt: { type: Date, default: null },
     schemaVersion: { type: Number, default: 1 },
   },
@@ -247,6 +248,7 @@ const customerSchema = new Schema(
 const customerOtpSchema = new Schema(
   {
     phone: { type: String, required: true, index: true },
+    email: { type: String, default: '' }, // khaali nahi to code is email par gaya (aur login ke baad customer ke saath jud jaata he)
     codeHash: { type: String, required: true },
     attempts: { type: Number, default: 0 },
     usedAt: { type: Date, default: null },
@@ -568,7 +570,7 @@ invoiceCounterSchema.index({ salonId: 1, year: 1 }, { unique: true })
 const notificationSchema = new Schema(
   {
     salonId: { type: Schema.Types.ObjectId, ref: 'Salon', required: true },
-    type: { type: String, enum: ['salon_viewed', 'booking_created'], required: true },
+    type: { type: String, enum: ['salon_viewed', 'booking_created', 'booking_cancelled'], required: true },
     title: { type: String, required: true, maxlength: 200 },
     body: { type: String, default: '', maxlength: 500 },
     // salon_viewed: anonymous viewer ki id, taaki ek hi customer baar-baar notification na bheje

@@ -6,7 +6,9 @@ import { friendlyError } from '../../api/client'
 import { useAuth } from '../../auth/AuthContext'
 import { roleCan } from '../../auth/permissions'
 import { FilterChips, StatusBadge } from '../../components/Chips'
-import { Card, ErrorNote } from '../../components/Screen'
+import { Card } from '../../components/Screen'
+import { EmptyState, ErrorState, LoadingState } from '../../components/States'
+import { Ionicons } from '@expo/vector-icons'
 import { COLORS } from '../../config/theme'
 import { formatDate, formatMoney } from '../../utils/formatMoney'
 
@@ -49,7 +51,10 @@ function BookingCard({ booking, canWrite, onAction, busy, error, confirmingId, s
         </Text>
         <StatusBadge status={booking.status} />
       </View>
-      <Text style={styles.name}>{booking.customerName}</Text>
+      <View style={styles.person}>
+        <Ionicons name="person-circle-outline" size={20} color={COLORS.brown} />
+        <Text style={styles.name} numberOfLines={1}>{booking.customerName}</Text>
+      </View>
       <Text style={styles.muted}>{booking.customerPhone}</Text>
       <Text style={styles.services}>{booking.services.map((s) => s.name).join(', ')}</Text>
       <Text style={styles.muted}>
@@ -128,12 +133,8 @@ export default function AppointmentsScreen({ navigation }) {
   return (
     <View style={styles.screen}>
       <FilterChips options={FILTERS} value={status} onChange={setStatus} />
-      {query.isLoading ? <ActivityIndicator style={styles.loader} color={COLORS.brown} /> : null}
-      {query.isError ? (
-        <View style={styles.pad}>
-          <ErrorNote message={friendlyError(query.error)} onRetry={query.refetch} />
-        </View>
-      ) : null}
+      {query.isLoading ? <LoadingState /> : null}
+      {query.isError ? <ErrorState offline={query.error?.status === 0} message={friendlyError(query.error)} onRetry={query.refetch} /> : null}
       <FlatList
         data={items}
         keyExtractor={(b) => b.id}
@@ -142,7 +143,7 @@ export default function AppointmentsScreen({ navigation }) {
         onRefresh={query.refetch}
         onEndReached={() => query.hasNextPage && !query.isFetchingNextPage && query.fetchNextPage()}
         onEndReachedThreshold={0.4}
-        ListEmptyComponent={!query.isLoading && !query.isError ? <Text style={styles.empty}>No appointments here.</Text> : null}
+        ListEmptyComponent={!query.isLoading && !query.isError ? <EmptyState icon="calendar-outline" title="No appointments here" text={status ? 'Try another filter.' : 'New bookings will show up here.'} /> : null}
         ListFooterComponent={query.isFetchingNextPage ? <ActivityIndicator color={COLORS.brown} /> : null}
         renderItem={({ item }) => (
           <BookingCard
@@ -169,14 +170,15 @@ const styles = StyleSheet.create({
   loader: { marginTop: 24 },
   empty: { textAlign: 'center', color: COLORS.muted, marginTop: 32 },
   top: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 6 },
-  when: { fontSize: 14, fontWeight: '700', color: COLORS.ink },
-  name: { fontSize: 16, fontWeight: '600', color: COLORS.ink },
+  when: { flex: 1, fontSize: 14, fontWeight: '700', color: COLORS.brown },
+  person: { flexDirection: 'row', alignItems: 'center', gap: 6 },
+  name: { flex: 1, fontSize: 16, fontWeight: '700', color: COLORS.ink },
   muted: { fontSize: 13, color: COLORS.muted, marginTop: 2 },
   services: { fontSize: 14, color: COLORS.ink, marginTop: 6 },
   error: { color: COLORS.error, fontSize: 13, marginTop: 8 },
   actions: { flexDirection: 'row', gap: 8, marginTop: 12 },
-  action: { flex: 1, minHeight: 44, borderRadius: 10, backgroundColor: COLORS.brown, alignItems: 'center', justifyContent: 'center', paddingHorizontal: 8 },
-  actionDanger: { backgroundColor: '#fff', borderWidth: 1, borderColor: COLORS.error },
+  action: { flex: 1, minHeight: 44, borderRadius: 12, backgroundColor: COLORS.brown, alignItems: 'center', justifyContent: 'center', paddingHorizontal: 8 },
+  actionDanger: { backgroundColor: COLORS.surface, borderWidth: 1, borderColor: COLORS.error },
   actionText: { color: '#fff', fontWeight: '600', fontSize: 14 },
   actionTextDanger: { color: COLORS.error },
 })

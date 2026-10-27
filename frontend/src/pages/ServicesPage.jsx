@@ -38,6 +38,7 @@ import { formatMoney } from '../utils/formatMoney'
 import { applyServerFieldErrors, serviceSchema } from '../utils/formSchemas'
 import { field } from '../utils/muiForm'
 import ResponsiveTable from '../components/ResponsiveTable'
+import EditIcon from '@mui/icons-material/EditOutlined'
 
 const EMPTY = { name: '', category: 'Hair', description: '', price: '', durationMin: 30, atSalon: true, atHome: false }
 
@@ -160,10 +161,10 @@ export default function ServicesPage() {
   const services = query.data?.services ?? []
 
   return (
-    <Box sx={{ maxWidth: 1000 }}>
-      <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 2, flexWrap: 'wrap' }}>
-        <Typography variant="h4" component="h1" sx={{ fontWeight: 800, color: 'primary.main', flexGrow: 1 }}>
-          Services
+    <Box>
+      <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5, mb: 1.5, flexWrap: 'wrap' }}>
+        <Typography variant="body2" color="text.secondary" sx={{ flexGrow: 1 }}>
+          Your price list. Customers see these services when they book.
         </Typography>
         {canWrite && (
           <Button variant="contained" onClick={() => setEditing(null)}>
@@ -228,9 +229,9 @@ export default function ServicesPage() {
                   </TableCell>
                   {canWrite && (
                     <TableCell align="right">
-                      <Button size="small" onClick={() => setEditing(s)}>
-                        Edit
-                      </Button>
+                      <IconButton size="small" aria-label="Edit" title="Edit" sx={{ minWidth: 36, minHeight: 36 }} onClick={() => setEditing(s)}>
+                        <EditIcon fontSize="small" />
+                      </IconButton>
                     </TableCell>
                   )}
                 </TableRow>

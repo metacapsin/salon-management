@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { keepPreviousData, useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
-import { Alert, Box, Button, Chip, MenuItem, Paper, Switch, TableBody, TableCell, TableContainer, TableHead, TableRow, TextField, Typography } from '@mui/material'
+import { Alert, Box, Button, Chip, IconButton, MenuItem, Paper, Switch, TableBody, TableCell, TableContainer, TableHead, TableRow, TextField, Typography } from '@mui/material'
 import { friendlyError } from '../../api/client'
 import { listCustomerMemberships, listMembershipPlans, updateMembershipPlan } from '../../api/membershipsApi'
 import { listServices } from '../../api/salonApi'
@@ -12,6 +12,7 @@ import CustomerMembershipDialog from './CustomerMembershipDialog'
 import MembershipPlanDialog from './MembershipPlanDialog'
 import { MEMBERSHIP_STATUS } from './status'
 import ResponsiveTable from '../../components/ResponsiveTable'
+import EditIcon from '@mui/icons-material/EditOutlined'
 
 const PAGE_SIZE = 20
 
@@ -121,9 +122,9 @@ export function PlansTab({ canWrite, canSell, onAssign, notify }) {
                       </Button>
                     )}
                     {canWrite && (
-                      <Button size="small" onClick={() => setEditing(p)}>
-                        Edit
-                      </Button>
+                      <IconButton size="small" aria-label="Edit" title="Edit" sx={{ minWidth: 36, minHeight: 36 }} onClick={() => setEditing(p)}>
+                        <EditIcon fontSize="small" />
+                      </IconButton>
                     )}
                   </TableCell>
                 </TableRow>

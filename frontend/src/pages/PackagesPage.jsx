@@ -5,6 +5,7 @@ import {
   Box,
   Button,
   Chip,
+  IconButton,
   MenuItem,
   Paper,
   Snackbar,
@@ -33,6 +34,7 @@ import { MembersTab, PlansTab } from '../features/memberships/MembershipTabs'
 import PackageDialog from '../features/packages/PackageDialog'
 import { formatMoney } from '../utils/formatMoney'
 import ResponsiveTable from '../components/ResponsiveTable'
+import EditIcon from '@mui/icons-material/EditOutlined'
 
 const PAGE_SIZE = 20
 
@@ -172,9 +174,9 @@ function PackagesTab({ canWrite, canSell, onAssign, notify }) {
                         </Button>
                       )}
                       {canWrite && (
-                        <Button size="small" onClick={() => setEditing(p)}>
-                          Edit
-                        </Button>
+                        <IconButton size="small" aria-label="Edit" title="Edit" sx={{ minWidth: 36, minHeight: 36 }} onClick={() => setEditing(p)}>
+                          <EditIcon fontSize="small" />
+                        </IconButton>
                       )}
                     </TableCell>
                   </TableRow>
@@ -318,10 +320,10 @@ export default function PackagesPage() {
   const onMembershipTab = tab === 'plans' || tab === 'members'
 
   return (
-    <Box sx={{ maxWidth: 1100 }}>
-      <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 1, flexWrap: 'wrap' }}>
-        <Typography variant="h4" component="h1" sx={{ fontWeight: 800, color: 'primary.main', flexGrow: 1 }}>
-          Packages & Memberships
+    <Box>
+      <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5, mb: 1, flexWrap: 'wrap' }}>
+        <Typography variant="body2" color="text.secondary" sx={{ flexGrow: 1 }}>
+          Sell packages and memberships, and track how they are used.
         </Typography>
         {!onMembershipTab && canSell && (
           <Button variant="outlined" onClick={() => setAssignFor('')} disabled={sellable.length === 0}>

@@ -22,9 +22,16 @@ function clearCustomerCookie(res) {
   res.clearCookie(CUSTOMER_COOKIE, cookieOptions)
 }
 
-// Customer login hona zaroori: cookie se pehchanta hai, req.customer set karta hai.
+// Website cookie se, mobile app Authorization: Bearer se. Dono me same token (typ: 'customer').
+function readCustomerToken(req) {
+  const [scheme, bearer] = (req.get('authorization') || '').split(' ')
+  if (scheme === 'Bearer' && bearer) return bearer
+  return req.cookies?.[CUSTOMER_COOKIE]
+}
+
+// Customer login hona zaroori: cookie ya Bearer se pehchanta hai, req.customer set karta hai.
 async function authenticateCustomer(req, res, next) {
-  const token = req.cookies?.[CUSTOMER_COOKIE]
+  const token = readCustomerToken(req)
   const fail = () => new ApiError(401, 'CUSTOMER_LOGIN_REQUIRED', 'Please log in with your mobile number.')
   if (!token) throw fail()
 
@@ -42,4 +49,4 @@ async function authenticateCustomer(req, res, next) {
   next()
 }
 
-module.exports = { authenticateCustomer, setCustomerCookie, clearCustomerCookie, CUSTOMER_COOKIE }
+module.exports = { authenticateCustomer, signCustomerToken, setCustomerCookie, clearCustomerCookie, CUSTOMER_COOKIE }

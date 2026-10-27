@@ -18,6 +18,12 @@ const schema = z.object({
   // Google App Password aksar "abcd efgh ijkl mnop" dikhta he; spaces hata dete hain.
   SMTP_PASS: z.string().transform((v) => v.replace(/\s+/g, '')).optional(),
   MAIL_FROM: z.string().optional(),
+  // Asli SMS (Twilio). Khaali chhodo to SMS sirf .data/sms.log me likha jaata he (development).
+  TWILIO_ACCOUNT_SID: z.string().optional(),
+  TWILIO_AUTH_TOKEN: z.string().optional(),
+  TWILIO_FROM: z.string().optional(), // Twilio ka number (+1...) ya Messaging Service SID (MG...)
+  // Twilio Verify (VA...): login OTP isse bhejte aur check karte hain. Trial account me custom SMS band hota he, Verify chalta he.
+  TWILIO_VERIFY_SID: z.string().optional(),
 })
 
 const parsed = schema.safeParse(process.env)
@@ -33,7 +39,9 @@ module.exports = {
   ...env,
   isProduction: env.NODE_ENV === 'production',
   isTest: env.NODE_ENV === 'test',
-  smtpConfigured: Boolean(env.SMTP_HOST && env.SMTP_USER && env.SMTP_PASS),
+  smtpConfigured: env.NODE_ENV !== 'test' && Boolean(env.SMTP_HOST && env.SMTP_USER && env.SMTP_PASS),
+  smsConfigured: env.NODE_ENV !== 'test' && Boolean(env.TWILIO_ACCOUNT_SID && env.TWILIO_AUTH_TOKEN && env.TWILIO_FROM),
+  verifyConfigured: env.NODE_ENV !== 'test' && Boolean(env.TWILIO_ACCOUNT_SID && env.TWILIO_AUTH_TOKEN && env.TWILIO_VERIFY_SID),
   cookieSecure: env.COOKIE_SECURE === 'true',
   // Token timings (SRS FR-AUTH-01/02)
   ACCESS_TOKEN_TTL_SECONDS: 15 * 60,

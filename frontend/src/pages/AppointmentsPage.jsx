@@ -1,7 +1,9 @@
 import { useState } from 'react'
 import { useLocation, useNavigate } from 'react-router-dom'
 import { keepPreviousData, useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
-import { Alert, Box, Button, Chip, Link, Pagination, Paper, Tab, TableBody, TableCell, TableContainer, TableHead, TableRow, Tabs, Typography } from '@mui/material'
+import { Alert, Avatar, Box, Button, Chip, Link, Pagination, Paper, TableBody, TableCell, TableContainer, TableHead, TableRow, Typography } from '@mui/material'
+import AddIcon from '@mui/icons-material/Add'
+import PhoneIcon from '@mui/icons-material/PhoneOutlined'
 import { friendlyError } from '../api/client'
 import { getBookingBenefits, listBookings, setBookingStatus } from '../api/salonApi'
 import { useAuth } from '../auth/AuthContext'
@@ -20,7 +22,13 @@ const FILTERS = [
   { value: 'completed', label: 'Completed' },
   { value: 'cancelled', label: 'Cancelled' },
 ]
-const STATUS_COLOR = { pending: 'warning', confirmed: 'info', completed: 'success', cancelled: 'default' }
+// Status ke halke (soft) rang: background, text aur chhota dot
+const STATUS_STYLE = {
+  pending: { bg: '#fff4dc', fg: '#8a5a00', dot: '#e0a100' },
+  confirmed: { bg: '#e3f0fb', fg: '#0b5394', dot: '#2f8fde' },
+  completed: { bg: '#e2f2e5', fg: '#25602f', dot: '#2f6b3a' },
+  cancelled: { bg: '#f1ebe6', fg: '#7a6150', dot: '#a8978a' },
+}
 // Har status se kaun-kaun si agli action ho sakti hai
 const ACTIONS = {
   pending: [{ to: 'confirmed', label: 'Confirm' }, { to: 'cancelled', label: 'Decline', color: 'error' }],
@@ -29,6 +37,10 @@ const ACTIONS = {
   cancelled: [],
 }
 
+const dateParts = (date) => {
+  const d = new Date(`${date}T00:00:00`)
+  return { day: d.getDate(), month: d.toLocaleDateString('en-IN', { month: 'short' }), weekday: d.toLocaleDateString('en-IN', { weekday: 'long' }) }
+}
 const formatDate = (date) => new Date(`${date}T00:00:00`).toLocaleDateString('en-IN', { weekday: 'short', day: 'numeric', month: 'short' })
 
 // Customers ki aayi hui appointments. Owner, manager aur receptionist confirm ya cancel kar sakte hain.
@@ -77,13 +89,13 @@ export default function AppointmentsPage() {
   const pageCount = Math.max(1, Math.ceil((query.data?.meta?.total ?? 0) / 20))
 
   return (
-    <Box sx={{ maxWidth: 1100 }}>
-      <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 2, mb: 2, flexWrap: 'wrap' }}>
-        <Typography variant="h4" component="h1" sx={{ fontWeight: 800, color: 'primary.main' }}>
-          Appointments
+    <Box>
+      <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 1.5, mb: 1.5, flexWrap: 'wrap' }}>
+        <Typography variant="body2" color="text.secondary">
+          Confirm, complete or cancel bookings from your customers.
         </Typography>
         {canWrite && (
-          <Button variant="contained" onClick={() => navigate('/appointments/new')}>
+          <Button variant="contained" size="small" startIcon={<AddIcon />} sx={{ minHeight: 40 }} onClick={() => navigate('/appointments/new')}>
             New appointment
           </Button>
         )}
@@ -93,11 +105,24 @@ export default function AppointmentsPage() {
           Appointment saved for {created.name} on {formatDate(created.date)} at {created.time}. It is waiting for confirmation.
         </Alert>
       )}
-      <Tabs value={status} onChange={(_, v) => changeStatus(v)} variant="scrollable" sx={{ mb: 2 }}>
-        {FILTERS.map((f) => (
-          <Tab key={f.value} value={f.value} label={f.label} />
-        ))}
-      </Tabs>
+      <Box role="tablist" aria-label="Filter appointments" sx={{ display: 'flex', gap: 0.75, mb: 1.5, overflowX: 'auto', pb: 0.25 }}>
+        {FILTERS.map((f) => {
+          const active = status === f.value
+          return (
+            <Chip
+              key={f.value}
+              role="tab"
+              aria-selected={active}
+              label={f.label}
+              clickable
+              onClick={() => changeStatus(f.value)}
+              color={active ? 'primary' : 'default'}
+              variant={active ? 'filled' : 'outlined'}
+              sx={{ height: 32, fontSize: '0.8125rem', bgcolor: active ? undefined : '#fff', borderColor: active ? 'primary.main' : 'divider', flexShrink: 0 }}
+            />
+          )
+        })}
+      </Box>
       {actionError && (
         <Alert severity="error" onClose={() => setActionError('')} sx={{ mb: 2 }}>
           {actionError}
@@ -106,77 +131,127 @@ export default function AppointmentsPage() {
 
       <QueryState query={query} isEmpty={bookings.length === 0} empty={<Alert severity="info">No appointments here yet. When a customer books from the Explore page, it will show up here.</Alert>}>
         <TableContainer component={Paper}>
-          <ResponsiveTable size="small" aria-label="Appointments">
+          <ResponsiveTable
+            size="medium"
+            aria-label="Appointments"
+          >
             <TableHead>
               <TableRow>
-                <TableCell>When</TableCell>
-                <TableCell>Customer</TableCell>
+                <TableCell sx={{ width: 150 }}>When</TableCell>
+                <TableCell sx={{ width: 200 }}>Customer</TableCell>
                 <TableCell>Services</TableCell>
-                <TableCell>Staff</TableCell>
-                <TableCell align="right">Total</TableCell>
-                <TableCell>Status</TableCell>
-                {canWrite && <TableCell />}
+                <TableCell sx={{ width: 90 }}>Staff</TableCell>
+                <TableCell align="right" sx={{ width: 140 }}>Total</TableCell>
+                <TableCell sx={{ width: 120 }}>Status</TableCell>
+                {canWrite && <TableCell align="right" sx={{ width: { xs: 150, lg: 250 } }}>Actions</TableCell>}
               </TableRow>
             </TableHead>
             <TableBody>
-              {bookings.map((b) => (
+              {bookings.map((b) => {
+                const d = dateParts(b.date)
+                const st = STATUS_STYLE[b.status]
+                return (
                 <TableRow key={b.id}>
                   <TableCell sx={{ whiteSpace: 'nowrap' }}>
-                    <strong>{formatDate(b.date)}</strong>
-                    <br />
-                    {b.startTime} · {b.durationMin} min
+                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5, textAlign: 'left' }}>
+                      <Box sx={{ width: 38, height: 40, flex: 'none', borderRadius: '10px', background: 'linear-gradient(180deg,#f3e7c9,#fbf3de)', border: '1px solid #ead9a8', display: 'grid', placeItems: 'center', textAlign: 'center', lineHeight: 1.1 }}>
+                        <Box>
+                          <Typography component="span" sx={{ display: 'block', fontSize: '0.58rem', fontWeight: 700, letterSpacing: '0.08em', textTransform: 'uppercase', color: '#8a6a1f' }}>
+                            {d.month}
+                          </Typography>
+                          <Typography component="span" sx={{ display: 'block', fontSize: '1rem', fontWeight: 800, color: 'text.primary' }}>
+                            {d.day}
+                          </Typography>
+                        </Box>
+                      </Box>
+                      <Box>
+                        <Typography variant="body2" sx={{ fontWeight: 700 }}>
+                          {d.weekday}
+                        </Typography>
+                        <Typography variant="caption" color="text.secondary">
+                          {b.startTime} · {b.durationMin} min
+                        </Typography>
+                      </Box>
+                    </Box>
                   </TableCell>
                   <TableCell>
-                    {b.customerName}
-                    <br />
-                    <Link href={`tel:${b.customerPhone}`} underline="hover">
-                      {b.customerPhone}
-                    </Link>
-                    {b.mode === 'home' && (
-                      <Typography variant="caption" display="block" color="text.secondary">
-                        🏠 {b.address}
-                      </Typography>
-                    )}
-                    {b.note && (
-                      <Typography variant="caption" display="block" color="text.secondary">
-                        Note: {b.note}
-                      </Typography>
-                    )}
+                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5, textAlign: 'left' }}>
+                      <Avatar sx={{ width: 32, height: 32, flex: 'none', bgcolor: 'primary.main', fontSize: '0.85rem', fontWeight: 700 }}>{b.customerName.trim().charAt(0).toUpperCase()}</Avatar>
+                      <Box sx={{ minWidth: 0, maxWidth: { md: 150 } }}>
+                        <Typography variant="body2" noWrap sx={{ fontWeight: 700, textTransform: 'capitalize' }}>
+                          {b.customerName}
+                        </Typography>
+                        <Link href={`tel:${b.customerPhone}`} underline="hover" variant="caption" color="text.secondary" sx={{ display: 'inline-flex', alignItems: 'center', gap: 0.4 }}>
+                          <PhoneIcon sx={{ fontSize: 13 }} />
+                          {b.customerPhone}
+                        </Link>
+                        {b.mode === 'home' && (
+                          <Typography variant="caption" color="text.secondary" sx={{ display: 'block' }}>
+                            🏠 {b.address}
+                          </Typography>
+                        )}
+                        {b.note && (
+                          <Typography variant="caption" color="text.secondary" sx={{ display: 'block' }}>
+                            Note: {b.note}
+                          </Typography>
+                        )}
+                      </Box>
+                    </Box>
                   </TableCell>
-                  <TableCell>{b.services.map((s) => s.name).join(', ')}</TableCell>
-                  <TableCell>{b.staffName || '-'}</TableCell>
+                  <TableCell>
+                    <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5, justifyContent: { xs: 'flex-end', md: 'flex-start' } }}>
+                      {b.services.map((s, i) => (
+                        <Chip key={`${s.name}-${i}`} size="small" label={s.name} sx={{ height: 22, bgcolor: '#f6efe7', color: 'text.primary', fontWeight: 600, fontSize: '0.72rem' }} />
+                      ))}
+                    </Box>
+                  </TableCell>
+                  <TableCell>
+                    <Typography variant="body2" color={b.staffName ? 'text.primary' : 'text.disabled'}>
+                      {b.staffName || '—'}
+                    </Typography>
+                  </TableCell>
                   <TableCell align="right">
-                    {formatMoney(b.total)}
-                    {b.membership && (
-                      <Chip size="small" color="success" variant="outlined" label={`⭐ ${b.membership.planName}: −${formatMoney(b.membership.discount)}`} sx={{ mt: 0.5, display: 'flex' }} />
-                    )}
-                    {b.offer && (
-                      <Chip size="small" color="warning" variant="outlined" label={`🏷️ ${b.offer.title}: −${formatMoney(b.offer.discount)}`} sx={{ mt: 0.5 }} />
-                    )}
+                    <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: 0.5 }}>
+                      <Typography variant="body2" sx={{ fontWeight: 700 }}>
+                        {formatMoney(b.total)}
+                      </Typography>
+                      {b.membership && (
+                        <Chip size="small" color="success" variant="outlined" label={`⭐ ${b.membership.planName}: −${formatMoney(b.membership.discount)}`} sx={{ maxWidth: '100%', fontSize: '0.7rem' }} />
+                      )}
+                      {b.offer && (
+                        <Chip size="small" color="warning" variant="outlined" label={`🏷️ ${b.offer.title}: −${formatMoney(b.offer.discount)}`} sx={{ maxWidth: '100%', fontSize: '0.7rem' }} />
+                      )}
+                    </Box>
                   </TableCell>
                   <TableCell>
-                    <Chip size="small" color={STATUS_COLOR[b.status]} label={b.status} sx={{ textTransform: 'capitalize' }} />
+                    <Box component="span" sx={{ display: 'inline-flex', alignItems: 'center', gap: 0.75, px: 1.1, py: 0.35, borderRadius: 99, bgcolor: st.bg, color: st.fg, fontSize: '0.75rem', fontWeight: 700, textTransform: 'capitalize' }}>
+                      <Box component="span" sx={{ width: 6, height: 6, borderRadius: '50%', bgcolor: st.dot }} />
+                      {b.status}
+                    </Box>
                   </TableCell>
                   {canWrite && (
-                    <TableCell align="right" sx={{ whiteSpace: 'nowrap' }}>
-                      {canBenefits && b.status !== 'cancelled' && (
-                        <Button size="small" onClick={() => setBenefitsFor(b)}>
-                          Benefits
-                        </Button>
-                      )}
-                      {ACTIONS[b.status].map((a) => (
-                        <Button key={a.to} size="small" color={a.color ?? 'primary'} disabled={change.isPending} onClick={() => change.mutate({ id: b.id, to: a.to, booking: b })}>
-                          {a.label}
-                        </Button>
-                      ))}
+                    <TableCell align="right">
+                      <Box sx={{ display: 'flex', flexWrap: { xs: 'wrap', lg: 'nowrap' }, justifyContent: 'flex-end', alignItems: 'center', gap: 0.75, whiteSpace: 'nowrap' }}>
+                        {canBenefits && b.status !== 'cancelled' && (
+                          <Button size="small" variant="outlined" color="inherit" sx={{ minHeight: 32, borderColor: 'divider', color: 'text.secondary' }} onClick={() => setBenefitsFor(b)}>
+                            Benefits
+                          </Button>
+                        )}
+                        {ACTIONS[b.status].map((a) => (
+                          <Button key={a.to} size="small" variant={a.color ? 'text' : 'contained'} color={a.color ?? 'primary'} disabled={change.isPending} sx={{ minHeight: 32 }} onClick={() => change.mutate({ id: b.id, to: a.to, booking: b })}>
+                            {a.label}
+                          </Button>
+                        ))}
+                      </Box>
                     </TableCell>
                   )}
                 </TableRow>
-              ))}
+                )
+              })}
             </TableBody>
           </ResponsiveTable>
         </TableContainer>
-        {pageCount > 1 && <Pagination sx={{ mt: 2 }} count={pageCount} page={page} onChange={(_, p) => setPage(p)} />}
+        {pageCount > 1 && <Pagination sx={{ mt: 1.5 }} count={pageCount} page={page} onChange={(_, p) => setPage(p)} />}
       </QueryState>
       {benefitsFor && <BenefitsDialog booking={benefitsFor} onClose={() => setBenefitsFor(null)} />}
     </Box>

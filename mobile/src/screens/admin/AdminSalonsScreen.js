@@ -5,6 +5,7 @@ import { fetchPlatformSalons } from '../../api/platformApi'
 import { friendlyError } from '../../api/client'
 import { FilterChips, StatusBadge } from '../../components/Chips'
 import { Card, ErrorNote } from '../../components/Screen'
+import { EmptyState, LoadingState } from '../../components/States'
 import { COLORS, TOUCH_MIN } from '../../config/theme'
 
 const STATUSES = [
@@ -68,7 +69,7 @@ export default function AdminSalonsScreen({ navigation }) {
       onRefresh={query.refetch}
       onEndReached={() => query.hasNextPage && !query.isFetchingNextPage && query.fetchNextPage()}
       onEndReachedThreshold={0.4}
-      ListEmptyComponent={query.isLoading ? <ActivityIndicator style={styles.loader} color={COLORS.brown} /> : !query.isError ? <Text style={styles.empty}>No salons found.</Text> : null}
+      ListEmptyComponent={query.isLoading ? <LoadingState /> : !query.isError ? <EmptyState title="No salons found" /> : null}
       ListFooterComponent={query.isFetchingNextPage ? <ActivityIndicator color={COLORS.brown} /> : null}
       renderItem={({ item }) => (
         <Pressable accessibilityRole="button" accessibilityLabel={item.name} onPress={() => navigation.navigate('SalonDetail', { id: item.id, name: item.name })}>

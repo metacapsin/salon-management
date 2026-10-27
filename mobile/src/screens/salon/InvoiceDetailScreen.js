@@ -1,5 +1,5 @@
 import { useRef, useState } from 'react'
-import { ActivityIndicator, StyleSheet, Text, View } from 'react-native'
+import { StyleSheet, Text, View } from 'react-native'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { fetchInvoice, recordPayment, refundPayment, voidInvoice } from '../../api/billingApi'
 import { friendlyError } from '../../api/client'
@@ -9,6 +9,7 @@ import Button from '../../components/Button'
 import { StatusBadge } from '../../components/Chips'
 import { ChoiceChips } from '../../components/Form'
 import { Card, ErrorNote, Screen, SectionTitle } from '../../components/Screen'
+import { LoadingState } from '../../components/States'
 import TextField from '../../components/TextField'
 import { COLORS } from '../../config/theme'
 import { newRequestKey, paiseToRupeesText, rupeesTextToPaise } from '../../utils/money'
@@ -139,7 +140,7 @@ export default function InvoiceDetailScreen({ route }) {
 
   return (
     <Screen onRefresh={query.refetch} refreshing={query.isRefetching}>
-      {query.isLoading ? <ActivityIndicator color={COLORS.brown} style={{ marginTop: 24 }} /> : null}
+      {query.isLoading ? <LoadingState /> : null}
       {query.isError ? <ErrorNote message={friendlyError(query.error)} onRetry={query.refetch} /> : null}
 
       {invoice ? (

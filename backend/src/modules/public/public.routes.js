@@ -390,4 +390,70 @@ router.post('/salons/:id/bookings', authenticateCustomer, bookLimit, validate({ 
   )
 })
 
+// ---------- Customer ki apni appointments: dekhna aur cancel karna ----------
+const CANCEL_BEFORE_MIN = 120 // shuru hone se itne minute pehle tak hi customer cancel kar sakta he
+
+// Salon ke timezone me "abhi" ko minutes me (booking ke date+time se seedha tulna ke liye, dono ko UTC maan kar)
+function minutesInZone(date, time) {
+  const [y, m, d] = date.split('-').map(Number)
+  const [hh, mm] = time.split(':').map(Number)
+  return Date.UTC(y, m - 1, d, hh, mm) / 60_000
+}
+function nowMinutesInZone(timezone) {
+  const parts = Object.fromEntries(
+    new Intl.DateTimeFormat('en-CA', { timeZone: timezone, year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit', hourCycle: 'h23' })
+      .formatToParts(new Date())
+      .map((p) => [p.type, p.value]),
+  )
+  return minutesInZone(`${parts.year}-${parts.month}-${parts.day}`, `${parts.hour}:${parts.minute}`)
+}
+const canCancel = (booking, timezone) =>
+  ['pending', 'confirmed'].includes(booking.status) && minutesInZone(booking.date, booking.startTime) - nowMinutesInZone(timezone) >= CANCEL_BEFORE_MIN
+
+// GET /public/my-bookings -> logged-in customer ki sari appointments (nayi pehle)
+router.get('/my-bookings', authenticateCustomer, async (req, res) => {
+  const bookings = await Booking.find({ customerId: req.customer._id }).sort({ date: -1, startTime: -1 }).limit(50).lean()
+  const salons = await Salon.find({ _id: { $in: [...new Set(bookings.map((b) => String(b.salonId)))] } }).select('name timezone').lean()
+  const bySalon = new Map(salons.map((s) => [String(s._id), s]))
+  sendSuccess(req, res, {
+    bookings: bookings.map((b) => {
+      const salon = bySalon.get(String(b.salonId))
+      return {
+        id: b._id,
+        salonName: salon?.name ?? 'Salon',
+        date: b.date,
+        startTime: b.startTime,
+        durationMin: b.durationMin,
+        mode: b.mode,
+        services: b.services.map((s) => s.name),
+        total: b.total,
+        status: b.status,
+        canCancel: salon ? canCancel(b, salon.timezone) : false,
+      }
+    }),
+  })
+})
+
+// POST /public/my-bookings/:id/cancel -> customer apni appointment cancel kare (sirf pending/confirmed, shuru hone se 2 ghante pehle tak)
+router.post('/my-bookings/:id/cancel', authenticateCustomer, validate({ params: idParams }), async (req, res) => {
+  const booking = await Booking.findOne({ _id: req.valid.params.id, customerId: req.customer._id })
+  if (!booking) throw new ApiError(404, 'NOT_FOUND', 'Appointment not found.')
+  if (!['pending', 'confirmed'].includes(booking.status)) {
+    throw new ApiError(409, 'INVALID_STATUS', `A ${booking.status} appointment cannot be cancelled.`)
+  }
+  const salon = await Salon.findById(booking.salonId).select('timezone').lean()
+  if (!salon || !canCancel(booking, salon.timezone)) {
+    throw new ApiError(409, 'TOO_LATE_TO_CANCEL', 'This appointment is too close to its start time to cancel online. Please call the salon.')
+  }
+  booking.status = 'cancelled'
+  await booking.save()
+  await Notification.create({
+    salonId: booking.salonId,
+    type: 'booking_cancelled',
+    title: 'Appointment cancelled by customer',
+    body: `${booking.customerName} cancelled ${booking.services.map((s) => s.name).join(', ')} on ${booking.date} at ${booking.startTime}.`,
+  })
+  sendSuccess(req, res, { booking: { id: booking._id, status: booking.status } })
+})
+
 module.exports = router

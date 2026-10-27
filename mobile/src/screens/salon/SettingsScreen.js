@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { ActivityIndicator, StyleSheet, Text, View } from 'react-native'
+import { StyleSheet, Text, View } from 'react-native'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { fetchSalonSettings, updateSalonSettings } from '../../api/salonApi'
 import { friendlyError } from '../../api/client'
@@ -9,6 +9,7 @@ import Button from '../../components/Button'
 import { StatusBadge } from '../../components/Chips'
 import { SwitchRow } from '../../components/Form'
 import { Card, ErrorNote, Screen, SectionTitle } from '../../components/Screen'
+import { LoadingState } from '../../components/States'
 import { COLORS } from '../../config/theme'
 import { formatDate } from '../../utils/formatMoney'
 import { FACILITY_LABELS } from './SettingsFormScreen'
@@ -66,7 +67,7 @@ export default function SettingsScreen({ navigation }) {
 
   return (
     <Screen onRefresh={query.refetch} refreshing={query.isRefetching}>
-      {query.isLoading ? <ActivityIndicator color={COLORS.brown} style={{ marginTop: 24 }} /> : null}
+      {query.isLoading ? <LoadingState /> : null}
       {query.isError ? <ErrorNote message={friendlyError(query.error)} onRetry={query.refetch} /> : null}
 
       {salon ? (
