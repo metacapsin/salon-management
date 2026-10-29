@@ -105,7 +105,7 @@ export default function CustomerLoginForm({ onDone, intro }) {
   return (
     <>
       <Typography variant="h4" component="h1" sx={{ fontFamily: 'var(--lp-heading)', fontWeight: 700, color: 'var(--lp-espresso)' }}>
-        {step === 'phone' ? 'Log in to Glamora' : step === 'otp' ? 'Enter the code' : 'One last thing'}
+        {step === 'phone' ? 'Log in to Galora' : step === 'otp' ? 'Enter the code' : 'One last thing'}
       </Typography>
       <Typography color="text.secondary" sx={{ mt: 0.5, mb: 3 }}>
         {step === 'phone' && (intro ?? 'Log in with your mobile number to find and book salons near you.')}

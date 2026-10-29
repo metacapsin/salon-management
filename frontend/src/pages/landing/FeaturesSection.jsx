@@ -11,7 +11,7 @@ export default function FeaturesSection() {
           <div className="lp-section-head lp-section-head--center">
             <p className="lp-eyebrow lp-eyebrow--dark">Features</p>
             <h2 id="lp-features-title">Everything your salon needs, nothing it does not</h2>
-            <p>From the first booking to the last bill of the day, Glamora keeps every part of your salon connected.</p>
+            <p>From the first booking to the last bill of the day, Galora keeps every part of your salon connected.</p>
           </div>
         </Reveal>
 

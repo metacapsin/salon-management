@@ -99,7 +99,7 @@ test('a salon owner token does not work as a customer login, and the customer co
   const agent = h.request.agent(h.app)
   const asked = await askOtp(agent, '9810020007')
   const done = await verify(agent, { phone: '9810020007', otp: asked.body.data.devOtp, name: 'Tara Das' })
-  const cookie = done.headers['set-cookie'].find((c) => c.startsWith('glamora_ct='))
+  const cookie = done.headers['set-cookie'].find((c) => c.startsWith('galora_ct='))
   assert.match(cookie, /HttpOnly/i)
   assert.match(cookie, /SameSite=Lax/i)
 })

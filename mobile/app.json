@@ -1,15 +1,15 @@
 {
   "expo": {
-    "name": "Glamora",
-    "slug": "glamora-mobile",
-    "scheme": "glamora",
+    "name": "Galora",
+    "slug": "galora-mobile",
+    "scheme": "galora",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "light",
     "backgroundColor": "#faf6f1",
     "android": {
-      "package": "com.glamora.salon",
+      "package": "com.galora.salon",
       "allowBackup": false,
       "adaptiveIcon": {
         "backgroundColor": "#2e1b0f",
@@ -25,7 +25,7 @@
       "expo-secure-store",
       "expo-font",
       "expo-status-bar",
-      ["expo-location", { "locationWhenInUsePermission": "Glamora uses your location to show salons near you." }],
+      ["expo-location", { "locationWhenInUsePermission": "Galora uses your location to show salons near you." }],
       ["expo-build-properties", { "android": { "usesCleartextTraffic": true } }]
     ]
   }

@@ -43,7 +43,7 @@ export default function RegisterPage() {
   return (
     <AuthLayout
       title="Create owner account"
-      subtitle="Set up your salon on Glamora."
+      subtitle="Set up your salon on Galora."
       footer={<Link to="/login">Already have an account? Sign in</Link>}
     >
       <form className="login-form" onSubmit={handleSubmit(onSubmit)} noValidate>

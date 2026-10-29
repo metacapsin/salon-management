@@ -4,7 +4,7 @@
 const env = require('../config/env')
 
 const BASE = 'https://nominatim.openstreetmap.org'
-const USER_AGENT = env.GEOCODER_USER_AGENT || 'Glamora/1.0 (salon discovery app)'
+const USER_AGENT = env.GEOCODER_USER_AGENT || 'Galora/1.0 (salon discovery app)'
 const MIN_GAP_MS = 1100
 const CACHE_TTL_MS = 24 * 60 * 60 * 1000
 const CACHE_MAX = 2000

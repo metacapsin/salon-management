@@ -153,7 +153,7 @@ export default function ExploreSection() {
       <main className="lp-container ex-main">
         <div className="ex-hero">
           <div className="ex-hero__text">
-            <p className="ex-hero__eyebrow">Glamora</p>
+            <p className="ex-hero__eyebrow">Galora</p>
             <h2>Find Your Perfect Salon</h2>
             <p>Discover the best beauty and grooming services near you.</p>
             {status === 'authenticated' && (

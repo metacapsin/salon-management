@@ -9,9 +9,9 @@ export default function BenefitsSection() {
       <div className="lp-container">
         <Reveal>
           <div className="lp-section-head lp-section-head--center">
-            <p className="lp-eyebrow">Why Glamora</p>
+            <p className="lp-eyebrow">Why Galora</p>
             <h2 id="lp-benefits-title">Software that gives you your time back</h2>
-            <p>Spend your energy on clients and craft. Let Glamora handle the rest.</p>
+            <p>Spend your energy on clients and craft. Let Galora handle the rest.</p>
           </div>
         </Reveal>
 

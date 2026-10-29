@@ -78,7 +78,7 @@ export default function AppLayout() {
   const drawer = (
     <Box sx={{ width: DRAWER_WIDTH, display: 'flex', flexDirection: 'column', height: '100%', bgcolor: COLORS.espresso, color: SIDEBAR_TEXT }}>
       <Box sx={{ px: 3, pt: 3, pb: 2 }}>
-        <Typography sx={{ fontFamily: "'Playfair Display', Georgia, serif", fontSize: '1.9rem', fontWeight: 700, color: COLORS.gold, lineHeight: 1 }}>Glamora</Typography>
+        <Typography sx={{ fontFamily: "'Playfair Display', Georgia, serif", fontSize: '1.9rem', fontWeight: 700, color: COLORS.gold, lineHeight: 1 }}>Galora</Typography>
         <Typography variant="caption" sx={{ color: 'rgba(233,220,205,0.7)', letterSpacing: '0.08em' }}>
           SALON &amp; BEAUTY PARLOUR
         </Typography>
@@ -166,7 +166,7 @@ export default function AppLayout() {
           <IconButton edge="start" color="inherit" aria-label="Open menu" onClick={() => setOpen(true)}>
             <MenuIcon />
           </IconButton>
-          <Typography sx={{ ml: 1, fontFamily: "'Playfair Display', Georgia, serif", fontSize: '1.4rem', fontWeight: 700, color: COLORS.gold }}>Glamora</Typography>
+          <Typography sx={{ ml: 1, fontFamily: "'Playfair Display', Georgia, serif", fontSize: '1.4rem', fontWeight: 700, color: COLORS.gold }}>Galora</Typography>
           <Typography variant="body2" sx={{ ml: 'auto', color: SIDEBAR_TEXT }} noWrap>
             {activeSalon?.salonName}
           </Typography>

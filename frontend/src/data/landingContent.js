@@ -36,7 +36,7 @@ export const features = [
     id: 'staff',
     icon: 'clock',
     title: 'Staff scheduling',
-    text: 'Set shifts, breaks and leave once. Glamora only offers slots when the right person is actually free.',
+    text: 'Set shifts, breaks and leave once. Galora only offers slots when the right person is actually free.',
     points: ['Shifts, breaks and leave', 'Skills for each service', 'Staff see their own day'],
   },
   {
@@ -77,7 +77,7 @@ export const benefits = [
   { icon: 'trending', title: 'Numbers you can trust', text: 'See daily collections and your best services without adding anything up by hand.' },
   { icon: 'users', title: 'Clients who return', text: 'Packages, memberships and customer history make it easy to look after regulars.' },
   { icon: 'rupee', title: 'Made for India', text: 'Prices in rupees and payments recorded the way your clients actually pay: cash, UPI or card.' },
-  { icon: 'sparkle', title: 'Works on your phone', text: 'Open Glamora in a browser on any phone. There is no app to install.' },
+  { icon: 'sparkle', title: 'Works on your phone', text: 'Open Galora in a browser on any phone. There is no app to install.' },
 ]
 
 export const aboutFacts = [

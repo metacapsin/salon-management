@@ -1,4 +1,4 @@
-// Glamora design tokens: chocolate brown, gold and warm cream (same family as the website's frontend/src/theme.js).
+// Galora design tokens: chocolate brown, gold and warm cream (same family as the website's frontend/src/theme.js).
 // Use gold only as an accent on dark brown; on cream or white use brown or goldDeep, because pale gold text is hard to read there.
 export const COLORS = {
   espresso: '#2e1b0f', // chocolate brown: headers, hero areas

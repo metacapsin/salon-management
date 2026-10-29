@@ -86,7 +86,7 @@ test('mobile refresh: junk, missing and cookie-only tokens are refused', async (
   // Website ka cookie mobile refresh me kaam nahi karta
   await h.createVerifiedUser('m6@x.com')
   const web = await h.request(h.app).post(api('/auth/login')).send({ email: 'm6@x.com', password: h.PASSWORD })
-  const cookie = web.headers['set-cookie'].find((c) => c.startsWith('glamora_rt=')).split(';')[0]
+  const cookie = web.headers['set-cookie'].find((c) => c.startsWith('galora_rt=')).split(';')[0]
   const res = await h.request(h.app).post(mobile('/refresh')).set('Cookie', cookie).send({})
   assert.equal(res.status, 400)
 })
@@ -115,5 +115,5 @@ test('website cookie flow is unchanged: it still sets a cookie and has no refres
   const web = await h.request(h.app).post(api('/auth/login')).send({ email: 'm9@x.com', password: h.PASSWORD })
   assert.equal(web.status, 200)
   assert.equal(web.body.data.refreshToken, undefined)
-  assert.match(web.headers['set-cookie'].find((c) => c.startsWith('glamora_rt=')), /HttpOnly/i)
+  assert.match(web.headers['set-cookie'].find((c) => c.startsWith('galora_rt=')), /HttpOnly/i)
 })

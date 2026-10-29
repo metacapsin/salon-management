@@ -1,7 +1,7 @@
 import { salonTypes } from '../../data/landingContent'
 import Reveal from './Reveal'
 
-// "Services" section: Glamora kis-kis tarah ke salon ke liye bana hai (photo cards).
+// "Services" section: Galora kis-kis tarah ke salon ke liye bana hai (photo cards).
 export default function ServicesSection() {
   return (
     <section id="services" className="lp-section lp-section--beige" aria-labelledby="lp-services-title">
@@ -10,7 +10,7 @@ export default function ServicesSection() {
           <div className="lp-section-head lp-section-head--center">
             <p className="lp-eyebrow lp-eyebrow--dark">Services</p>
             <h2 id="lp-services-title">Made for every kind of salon</h2>
-            <p>Whether you style hair, paint faces or pamper skin, Glamora fits the way you work.</p>
+            <p>Whether you style hair, paint faces or pamper skin, Galora fits the way you work.</p>
           </div>
         </Reveal>
 

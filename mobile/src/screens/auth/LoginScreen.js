@@ -146,7 +146,7 @@ export default function LoginScreen({ onSubmit, onRequestOtp, onVerifyOtp, initi
           <View style={styles.logo}>
             <Ionicons name="sparkles" size={28} color={COLORS.espresso} />
           </View>
-          <Text style={styles.brand}>Glamora</Text>
+          <Text style={styles.brand}>Galora</Text>
           <Text style={styles.tag}>Beauty & salon, beautifully simple</Text>
         </View>
 

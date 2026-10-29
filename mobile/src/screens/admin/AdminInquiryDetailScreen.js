@@ -65,7 +65,7 @@ export default function AdminInquiryDetailScreen({ route }) {
             <Text style={styles.value}>{inquiry.email}</Text>
             <Text style={styles.value}>{inquiry.phone}</Text>
             <View style={styles.links}>
-              <LinkButton label="Email customer" url={`mailto:${inquiry.email}?subject=${encodeURIComponent('Your message to Glamora')}`} />
+              <LinkButton label="Email customer" url={`mailto:${inquiry.email}?subject=${encodeURIComponent('Your message to Galora')}`} />
               <LinkButton label="Call customer" url={`tel:${phoneDigits}`} />
             </View>
           </Card>

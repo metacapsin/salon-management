@@ -3,7 +3,7 @@ const assert = require('node:assert/strict')
 const h = require('./helpers')
 
 const api = (path) => `/api/v1${path}`
-const cookieOf = (res) => (res.headers['set-cookie'] || []).find((c) => c.startsWith('glamora_rt='))
+const cookieOf = (res) => (res.headers['set-cookie'] || []).find((c) => c.startsWith('galora_rt='))
 
 before(h.connect)
 after(h.disconnect)

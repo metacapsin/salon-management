@@ -1,5 +1,5 @@
 /* =====================================================================
-   Glamora application styling (plain CSS, koi library nahi)
+   Galora application styling (plain CSS, koi library nahi)
    Saare class naam "gl-" se shuru hote hain, taaki login.css se na takraayein.
    Rang sabse pehle "variables" me likhe hain: ek jagah badlo, poore app me badal jaye.
 
@@ -272,7 +272,7 @@
   display: none;
 }
 
-/* Sidebar me Glamora ke neeche hide/show button (sirf desktop par) */
+/* Sidebar me Galora ke neeche hide/show button (sirf desktop par) */
 .gl-sidebar__toggle {
   display: grid;
   place-items: center;

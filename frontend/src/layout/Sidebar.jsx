@@ -29,7 +29,7 @@ export default function Sidebar({ isOpen, onNavigate, onToggle, collapsed }) {
         <span className="gl-brand__mark" aria-hidden="true">
           G
         </span>
-        <span className="gl-brand__name">Glamora</span>
+        <span className="gl-brand__name">Galora</span>
         <span className="gl-brand__sub">SALON &amp; BEAUTY PARLOUR</span>
         {/* Desktop par sidebar hide/show ka button (mobile par header wala hamburger chalta hai) */}
         <button type="button" className="gl-sidebar__toggle" onClick={onToggle} aria-label={collapsed ? 'Show menu' : 'Hide menu'} aria-expanded={!collapsed} title={collapsed ? 'Show menu' : 'Hide menu'}>

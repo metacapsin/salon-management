@@ -27,7 +27,7 @@ export default function ProductPreview() {
         </Reveal>
 
         <Reveal delay={120}>
-          <div className="lp-window" role="img" aria-label="Preview of the Glamora dashboard with appointments, customers, revenue and staff availability">
+          <div className="lp-window" role="img" aria-label="Preview of the Galora dashboard with appointments, customers, revenue and staff availability">
             <div className="lp-window__bar" aria-hidden="true">
               <span />
               <span />

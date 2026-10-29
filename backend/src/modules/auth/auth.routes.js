@@ -47,7 +47,7 @@ router.post(
     } else {
       await sendMail({
         to: existing.email,
-        subject: 'You already have a Glamora account',
+        subject: 'You already have a Galora account',
         text: `Someone tried to register with this email. If it was you, just sign in or reset your password at ${env.PUBLIC_APP_URL}/forgot-password.`,
       })
     }
@@ -183,7 +183,7 @@ router.post('/password-reset', validate({ body: z.strictObject({ email }) }), as
     const resetToken = await svc.issueToken({ purpose: 'password_reset', userId: user._id, ttlMs: env.PASSWORD_RESET_TTL_MS })
     await sendMail({
       to: user.email,
-      subject: 'Reset your Glamora password',
+      subject: 'Reset your Galora password',
       text: `Use this link to choose a new password:\n${env.PUBLIC_APP_URL}/reset-password?token=${resetToken}\n\nIt works once and expires in 30 minutes. If you did not ask for this, ignore this email.`,
     })
   }

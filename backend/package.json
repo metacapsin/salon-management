@@ -1,8 +1,8 @@
 {
-  "name": "glamora-backend",
+  "name": "galora-backend",
   "version": "1.0.0",
   "private": true,
-  "description": "Glamora salon management backend",
+  "description": "Galora salon management backend",
   "main": "src/server.js",
   "scripts": {
     "start": "node src/server.js",

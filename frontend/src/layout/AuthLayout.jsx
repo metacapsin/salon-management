@@ -7,9 +7,9 @@ export default function AuthLayout({ title, subtitle, children, footer }) {
     <main className="login">
       <div className="login__inner">
         <section className="login__brand">
-          <p className="login__brand-name">Glamora</p>
+          <p className="login__brand-name">Galora</p>
           <p className="login__brand-sub">Salon &amp; Beauty Parlour Management</p>
-          <p className="login__brand-tagline">Glow up with Glamora.</p>
+          <p className="login__brand-tagline">Glow up with Galora.</p>
         </section>
 
         <section className="login__card" aria-labelledby="auth-title">

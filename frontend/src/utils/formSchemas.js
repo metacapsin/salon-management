@@ -171,7 +171,7 @@ export const inviteSchema = z.object({
   role: z.enum(['manager', 'receptionist']),
 })
 
-// "Glamora Demo!" -> "glamora-demo"
+// "Galora Demo!" -> "galora-demo"
 export function slugify(text) {
   return text
     .toLowerCase()

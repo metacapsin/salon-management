@@ -14,7 +14,7 @@ async function main() {
   for (const salon of stale) await salon.save()
   if (stale.length > 0) console.log(`Filled city keys for ${stale.length} salon(s)`)
 
-  app.listen(env.PORT, () => console.log(`Glamora API running on http://localhost:${env.PORT}`))
+  app.listen(env.PORT, () => console.log(`Galora API running on http://localhost:${env.PORT}`))
 }
 
 main().catch((error) => {

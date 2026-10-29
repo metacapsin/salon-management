@@ -11,7 +11,7 @@ export default function Header({ onMenuClick, menuOpen, collapsed }) {
   const { activeSalon } = useAuth()
   const { pathname } = useLocation()
   // Jis page par hain uska naam heading me
-  const title = ALL_NAV.find((item) => item.to === pathname)?.label ?? 'Glamora'
+  const title = ALL_NAV.find((item) => item.to === pathname)?.label ?? 'Galora'
 
   return (
     <header className="gl-header">

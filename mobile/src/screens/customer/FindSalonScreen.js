@@ -157,7 +157,7 @@ export default function FindSalonScreen({ navigation }) {
     <View>
       <View style={[styles.hero, { paddingTop: 14 + insets.top }]}>
         <View style={styles.heroTop}>
-          <Text style={styles.brand}>Glamora</Text>
+          <Text style={styles.brand}>Galora</Text>
           <View style={styles.heroActions}>
             <Pressable onPress={() => setSheet(true)} accessibilityRole="button" accessibilityLabel={`Location: ${placeLabel}`} style={styles.place}>
               <Ionicons name="location" size={14} color={COLORS.gold} />
@@ -176,7 +176,7 @@ export default function FindSalonScreen({ navigation }) {
             )}
           </View>
         </View>
-        <Text style={styles.welcome}>{guest ? 'Welcome to Glamora' : `Hello, ${firstName}`}</Text>
+        <Text style={styles.welcome}>{guest ? 'Welcome to Galora' : `Hello, ${firstName}`}</Text>
         <Text style={styles.headline}>Find your perfect salon</Text>
         <View style={styles.search}>
           <Ionicons name="search" size={20} color={COLORS.muted} />

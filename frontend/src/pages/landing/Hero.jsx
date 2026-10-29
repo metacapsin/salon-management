@@ -17,7 +17,7 @@ export default function Hero() {
             Run your salon <em>beautifully.</em>
           </h1>
           <p className="lp-hero__text">
-            Glamora brings bookings, customers, staff, billing and memberships into one calm workspace, so you spend less time on paperwork and more time with your clients.
+            Galora brings bookings, customers, staff, billing and memberships into one calm workspace, so you spend less time on paperwork and more time with your clients.
           </p>
           <div className="lp-hero__buttons">
             <Link to="/register" className="lp-btn lp-btn--gold lp-btn--lg">

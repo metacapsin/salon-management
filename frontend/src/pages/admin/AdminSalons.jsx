@@ -7,7 +7,7 @@ import QueryState from '../../components/QueryState'
 import CreateSalonDialog from '../../features/admin/CreateSalonDialog'
 import ResponsiveTable from '../../components/ResponsiveTable'
 
-// Glamora par registered saare salons. Search aur status filter server par chalta he.
+// Galora par registered saare salons. Search aur status filter server par chalta he.
 export default function AdminSalons() {
   const [page, setPage] = useState(1)
   const [text, setText] = useState('')

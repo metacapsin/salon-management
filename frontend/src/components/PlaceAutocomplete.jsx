@@ -7,7 +7,7 @@ import { INDIAN_CITIES } from '../data/indianCities'
 // Pehle turant: jin shehron me salon hain + bade shehron ki list. Phir type karte hi (300 ms ruk kar) poore India me search
 // (OpenStreetMap). Suggestion me na ho to bhi jo likha hai wahi Enter dabakar chun sakte hain.
 //   value: abhi ka shehar (string)   onSelect({ city, lat?, lng? })
-//   salonCities: [{ city, salonCount }] (jin shehron me Glamora ke salon hain)
+//   salonCities: [{ city, salonCount }] (jin shehron me Galora ke salon hain)
 export default function PlaceAutocomplete({ value, salonCities, onSelect, size = 'small' }) {
   const [input, setInput] = useState(value ?? '')
   const [remote, setRemote] = useState([])

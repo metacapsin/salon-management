@@ -33,7 +33,7 @@ export default function LandingNavbar() {
   return (
     <header className={scrolled || menuOpen ? 'lp-nav lp-nav--solid' : 'lp-nav'}>
       <div className="lp-container lp-nav__inner">
-        <a href="#home" className="lp-nav__brand" aria-label="Glamora home" onClick={closeMenu}>
+        <a href="#home" className="lp-nav__brand" aria-label="Galora home" onClick={closeMenu}>
           <Logo />
         </a>
 

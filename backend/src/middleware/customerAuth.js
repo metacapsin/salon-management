@@ -4,7 +4,7 @@ const env = require('../config/env')
 const ApiError = require('../utils/apiError')
 const { Customer } = require('../models')
 
-const CUSTOMER_COOKIE = 'glamora_ct'
+const CUSTOMER_COOKIE = 'galora_ct'
 const CUSTOMER_SESSION_MS = 30 * 24 * 60 * 60 * 1000
 // Cookie sirf /api/v1 par jaati hai. SameSite=Lax: dusri site se POST ke saath cookie nahi jaati (CSRF se bachav).
 const cookieOptions = { httpOnly: true, secure: env.cookieSecure, sameSite: 'lax', path: '/api/v1' }

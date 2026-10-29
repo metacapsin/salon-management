@@ -68,8 +68,8 @@ router.post('/auth/request-otp', requireAllowedOrigin, requestLimit, validate({ 
     await CustomerOtp.create({ phone: mobile, email: emailTo, codeHash: codeHash(mobile, code), expiresAt: new Date(now + OTP_TTL_MS) })
     await sendMail({
       to: emailTo,
-      subject: `${code} is your Glamora login code`,
-      text: `Your Glamora login code is ${code}.\n\nIt is valid for 5 minutes. Do not share it with anyone.\nIf you did not ask for this, you can ignore this email.`,
+      subject: `${code} is your Galora login code`,
+      text: `Your Galora login code is ${code}.\n\nIt is valid for 5 minutes. Do not share it with anyone.\nIf you did not ask for this, you can ignore this email.`,
     })
   } else if (env.verifyConfigured) {
     // Twilio Verify apna code bhejta he; yaha ka hash bas placeholder (kisi code se match nahi hota). Cooldown/attempts yahi ginte hain.
@@ -77,7 +77,7 @@ router.post('/auth/request-otp', requireAllowedOrigin, requestLimit, validate({ 
     await startVerification(`+91${mobile}`)
   } else {
     await CustomerOtp.create({ phone: mobile, codeHash: codeHash(mobile, code), expiresAt: new Date(now + OTP_TTL_MS) })
-    await sendSms({ to: `+91${mobile}`, text: `${code} is your Glamora login code. It is valid for 5 minutes. Do not share it with anyone.` })
+    await sendSms({ to: `+91${mobile}`, text: `${code} is your Galora login code. It is valid for 5 minutes. Do not share it with anyone.` })
   }
 
   // devOtp sirf development/test me: SMS provider jodne se pehle bina SMS ke login try karne ke liye. Production me kabhi nahi.

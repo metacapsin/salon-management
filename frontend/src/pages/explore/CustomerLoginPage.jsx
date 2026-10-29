@@ -20,7 +20,7 @@ export default function CustomerLoginPage() {
     <div className="lp ex ex-login">
       <header className="ex-header">
         <div className="lp-container ex-header__inner">
-          <Link to="/" aria-label="Glamora home">
+          <Link to="/" aria-label="Galora home">
             <Logo />
           </Link>
         </div>

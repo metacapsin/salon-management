@@ -6,7 +6,7 @@ const { z } = require('zod')
 const schema = z.object({
   NODE_ENV: z.enum(['development', 'test', 'production']).default('development'),
   PORT: z.coerce.number().int().positive().default(3000),
-  MONGO_URI: z.string().min(1).default('mongodb://127.0.0.1:27018/glamora?replicaSet=rs0&directConnection=true'),
+  MONGO_URI: z.string().min(1).default('mongodb://127.0.0.1:27018/galora?replicaSet=rs0&directConnection=true'),
   JWT_ACCESS_SECRET: z.string().min(32, 'JWT_ACCESS_SECRET must be at least 32 characters'),
   CLIENT_ORIGIN: z.string().url().default('http://localhost:5173'),
   PUBLIC_APP_URL: z.string().url().default('http://localhost:5173'),

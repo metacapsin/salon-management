@@ -8,10 +8,10 @@ import * as SecureStore from 'expo-secure-store'
 // sessionStorage. If the browser blocks site data (some Chrome settings do), the token is kept in memory, and ALSO
 // in window.name, but only in a development build running on localhost. window.name survives a page refresh in the
 // same tab even when storage is blocked. A production build (__DEV__ is false) never uses window.name.
-const KEY = 'glamora_refresh_token'
+const KEY = 'galora_refresh_token'
 // A customer's long-lived login token is kept the same way (SecureStore on a phone).
-const CUSTOMER_KEY = 'glamora_customer_token'
-const NAME_PREFIX = 'glamora_dev_rt='
+const CUSTOMER_KEY = 'galora_customer_token'
+const NAME_PREFIX = 'galora_dev_rt='
 const isWeb = Platform.OS === 'web'
 
 let memoryToken = null
@@ -50,8 +50,8 @@ export function canRememberLogin() {
   if (devNameAllowed()) return true // the localhost development fallback above keeps it
   try {
     const store = globalThis.sessionStorage
-    store.setItem('glamora_probe', '1')
-    store.removeItem('glamora_probe')
+    store.setItem('galora_probe', '1')
+    store.removeItem('galora_probe')
     return true
   } catch {
     return false

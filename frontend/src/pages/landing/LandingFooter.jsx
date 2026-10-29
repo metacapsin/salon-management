@@ -42,7 +42,7 @@ export default function LandingFooter() {
       </div>
 
       <div className="lp-container lp-footer__bottom">
-        <p>© {year} Glamora. All rights reserved.</p>
+        <p>© {year} Galora. All rights reserved.</p>
         <a href="#home">Back to top ↑</a>
       </div>
     </footer>

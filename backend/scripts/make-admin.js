@@ -1,4 +1,4 @@
-// Kisi ko Glamora Super Admin banata hai (ya hata deta hai). Ye sirf server par command se hota hai, kisi API se kabhi nahi.
+// Kisi ko Galora Super Admin banata hai (ya hata deta hai). Ye sirf server par command se hota hai, kisi API se kabhi nahi.
 // Pehle us email se normal register karke email verify kar lo (password wahi se milta hai, yahan koi password nahi maanga jaata).
 //
 // Chalane ka tareeka:

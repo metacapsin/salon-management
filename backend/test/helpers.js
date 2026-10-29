@@ -1,7 +1,7 @@
-// Tests alag database (glamora_test) me chalte hain, aapke asli data ko nahi chhuate.
+// Tests alag database (galora_test) me chalte hain, aapke asli data ko nahi chhuate.
 // Replica set chahiye: pehle `npm run db` chalu rakho.
 process.env.NODE_ENV = 'test'
-process.env.MONGO_URI = 'mongodb://127.0.0.1:27018/glamora_test?replicaSet=rs0&directConnection=true'
+process.env.MONGO_URI = 'mongodb://127.0.0.1:27018/galora_test?replicaSet=rs0&directConnection=true'
 process.env.JWT_ACCESS_SECRET = process.env.JWT_ACCESS_SECRET || 'test-secret-test-secret-test-secret-123456'
 
 const mongoose = require('mongoose')

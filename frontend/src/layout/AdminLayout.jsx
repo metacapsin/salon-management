@@ -68,7 +68,7 @@ export default function AdminLayout() {
           <span className="gl-brand__mark" aria-hidden="true">
             G
           </span>
-          <span className="gl-brand__name">Glamora</span>
+          <span className="gl-brand__name">Galora</span>
           <span className="gl-brand__sub">PLATFORM ADMIN</span>
           <button type="button" className="gl-sidebar__toggle" onClick={toggleMenu} aria-label={collapsed ? 'Show menu' : 'Hide menu'} aria-expanded={!collapsed} title={collapsed ? 'Show menu' : 'Hide menu'}>
             <Icon name="menu" size={20} />

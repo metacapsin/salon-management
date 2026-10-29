@@ -277,7 +277,7 @@ router.post('/salons/:id/view', authenticateCustomer, viewLimit, validate({ para
   // Ek hi step me "dhundho, na mile to banao": do requests ek saath aayein to bhi ek hi notification banti hai
   const result = await Notification.updateOne(
     { salonId: salon._id, type: 'salon_viewed', viewerKey: viewerId, createdAt: { $gt: since } },
-    { $setOnInsert: { title: 'A customer is looking at your salon', body: `${req.customer.name} (+91 ${req.customer.phone}) just opened your salon page on Glamora.` } },
+    { $setOnInsert: { title: 'A customer is looking at your salon', body: `${req.customer.name} (+91 ${req.customer.phone}) just opened your salon page on Galora.` } },
     { upsert: true },
   )
   sendSuccess(req, res, { counted: result.upsertedCount > 0 })

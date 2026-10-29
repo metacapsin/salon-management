@@ -80,7 +80,7 @@ router.post(
     })
     await sendMail({
       to: addr,
-      subject: `You are invited to ${req.salon.name} on Glamora`,
+      subject: `You are invited to ${req.salon.name} on Galora`,
       text: `${req.user.name} invited you to join ${req.salon.name} as ${role}.\nAccept here: ${env.PUBLIC_APP_URL}/accept-invitation?token=${inviteToken}\n\nThe link works once and expires in 48 hours.`,
     })
     await recordAudit(req, { action: 'invitation.created', entityType: 'invitation', changes: { email: addr, role } })

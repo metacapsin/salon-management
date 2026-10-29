@@ -3,24 +3,24 @@
 // Dobara chalane par jo pehle se hai use chhodta hai (duplicate nahi banata).
 // Production me chalne se mana hai (SRS section 24.1: production me test contacts kabhi nahi).
 //
-// Sab demo users ka password: Glamora-Demo-2026
+// Sab demo users ka password: Galora-Demo-2026
 const mongoose = require('mongoose')
 const env = require('../src/config/env')
 const { User, Salon, Branch, Membership, Service } = require('../src/models')
 const { hashPassword } = require('../src/modules/auth/auth.service')
 const { placeKey } = require('../src/utils/placeKey')
 
-const DEMO_PASSWORD = 'Glamora-Demo-2026'
+const DEMO_PASSWORD = 'Galora-Demo-2026'
 
 const SALONS = [
   {
-    name: 'Glamora Demo Salon',
-    slug: 'glamora-demo',
+    name: 'Galora Demo Salon',
+    slug: 'galora-demo',
     city: 'Jaipur',
     people: [
-      ['Asha Verma', 'owner@glamora-demo.test', 'owner'],
-      ['Meera Joshi', 'manager@glamora-demo.test', 'manager'],
-      ['Riya Singh', 'reception@glamora-demo.test', 'receptionist'],
+      ['Asha Verma', 'owner@galora-demo.test', 'owner'],
+      ['Meera Joshi', 'manager@galora-demo.test', 'manager'],
+      ['Riya Singh', 'reception@galora-demo.test', 'receptionist'],
     ],
   },
   {

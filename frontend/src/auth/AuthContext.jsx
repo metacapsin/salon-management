@@ -5,7 +5,7 @@ import { refreshSession, setAccessToken, setActiveSalonId, setSessionLostHandler
 
 const AuthContext = createContext(null)
 
-const SALON_KEY = 'glamora.activeSalonId'
+const SALON_KEY = 'galora.activeSalonId'
 
 // localStorage kabhi band/khaali ho sakta hai (private window), isliye try/catch. Sirf salon ki id yaad rakhte hain, token nahi.
 function readStoredSalon() {

@@ -10,7 +10,7 @@ export default function NoSalonScreen() {
   return (
     <View style={styles.screen}>
       <View style={styles.card}>
-        <EmptyState icon="storefront-outline" title="No salon yet" text="Your account is not linked to a salon. Ask your salon owner to invite you, or create your salon on the Glamora website." />
+        <EmptyState icon="storefront-outline" title="No salon yet" text="Your account is not linked to a salon. Ask your salon owner to invite you, or create your salon on the Galora website." />
         <Button title="Sign out" icon="log-out-outline" variant="secondary" onPress={logout} />
       </View>
     </View>
