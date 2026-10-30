@@ -1,19 +1,20 @@
 import { useState } from 'react'
 import { Link as RouterLink, useParams } from 'react-router-dom'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
-import { Alert, Box, Button, Card, CardContent, Chip, Dialog, DialogActions, DialogContent, DialogTitle, TextField, Typography } from '@mui/material'
+import { Alert, Button, Dialog, DialogActions, DialogContent, DialogTitle, TextField, Typography } from '@mui/material'
 import { friendlyError } from '../../api/client'
 import { getPlatformSalon, setPlatformSalonStatus } from '../../api/platformApi'
-import QueryState from '../../components/QueryState'
+import AdminQueryState from '../../components/admin/AdminQueryState'
+import PageHeader from '../../components/admin/PageHeader'
+import StatusPill from '../../components/admin/StatusPill'
+import Icon from '../../components/Icon'
 
-function Field({ label, children }) {
+function Field({ label, wide, children }) {
   return (
-    <Box sx={{ py: 0.75 }}>
-      <Typography variant="caption" color="text.secondary" display="block">
-        {label}
-      </Typography>
-      <Typography>{children || '—'}</Typography>
-    </Box>
+    <div className={wide ? 'ad-field ad-field--wide' : 'ad-field'}>
+      <dt>{label}</dt>
+      <dd>{children || '—'}</dd>
+    </div>
   )
 }
 
@@ -41,48 +42,66 @@ export default function AdminSalonDetail() {
     .map(([role, n]) => `${n} ${role}`)
     .join(', ')
 
+  const back = (
+    <RouterLink to="/admin/salons" className="ad-back">
+      <Icon name="chevron" size={16} />
+      All salons
+    </RouterLink>
+  )
+
   return (
-    <Box sx={{ maxWidth: 800 }}>
-      <Button component={RouterLink} to="/admin/salons" sx={{ mb: 1 }}>
-        ← All salons
-      </Button>
-      <QueryState query={query}>
+    <>
+      {salon ? (
+        <PageHeader
+          back={back}
+          title={
+            <span className="ad-title-row">
+              {salon.name}
+              <StatusPill label={salon.status} tone={salon.status === 'active' ? 'success' : 'warning'} />
+            </span>
+          }
+          subtitle={salon.slug ? `Booking address: ${salon.slug}` : undefined}
+          actions={
+            <Button variant="outlined" color={nextStatus === 'suspended' ? 'error' : 'success'} onClick={() => setDialogOpen(true)}>
+              {nextStatus === 'suspended' ? 'Suspend salon' : 'Activate salon'}
+            </Button>
+          }
+        />
+      ) : (
+        <PageHeader back={back} title="Salon details" />
+      )}
+      <AdminQueryState query={query} rows={4}>
         {salon && (
-          <>
-            <Box sx={{ display: 'flex', gap: 2, alignItems: 'center', flexWrap: 'wrap', mb: 2 }}>
-              <Typography variant="h4" component="h1" sx={{ fontWeight: 800, color: 'primary.main' }}>
-                {salon.name}
-              </Typography>
-              <Chip label={salon.status} color={salon.status === 'active' ? 'success' : 'warning'} />
-              <Button variant="outlined" color={nextStatus === 'suspended' ? 'error' : 'success'} onClick={() => setDialogOpen(true)} sx={{ ml: 'auto' }}>
-                {nextStatus === 'suspended' ? 'Suspend salon' : 'Activate salon'}
-              </Button>
-            </Box>
-            <Card>
-              <CardContent sx={{ display: 'grid', gap: 1, gridTemplateColumns: { xs: '1fr', sm: '1fr 1fr' } }}>
-                <Field label="Booking address (slug)">{salon.slug}</Field>
-                <Field label="Registered on">{new Date(salon.createdAt).toLocaleString()}</Field>
-                <Field label="Owner">{salon.ownerName}</Field>
-                <Field label="Owner email">{salon.ownerEmail}</Field>
-                <Field label="Owner phone">{salon.ownerPhone}</Field>
-                <Field label="Team">{team}</Field>
-                <Field label="Address">{address}</Field>
-                <Field label="Timezone">{salon.timezone}</Field>
-                <Field label="Audience">{salon.audience}</Field>
-                <Field label="Booking page">{salon.publicBookingEnabled ? 'Published' : 'Not published'}</Field>
-                <Box sx={{ gridColumn: '1 / -1' }}>
-                  <Field label="About">{salon.about}</Field>
-                </Box>
-              </CardContent>
-            </Card>
-          </>
+          <section className="ad-panel" aria-label="Salon details">
+            <div className="ad-panel__head">
+              <div>
+                <h2>Salon profile</h2>
+                <p>Platform-level details. Customers, bookings and billing stay private to the salon.</p>
+              </div>
+            </div>
+            <dl className="ad-detail">
+              <Field label="Booking address (slug)">{salon.slug}</Field>
+              <Field label="Registered on">{new Date(salon.createdAt).toLocaleString()}</Field>
+              <Field label="Owner">{salon.ownerName}</Field>
+              <Field label="Owner email">{salon.ownerEmail}</Field>
+              <Field label="Owner phone">{salon.ownerPhone}</Field>
+              <Field label="Team">{team}</Field>
+              <Field label="Address">{address}</Field>
+              <Field label="Timezone">{salon.timezone}</Field>
+              <Field label="Audience">{salon.audience}</Field>
+              <Field label="Booking page">{salon.publicBookingEnabled ? 'Published' : 'Not published'}</Field>
+              <Field label="About" wide>
+                {salon.about}
+              </Field>
+            </dl>
+          </section>
         )}
-      </QueryState>
+      </AdminQueryState>
 
       <Dialog open={dialogOpen} onClose={() => setDialogOpen(false)} fullWidth maxWidth="xs">
         <DialogTitle>{nextStatus === 'suspended' ? 'Suspend this salon?' : 'Activate this salon?'}</DialogTitle>
         <DialogContent>
-          <Typography sx={{ mb: 2 }}>
+          <Typography sx={{ mb: 2 }} color="text.secondary">
             {nextStatus === 'suspended' ? 'The salon team can still read their data, but they cannot make changes until you activate it again.' : 'The salon team can make changes again.'}
           </Typography>
           <TextField label="Reason (optional)" value={reason} onChange={(e) => setReason(e.target.value)} fullWidth multiline minRows={2} slotProps={{ htmlInput: { maxLength: 300 } }} />
@@ -99,6 +118,6 @@ export default function AdminSalonDetail() {
           </Button>
         </DialogActions>
       </Dialog>
-    </Box>
+    </>
   )
 }

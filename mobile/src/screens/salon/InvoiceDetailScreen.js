@@ -179,9 +179,13 @@ export default function InvoiceDetailScreen({ route }) {
             <Row label="Subtotal" value={formatPaise(invoice.subtotal)} />
             {invoice.offer ? <Row label={`Offer: ${invoice.offer.title}`} value={`−${formatPaise(invoice.offer.discount)}`} color={COLORS.success} /> : null}
             {invoice.membership ? <Row label={`Membership: ${invoice.membership.planName}`} value={`−${formatPaise(invoice.membership.discount)}`} color={COLORS.success} /> : null}
-            <Row label="Taxable amount" value={formatPaise(invoice.taxableAmount)} />
-            <Row label={`CGST (${invoice.tax.ratePercent / 2}%)`} value={formatPaise(invoice.tax.cgst)} />
-            <Row label={`SGST (${invoice.tax.ratePercent / 2}%)`} value={formatPaise(invoice.tax.sgst)} />
+            {invoice.tax.total > 0 ? (
+              <>
+                <Row label="Taxable amount" value={formatPaise(invoice.taxableAmount)} />
+                <Row label={`CGST (${invoice.tax.ratePercent / 2}%)`} value={formatPaise(invoice.tax.cgst)} />
+                <Row label={`SGST (${invoice.tax.ratePercent / 2}%)`} value={formatPaise(invoice.tax.sgst)} />
+              </>
+            ) : null}
             <View style={styles.divider} />
             <Row label="Total" value={formatPaise(invoice.total)} bold />
             <Row label="Paid" value={formatPaise(invoice.amountPaid)} />

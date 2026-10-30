@@ -95,7 +95,10 @@
   margin-top: 16px;
   overflow-x: auto;
   padding-bottom: 6px;
-  scrollbar-width: thin;
+  scrollbar-width: none;
+}
+.ex-cats::-webkit-scrollbar {
+  display: none;
 }
 .ex-cat {
   flex: 0 0 auto;
@@ -817,4 +820,96 @@
   .ex-tab {
     min-height: 44px;
   }
+}
+
+/* ---------- salon photo slider (card + popup) ---------- */
+.ex-slider {
+  position: absolute;
+  inset: 0;
+}
+.ex-slider {
+  overflow: hidden;
+}
+.ex-slider img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  animation: ex-slider-fade 0.7s ease;
+}
+.ex-slider img.ex-slider__img {
+  object-fit: contain; /* poori photo dikhe, crop na ho (card ke `.ex-card__media img` cover se zyada specific) */
+}
+.ex-slider img.ex-slider__bg {
+  object-fit: cover;
+  filter: blur(18px) brightness(0.85);
+  transform: scale(1.15); /* blur ke kinare saaf na dikhein */
+}
+@keyframes ex-slider-fade {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .ex-slider img {
+    animation: none;
+  }
+}
+.ex-slider__arrow {
+  position: absolute;
+  top: 50%;
+  z-index: 3; /* card ke clickable overlay ke upar */
+  transform: translateY(-50%);
+  width: 32px;
+  height: 32px;
+  border: 0;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.92);
+  color: var(--lp-brown);
+  font-size: 1.4rem;
+  line-height: 1;
+  display: grid;
+  place-items: center;
+  cursor: pointer;
+  box-shadow: 0 2px 6px rgba(46, 27, 15, 0.3);
+  opacity: 0.9;
+}
+.ex-slider__arrow:hover,
+.ex-slider__arrow:focus-visible {
+  opacity: 1;
+  background: #fff;
+}
+.ex-slider__arrow:focus-visible {
+  outline: 2px solid var(--lp-gold-deep);
+}
+.ex-slider__arrow--prev {
+  left: 8px;
+}
+.ex-slider__arrow--next {
+  right: 8px;
+}
+.ex-slider__dots {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 10px;
+  z-index: 3;
+  display: flex;
+  justify-content: center;
+  gap: 5px;
+  pointer-events: none;
+}
+.ex-slider__dots span {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.6);
+  box-shadow: 0 0 2px rgba(0, 0, 0, 0.4);
+}
+.ex-slider__dots span.is-on {
+  background: #fff;
+  transform: scale(1.25);
 }

@@ -6,6 +6,7 @@ import { useAuth } from '../../auth/AuthContext'
 import ActivityList from '../../components/ActivityList'
 import AppointmentTable from '../../components/AppointmentTable'
 import Icon from '../../components/Icon'
+import ReviewsPanel from '../../components/ReviewsPanel'
 import ScheduleSummary from '../../components/ScheduleSummary'
 import StaffAvailability from '../../components/StaffAvailability'
 import StatCard from '../../components/StatCard'
@@ -152,6 +153,8 @@ export default function DashboardOverview() {
             <h3 id="gl-activity-title">Recent activity</h3>
             <ActivityList items={activity} />
           </section>
+
+          <ReviewsPanel />
         </div>
 
         <section className="gl-card gl-panel gl-fade-up" style={{ '--delay': '500ms' }} aria-labelledby="gl-staff-title">

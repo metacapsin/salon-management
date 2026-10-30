@@ -2,9 +2,11 @@ import { Pressable, StyleSheet, Text, View } from 'react-native'
 import { Ionicons } from '@expo/vector-icons'
 import { useQuery } from '@tanstack/react-query'
 import { fetchBillingSummary, fetchPendingAppointmentCount } from '../../api/dashboardApi'
+import { fetchReviews } from '../../api/salonApi'
 import { friendlyError } from '../../api/client'
 import { useAuth } from '../../auth/AuthContext'
 import { ROLE_LABELS, roleCan } from '../../auth/permissions'
+import { Stars } from '../../components/Reviews'
 import { Card, ErrorNote, Screen, SectionTitle, StatCard } from '../../components/Screen'
 import { COLORS, FONT, RADIUS, SHADOW } from '../../config/theme'
 import { formatPaise } from '../../utils/formatPaise'
@@ -35,6 +37,7 @@ export default function DashboardScreen({ navigation }) {
   const canAppointments = roleCan(role, 'appointments.read')
   const canNew = roleCan(role, 'appointments.write')
   const canBill = roleCan(role, 'billing.write')
+  const canReviews = roleCan(role, 'reviews.read')
   const today = todayString()
 
   const todayQuery = useQuery({
@@ -51,6 +54,12 @@ export default function DashboardScreen({ navigation }) {
     queryKey: ['pending-appointments', activeSalonId],
     queryFn: fetchPendingAppointmentCount,
     enabled: canAppointments,
+  })
+
+  const reviewsQuery = useQuery({
+    queryKey: ['reviews', activeSalonId, 'summary'],
+    queryFn: () => fetchReviews({ page: 1, pageSize: 1 }),
+    enabled: canReviews,
   })
 
   const queries = [todayQuery, allQuery, pendingQuery].filter((q) => q.fetchStatus !== 'idle' || q.data !== undefined)
@@ -109,6 +118,26 @@ export default function DashboardScreen({ navigation }) {
         </>
       ) : null}
 
+      {canReviews ? (
+        <>
+          <SectionTitle>Customer reviews</SectionTitle>
+          <Pressable accessibilityRole="button" accessibilityLabel="Open reviews" onPress={() => navigation.navigate('Reviews')} style={styles.reviews}>
+            {reviewsQuery.data && reviewsQuery.data.summary.count > 0 ? (
+              <>
+                <Text style={styles.reviewAvg}>{reviewsQuery.data.summary.average.toFixed(1)}</Text>
+                <View style={{ flex: 1 }}>
+                  <Stars value={reviewsQuery.data.summary.average} size={16} />
+                  <Text style={styles.muted}>{reviewsQuery.data.summary.count} {reviewsQuery.data.summary.count === 1 ? 'review' : 'reviews'} · see all and reply</Text>
+                </View>
+              </>
+            ) : (
+              <Text style={[styles.muted, { flex: 1 }]}>{reviewsQuery.isLoading ? 'Loading…' : 'No reviews yet. Customers get a review request after an appointment is completed.'}</Text>
+            )}
+            <Ionicons name="chevron-forward" size={20} color={COLORS.muted} />
+          </Pressable>
+        </>
+      ) : null}
+
       {!canBilling && !canAppointments ? (
         <Card>
           <Text style={styles.muted}>Use the More tab to open the sections available to your role.</Text>
@@ -125,6 +154,8 @@ const styles = StyleSheet.create({
   rolePill: { flexDirection: 'row', alignItems: 'center', gap: 6, alignSelf: 'flex-start', marginTop: 12, paddingHorizontal: 12, paddingVertical: 5, borderRadius: RADIUS.pill, borderWidth: 1, borderColor: 'rgba(230,199,103,0.5)' },
   roleText: { color: COLORS.gold, fontSize: 13, fontWeight: '600' },
   quick: { flexDirection: 'row', gap: 12, marginBottom: 4 },
+  reviews: { flexDirection: 'row', alignItems: 'center', gap: 12, minHeight: 64, backgroundColor: COLORS.surface, borderRadius: RADIUS.lg, borderWidth: 1, borderColor: COLORS.line, padding: 14 },
+  reviewAvg: { fontSize: 30, fontWeight: '700', color: COLORS.espresso, fontFamily: FONT.heading },
   action: { flex: 1, flexDirection: 'row', alignItems: 'center', gap: 8, minHeight: 56, backgroundColor: COLORS.surface, borderRadius: RADIUS.lg, borderWidth: 1, borderColor: COLORS.line, padding: 10 },
   actionIcon: { width: 36, height: 36, borderRadius: 12, backgroundColor: COLORS.gold, alignItems: 'center', justifyContent: 'center' },
   actionText: { flex: 1, fontSize: 13, fontWeight: '700', color: COLORS.ink },

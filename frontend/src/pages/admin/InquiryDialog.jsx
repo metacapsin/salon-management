@@ -1,9 +1,10 @@
 import { useState } from 'react'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
-import { Alert, Box, Button, Chip, Dialog, DialogContent, DialogTitle, Divider, MenuItem, Stack, TextField, Typography } from '@mui/material'
+import { Alert, Box, Button, Dialog, DialogContent, DialogTitle, Divider, MenuItem, Stack, TextField, Typography } from '@mui/material'
 import { addContactInquiryNote, getContactInquiry, setContactInquiryStatus } from '../../api/platformApi'
 import { friendlyError } from '../../api/client'
 import QueryState from '../../components/QueryState'
+import StatusPill from '../../components/admin/StatusPill'
 import { INQUIRY_STATUSES, statusInfo } from '../../data/inquiry'
 
 // Ek inquiry ki poori detail: message, customer se contact, status, admin notes.
@@ -41,7 +42,7 @@ export default function InquiryDialog({ id, onClose }) {
                   {inquiry.name}
                 </Typography>
                 <Box sx={{ display: 'flex', gap: 1, mt: 0.5, flexWrap: 'wrap' }}>
-                  <Chip size="small" label={statusInfo(inquiry.status).label} color={statusInfo(inquiry.status).color} />
+                  <StatusPill label={statusInfo(inquiry.status).label} tone={statusInfo(inquiry.status).color} />
                   <Typography variant="caption" color="text.secondary" sx={{ alignSelf: 'center' }}>
                     Received {new Date(inquiry.createdAt).toLocaleString()}
                   </Typography>
@@ -111,7 +112,7 @@ export default function InquiryDialog({ id, onClose }) {
           )}
         </QueryState>
       </DialogContent>
-      <Box sx={{ p: 1.5, display: 'flex', justifyContent: 'flex-end' }}>
+      <Box sx={{ px: 3, py: 2, display: 'flex', justifyContent: 'flex-end' }}>
         <Button onClick={onClose}>Close</Button>
       </Box>
     </Dialog>
@@ -121,7 +122,7 @@ export default function InquiryDialog({ id, onClose }) {
 // Customer ka message: line breaks bachakar, lambe shabd tootkar dikhata hai
 function MessageBox({ children }) {
   return (
-    <Box sx={{ p: 1.5, borderRadius: 1, bgcolor: 'action.hover', whiteSpace: 'pre-wrap', overflowWrap: 'anywhere' }}>
+    <Box sx={{ p: 2, borderRadius: 2, bgcolor: '#faf6f0', border: '1px solid #e9e0d4', whiteSpace: 'pre-wrap', overflowWrap: 'anywhere' }}>
       <Typography variant="body2">{children}</Typography>
     </Box>
   )

@@ -4,9 +4,10 @@ const express = require('express')
 const { sendSuccess } = require('../../utils/response')
 const { z, objectId } = require('../../utils/schemas')
 const ApiError = require('../../utils/apiError')
+const { publicUrl } = require('../../utils/uploads')
 const { validate, limiter } = require('../../middleware/common')
 const { authenticateCustomer } = require('../../middleware/customerAuth')
-const { Salon, Service, Notification, Branch, Booking, Offer } = require('../../models')
+const { Salon, Service, Notification, Branch, Booking, Offer, Review } = require('../../models')
 const { buildSlots, dateInRange } = require('../bookings/slots')
 const { placeKey } = require('../../utils/placeKey')
 const { discountFor } = require('../offers/pricing')
@@ -58,13 +59,14 @@ function distanceKm(lat1, lng1, lat2, lng2) {
   return 6371 * 2 * Math.asin(Math.sqrt(a))
 }
 
-function card(salon, distance) {
+function card(salon, distance, req) {
   return {
     id: salon._id,
     name: salon.name,
     slug: salon.slug,
     about: salon.about,
-    coverUrl: salon.coverUrl,
+    coverUrl: publicUrl(req, salon.coverUrl),
+    images: (salon.images ?? []).map((u) => publicUrl(req, u)),
     city: salon.address?.city ?? '',
     area: salon.address?.area ?? '',
     audience: salon.audience,
@@ -164,7 +166,7 @@ router.get('/salons', validate({ query: listQuery }), async (req, res) => {
   const items = salons.map((s) => {
     const { lat, lng } = s.address?.location ?? {}
     const known = hasOrigin && typeof lat === 'number' && typeof lng === 'number'
-    return card(s, known ? distanceKm(f.lat, f.lng, lat, lng) : null)
+    return card(s, known ? distanceKm(f.lat, f.lng, lat, lng) : null, req)
   })
   const badges = await offerBadges(salons)
   for (const item of items) item.offer = badges.get(String(item.id)) ?? null
@@ -214,7 +216,7 @@ router.get('/nearest-salons', validate({ query: nearestQuery }), async (req, res
   const { lat, lng, limit } = req.valid.query
   const salons = await Salon.find({ ...baseFilter, 'address.location.lat': { $type: 'number' }, 'address.location.lng': { $type: 'number' } }).limit(2000).lean()
   const items = salons
-    .map((s) => card(s, distanceKm(lat, lng, s.address.location.lat, s.address.location.lng)))
+    .map((s) => card(s, distanceKm(lat, lng, s.address.location.lat, s.address.location.lng), req))
     .sort((a, b) => a.distanceKm - b.distanceKm)
     .slice(0, limit)
   const badges = await offerBadges(salons)
@@ -237,7 +239,7 @@ router.get('/salons/:id', authenticateCustomer, validate({ params: idParams }), 
   const a = salon.address ?? {}
   sendSuccess(req, res, {
     salon: {
-      ...card(salon, null),
+      ...card(salon, null, req),
       offers: offers.map((o) => ({
         id: o._id,
         title: o.title,
@@ -415,11 +417,14 @@ router.get('/my-bookings', authenticateCustomer, async (req, res) => {
   const bookings = await Booking.find({ customerId: req.customer._id }).sort({ date: -1, startTime: -1 }).limit(50).lean()
   const salons = await Salon.find({ _id: { $in: [...new Set(bookings.map((b) => String(b.salonId)))] } }).select('name timezone').lean()
   const bySalon = new Map(salons.map((s) => [String(s._id), s]))
+  const reviews = new Map((await Review.find({ bookingId: { $in: bookings.map((b) => b._id) } }).select('bookingId').lean()).map((r) => [String(r.bookingId), r._id]))
   sendSuccess(req, res, {
     bookings: bookings.map((b) => {
       const salon = bySalon.get(String(b.salonId))
       return {
         id: b._id,
+        reviewId: reviews.get(String(b._id)) ?? null,
+        canReview: b.status === 'completed' && !reviews.has(String(b._id)),
         salonName: salon?.name ?? 'Salon',
         date: b.date,
         startTime: b.startTime,

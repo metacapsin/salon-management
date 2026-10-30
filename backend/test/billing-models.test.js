@@ -8,10 +8,10 @@ const { Invoice } = require('../src/models')
 before(h.connect)
 after(h.disconnect)
 
-test('money: rupees to paise and 18% GST split', () => {
+test('money: rupees to paise and no GST', () => {
   assert.equal(toPaise(499), 49900)
   assert.equal(toPaise(0.1 + 0.2), 30)
-  assert.deepEqual(gstOn(100000), { taxRatePercent: 18, cgst: 9000, sgst: 9000, tax: 18000 })
+  assert.deepEqual(gstOn(100000), { taxRatePercent: 0, cgst: 0, sgst: 0, tax: 0 })
   // odd paisa: cgst + sgst hamesha tax ke barabar
   const g = gstOn(10001)
   assert.equal(g.cgst + g.sgst, g.tax)

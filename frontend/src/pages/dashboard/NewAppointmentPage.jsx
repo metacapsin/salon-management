@@ -4,6 +4,7 @@ import { useNavigate } from 'react-router-dom'
 import { fieldErrorsOf, friendlyError } from '../../api/client'
 import { createBooking, listBookingSlots, listServices, listStaff } from '../../api/salonApi'
 import { useAuth } from '../../auth/AuthContext'
+import SelectBox from '../../components/SelectBox'
 import { NAME_ERROR, NAME_PATTERN } from '../../utils/validators'
 
 // Aaj ki tarikh "YYYY-MM-DD" (local). toISOString UTC deta hai, isliye khud banate hain.
@@ -111,7 +112,7 @@ export default function NewAppointmentPage() {
 
   return (
     <div className="gl-dashboard">
-      <section className="gl-card gl-panel gl-fade-up" style={{ maxWidth: 680 }} aria-labelledby="gl-new-appt-title">
+      <section className="gl-card gl-panel gl-fade-up" style={{ maxWidth: '100%' }} aria-labelledby="gl-new-appt-title">
         <div className="gl-panel__head">
           <h3 id="gl-new-appt-title">New appointment</h3>
         </div>
@@ -135,29 +136,28 @@ export default function NewAppointmentPage() {
 
           <div className={cls('serviceId')}>
             <label htmlFor="appt-service">Service</label>
-            <select id="appt-service" className="gl-input gl-select" value={values.serviceId} onChange={(e) => setField('serviceId', e.target.value)} disabled={services.isPending} aria-invalid={Boolean(errors.serviceId)}>
-              <option value="">{services.isPending ? 'Loading services...' : 'Select a service'}</option>
-              {serviceList.map((s) => (
-                <option key={s.id} value={s.id}>
-                  {s.name} · {s.durationMin} min · ₹{s.price}
-                </option>
-              ))}
-            </select>
+            <SelectBox
+              id="appt-service"
+              value={values.serviceId}
+              onChange={(e) => setField('serviceId', e.target.value)}
+              disabled={services.isPending}
+              error={Boolean(errors.serviceId)}
+              options={[{ value: '', label: services.isPending ? 'Loading services...' : 'Select a service' }, ...serviceList.map((s) => ({ value: s.id, label: `${s.name} · ${s.durationMin} min · ₹${s.price}` }))]}
+            />
             {!services.isPending && serviceList.length === 0 && <p className="gl-field__hint">No active services yet. Add one on the Services page first.</p>}
             {(errors.serviceId || errors.serviceIds) && <p className="gl-field__error">{errors.serviceId || errors.serviceIds}</p>}
           </div>
 
           <div className={cls('staffId')}>
             <label htmlFor="appt-staff">Staff member (optional)</label>
-            <select id="appt-staff" className="gl-input gl-select" value={values.staffId} onChange={(e) => setField('staffId', e.target.value)} disabled={staff.isPending} aria-invalid={Boolean(errors.staffId)}>
-              <option value="">{staff.isPending ? 'Loading staff...' : 'Any available staff'}</option>
-              {staffList.map((s) => (
-                <option key={s.id} value={s.id}>
-                  {s.name}
-                  {s.title ? ` · ${s.title}` : ''}
-                </option>
-              ))}
-            </select>
+            <SelectBox
+              id="appt-staff"
+              value={values.staffId}
+              onChange={(e) => setField('staffId', e.target.value)}
+              disabled={staff.isPending}
+              error={Boolean(errors.staffId)}
+              options={[{ value: '', label: staff.isPending ? 'Loading staff...' : 'Any available staff' }, ...staffList.map((s) => ({ value: s.id, label: s.title ? `${s.name} · ${s.title}` : s.name }))]}
+            />
             {errors.staffId && <p className="gl-field__error">{errors.staffId}</p>}
           </div>
 
@@ -169,14 +169,14 @@ export default function NewAppointmentPage() {
             </div>
             <div className={cls('startTime')}>
               <label htmlFor="appt-time">Available time</label>
-              <select id="appt-time" className="gl-input gl-select" value={values.startTime} onChange={(e) => setField('startTime', e.target.value)} disabled={!canLoadSlots || slots.isFetching || freeSlots.length === 0} aria-invalid={Boolean(errors.startTime)}>
-                <option value="">{freeSlots.length ? 'Select a time' : '-'}</option>
-                {freeSlots.map((s) => (
-                  <option key={s.time} value={s.time}>
-                    {s.time}
-                  </option>
-                ))}
-              </select>
+              <SelectBox
+                id="appt-time"
+                value={values.startTime}
+                onChange={(e) => setField('startTime', e.target.value)}
+                disabled={!canLoadSlots || slots.isFetching || freeSlots.length === 0}
+                error={Boolean(errors.startTime)}
+                options={[{ value: '', label: freeSlots.length ? 'Select a time' : '-' }, ...freeSlots.map((s) => ({ value: s.time, label: s.time }))]}
+              />
               {errors.startTime ? <p className="gl-field__error">{errors.startTime}</p> : slotHint && <p className="gl-field__hint">{slotHint}</p>}
             </div>
           </div>

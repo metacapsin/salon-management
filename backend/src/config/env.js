@@ -47,7 +47,7 @@ module.exports = {
   ACCESS_TOKEN_TTL_SECONDS: 15 * 60,
   REFRESH_TOKEN_TTL_MS: 7 * 24 * 60 * 60 * 1000,
   INVITATION_TTL_MS: 48 * 60 * 60 * 1000,
-  PASSWORD_RESET_TTL_MS: 30 * 60 * 1000,
+  PASSWORD_RESET_TTL_MS: 10 * 60 * 1000,
   EMAIL_VERIFY_TTL_MS: 24 * 60 * 60 * 1000,
   // Login lockout (SRS FR-AUTH-03): 5 failures in 15 minutes -> 15 minute backoff
   LOGIN_MAX_FAILURES: 5,

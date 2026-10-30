@@ -67,6 +67,7 @@ const READS = [
   ['/invoices', ['owner', 'manager', 'receptionist']],
   ['/invoices/summary', ['owner', 'manager', 'receptionist']],
   ['/notifications', ['owner', 'manager']],
+  ['/reviews', ['owner', 'manager']],
   ['/users', ['owner', 'manager']],
   ['/audit-events', ['owner', 'manager']],
 ]
@@ -152,9 +153,9 @@ test('new appointment: free-time lookup and booking need appointments.write; a t
 })
 
 test('allowed writes work for the right roles (owner + manager can refund; only owner can void)', async () => {
-  const pay = await call('post', people.receptionist, `/invoices/${ids.invoice}/payments`, { requestKey: 'ok-pay-0001', method: 'cash', amount: 59000 })
+  const pay = await call('post', people.receptionist, `/invoices/${ids.invoice}/payments`, { requestKey: 'ok-pay-0001', method: 'cash', amount: 50000 })
   assert.equal(pay.status, 201, JSON.stringify(pay.body))
-  const refund = await call('post', people.manager, `/invoices/${ids.invoice}/refunds`, { requestKey: 'ok-ref-0001', method: 'cash', amount: 59000, note: 'test refund' })
+  const refund = await call('post', people.manager, `/invoices/${ids.invoice}/refunds`, { requestKey: 'ok-ref-0001', method: 'cash', amount: 50000, note: 'test refund' })
   assert.equal(refund.status, 201, JSON.stringify(refund.body))
   const managerVoid = await call('post', people.manager, `/invoices/${ids.invoice}/void`, { note: 'manager cannot' })
   assert.equal(managerVoid.status, 403)

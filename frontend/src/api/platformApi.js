@@ -45,4 +45,7 @@ export const getPlatformSalon =(id) => call(`/salons/${id}`).then((r) => r.data)
 export const setPlatformSalonStatus = (id, body) => call(`/salons/${id}/status`, { method: 'PATCH', body }).then((r) => r.data)
 
 // Admin kisi approved owner ke naam par salon banata he
+// Salon ki ek photo (File) upload; max 5 per salon.
+export const uploadSalonImage = (salonId, file) => call(`/salons/${salonId}/images`, { method: 'POST', body: file }).then((r) => r.data)
+
 export const createPlatformSalon = (body) => call('/salons', { method: 'POST', body }).then((r) => r.data)

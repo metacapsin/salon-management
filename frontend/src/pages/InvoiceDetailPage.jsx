@@ -146,7 +146,7 @@ export default function InvoiceDetailPage() {
   }
 
   return (
-    <Box sx={{ maxWidth: 820 }}>
+    <Box>
       {/* Chhapte waqt sirf bill dikhe (sidebar, header, buttons nahi) */}
       <GlobalStyles styles={{ '@media print': { 'body *': { visibility: 'hidden' }, '#invoice-print, #invoice-print *': { visibility: 'visible' }, '#invoice-print': { position: 'absolute', left: 0, top: 0, width: '100%', boxShadow: 'none !important' }, '.no-print': { display: 'none !important' } } }} />
       <Box className="no-print" sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 2, flexWrap: 'wrap' }}>
@@ -155,11 +155,6 @@ export default function InvoiceDetailPage() {
         {inv && final && roleCan(role, 'billing.write') && inv.amountDue > 0 && (
           <Button variant="contained" onClick={() => setDialog('payment')}>
             Record payment
-          </Button>
-        )}
-        {inv && final && roleCan(role, 'billing.refund') && net > 0 && (
-          <Button color="error" variant="outlined" onClick={() => setDialog('refund')}>
-            Refund
           </Button>
         )}
         {inv && final && roleCan(role, 'billing.void') && net === 0 && (
@@ -181,8 +176,8 @@ export default function InvoiceDetailPage() {
 
       <QueryState query={query} isEmpty={!inv}>
         {inv && (
-          <Paper id="invoice-print" sx={{ p: { xs: 2, sm: 4 } }}>
-            <Box sx={{ display: 'flex', justifyContent: 'space-between', gap: 2, flexWrap: 'wrap', mb: 3 }}>
+          <Paper id="invoice-print" sx={{ p: { xs: 2, sm: 3 } }}>
+            <Box sx={{ display: 'grid', gridTemplateColumns: { xs: 'minmax(0, 1fr)', sm: 'minmax(0, 1fr) auto' }, gap: 2, mb: 2 }}>
               <Box>
                 <Typography variant="h5" sx={{ fontWeight: 800 }}>
                   {salon?.name}
@@ -191,7 +186,7 @@ export default function InvoiceDetailPage() {
                 {(salon?.phone || salon?.email) && <Typography variant="body2">{[salon.phone, salon.email].filter(Boolean).join(' · ')}</Typography>}
               </Box>
               <Box sx={{ textAlign: { sm: 'right' } }}>
-                <Typography variant="h6">{inv.status === 'void' ? 'INVOICE (VOID)' : 'TAX INVOICE'}</Typography>
+                <Typography variant="h6">{inv.status === 'void' ? 'INVOICE (VOID)' : inv.tax.total > 0 ? 'TAX INVOICE' : 'INVOICE'}</Typography>
                 <Typography sx={{ fontWeight: 700 }}>{inv.invoiceNumber}</Typography>
                 <Typography variant="body2">{dateTime(inv.createdAt)}</Typography>
                 <Box sx={{ mt: 0.5 }}>
@@ -235,9 +230,14 @@ export default function InvoiceDetailPage() {
                 <Row label="Subtotal" value={inv.subtotal} />
                 {inv.offer && <Row label={`Offer: ${inv.offer.title}`} value={-inv.offer.discount} />}
                 {inv.membership && <Row label={`Membership: ${inv.membership.planName}`} value={-inv.membership.discount} />}
-                <Row label="Amount before tax" value={inv.taxableAmount} />
-                <Row label={`CGST ${inv.tax.ratePercent / 2}%`} value={inv.tax.cgst} />
-                <Row label={`SGST ${inv.tax.ratePercent / 2}%`} value={inv.tax.sgst} />
+                {/* Naye bills me GST nahi lagta; sirf purane bills (jinme GST ban chuka he) me dikhta he, taaki unka total milta rahe */}
+                {inv.tax.total > 0 && (
+                  <>
+                    <Row label="Amount before tax" value={inv.taxableAmount} />
+                    <Row label={`CGST ${inv.tax.ratePercent / 2}%`} value={inv.tax.cgst} />
+                    <Row label={`SGST ${inv.tax.ratePercent / 2}%`} value={inv.tax.sgst} />
+                  </>
+                )}
                 <Row label="Total" value={inv.total} bold />
                 <Row label="Paid" value={net} />
                 <Row label="Amount due" value={inv.amountDue} bold />
@@ -276,7 +276,7 @@ export default function InvoiceDetailPage() {
               </Table>
             )}
             <Typography variant="caption" color="text.secondary" sx={{ display: 'block', mt: 3 }}>
-              Prices are before GST. This is a computer generated invoice.
+              This is a computer generated invoice.
             </Typography>
           </Paper>
         )}

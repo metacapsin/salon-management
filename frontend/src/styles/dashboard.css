@@ -879,8 +879,7 @@
 
 /* ---------- 6. Dashboard ---------- */
 .gl-dashboard {
-  max-width: 1200px;
-  margin: 0 auto;
+  width: 100%;
 }
 
 /* Salon ki photo (Unsplash, free license) + upar gehra parda, taaki text saaf padhe.
@@ -891,7 +890,8 @@
   align-items: center;
   gap: 20px;
   flex-wrap: wrap;
-  padding: 36px 36px;
+  padding: 32px 36px;
+  margin-bottom: 20px;
   border-radius: 22px;
   color: #fff;
   background-color: var(--gl-espresso);
@@ -926,7 +926,7 @@
   display: flex;
   align-items: center;
   gap: 10px;
-  margin: 16px 0 20px;
+  margin: 0 0 20px;
   padding: 10px 14px;
   border: 1px dashed var(--gl-gold);
   border-radius: 12px;
@@ -944,12 +944,26 @@
 .gl-stats {
   display: grid;
   gap: 16px;
-  /* 4 cards hamesha ek line me; bahut chhoti (phone) screen par hi neeche aate hain */
-  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-  margin-bottom: 24px;
+  /* Desktop: 4 cards ek line me; tablet: 2 columns; chhote phone: 1 column */
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  margin-bottom: 20px;
+}
+
+@media (max-width: 1099px) {
+  .gl-stats {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 420px) {
+  .gl-stats {
+    grid-template-columns: minmax(0, 1fr);
+  }
 }
 
 .gl-stat {
+  display: flex;
+  flex-direction: column;
   padding: 20px;
 }
 

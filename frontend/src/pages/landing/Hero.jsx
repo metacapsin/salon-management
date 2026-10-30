@@ -1,13 +1,14 @@
 import { Link } from 'react-router-dom'
 import Icon from '../../components/Icon'
-import { images } from '../../data/landingContent'
+import ImageCarousel from '../../components/ImageCarousel'
+import { heroSlides } from '../../data/landingContent'
 
-// Sabse upar ka bada hissa: salon ki photo, badi heading, do buttons.
-// Photo CSS ki jagah <img> se lagayi hai (alt="" kyunki sirf sajawat hai) aur upar gehra parda hai, taaki text saaf padhe.
+// Sabse upar ka bada hissa: salon ki 5 photos ka slider, badi heading, do buttons.
+// Photos <img> se hain (alt="" kyunki sirf sajawat hai) aur upar gehra parda hai, taaki text saaf padhe.
 export default function Hero() {
   return (
     <section id="home" className="lp-hero">
-      <img className="lp-hero__image" src={images.hero} alt="" fetchPriority="high" />
+      <ImageCarousel className="ic--fill" fit="contain" images={heroSlides} label="Salon photos" />
       <div className="lp-hero__shade" />
 
       <div className="lp-container lp-hero__inner">

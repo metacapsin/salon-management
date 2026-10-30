@@ -86,4 +86,4 @@ async function customerAgent(phone = '9810000001', name = 'Test Customer') {
   return agent
 }
 
-module.exports = { customerAgent, app, request, models, outbox, PASSWORD, connect, disconnect, tokenFromMail, createVerifiedUser, loginAs, createSalon, ownerWithSalon, bearer }
+module.exports = { lastMailTo, customerAgent, app, request, models, outbox, PASSWORD, connect, disconnect, tokenFromMail, createVerifiedUser, loginAs, createSalon, ownerWithSalon, bearer }

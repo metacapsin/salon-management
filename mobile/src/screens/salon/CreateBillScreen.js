@@ -224,10 +224,6 @@ export default function CreateBillScreen({ navigation }) {
                   <Text style={[styles.rowValue, { color: COLORS.success }]}>−{formatPaise(q.membership.discount)}</Text>
                 </View>
               ) : null}
-              <View style={styles.row}>
-                <Text style={styles.rowLabel}>GST ({q.tax.ratePercent}%)</Text>
-                <Text style={styles.rowValue}>{formatPaise(q.tax.total)}</Text>
-              </View>
               <View style={styles.divider} />
               <View style={styles.row}>
                 <Text style={styles.total}>Total</Text>

@@ -1,26 +1,19 @@
-import { useState } from 'react'
-import { Image, Pressable, StyleSheet, Text, View } from 'react-native'
+import { Pressable, StyleSheet, Text, View } from 'react-native'
 import { Ionicons } from '@expo/vector-icons'
+import PhotoGallery from '../../components/PhotoGallery'
 import { COLORS, FONT, RADIUS } from '../../config/theme'
 import { formatMoney } from '../../utils/formatMoney'
 
 // One salon in a list: photo (or a monogram), rating, offer, name, place and distance, a few service tags, starting price.
 // Only data the server really has is shown; a missing piece is simply left out.
 export default function SalonCard({ salon, onPress }) {
-  const [imageFailed, setImageFailed] = useState(false)
   const place = [salon.area, salon.city].filter(Boolean).join(', ')
   const rated = salon.rating?.count > 0
   const tags = (salon.tags ?? []).slice(0, 3)
   return (
     <Pressable onPress={onPress} accessibilityRole="button" accessibilityLabel={`${salon.name}, open salon`} style={({ pressed }) => [styles.card, pressed && styles.pressed]}>
       <View>
-        {salon.coverUrl && !imageFailed ? (
-          <Image source={{ uri: salon.coverUrl }} style={styles.cover} onError={() => setImageFailed(true)} accessibilityIgnoresInvertColors />
-        ) : (
-          <View style={[styles.cover, styles.placeholder]}>
-            <Text style={styles.initial}>{salon.name?.[0]?.toUpperCase() ?? 'G'}</Text>
-          </View>
-        )}
+        <PhotoGallery photos={salon.images?.length ? salon.images : salon.coverUrl ? [salon.coverUrl] : []} name={salon.name} height={168} />
         <View style={styles.rating}>
           <Ionicons name="star" size={12} color={COLORS.goldDeep} />
           <Text style={styles.ratingText}>{rated ? `${salon.rating.average.toFixed(1)} (${salon.rating.count})` : 'New'}</Text>

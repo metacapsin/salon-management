@@ -133,3 +133,62 @@ test('platform admin can create an owner account and salon together; duplicates 
   const plain = await h.ownerWithSalon('pl-create-plain@x.com', 'pl-create-plain')
   assert.equal((await request(h.app).post(api('/platform/salons')).set(h.bearer(plain.token, plain.salonId)).send({ ...body, ownerEmail: 'x2@x.com', slug: 'other-salon' })).status, 403)
 })
+
+test('salon photos: admin can add up to 5 real images; fakes, 6th photo and non-admins are refused', async () => {
+  const fs = require('fs')
+  const path = require('path')
+  const owner = await h.ownerWithSalon('img-owner@x.com', 'img-owner')
+  const admin = await makeAdmin('img-admin@x.com')
+  const url = api(`/platform/salons/${owner.salonId}/images`)
+  const jpeg = Buffer.concat([Buffer.from([0xff, 0xd8, 0xff, 0xe0]), Buffer.alloc(64, 1)])
+  const send = (token, body, type = 'image/jpeg') => request(h.app).post(url).set('Authorization', `Bearer ${token}`).set('Content-Type', type).send(body)
+
+  assert.equal((await send(owner.token, jpeg)).status, 403) // owner nahi laga sakta
+  assert.equal((await send(admin.token, Buffer.from('not an image at all, just text'))).status, 400) // asli image nahi
+  assert.equal((await send(admin.token, jpeg, 'text/plain')).status, 400) // galat type: body parse nahi hoti
+
+  const first = await send(admin.token, jpeg)
+  assert.equal(first.status, 201)
+  const saved = first.body.data.images[0]
+  assert.match(saved, /^\/uploads\/salons\/[a-f0-9]+\/[a-f0-9]+\.jpg$/)
+  assert.equal(first.body.data.coverUrl, saved) // pehli photo cover bani
+  assert.equal((await request(h.app).get(saved)).status, 200) // file asli me serve hoti he
+
+  for (let i = 0; i < 4; i++) assert.equal((await send(admin.token, jpeg)).status, 201)
+  assert.equal((await send(admin.token, jpeg)).status, 409) // 6th nahi
+
+  fs.rmSync(path.join(__dirname, '..', 'uploads', 'salons', String(owner.salonId)), { recursive: true, force: true })
+})
+
+test('owner photos: add, make cover, remove; settings lists them', async () => {
+  const fs = require('fs')
+  const path = require('path')
+  const owner = await h.ownerWithSalon('ph-owner@x.com', 'ph-owner')
+  const jpeg = (n) => Buffer.concat([Buffer.from([0xff, 0xd8, 0xff, 0xe0]), Buffer.alloc(64, n)])
+  const auth = h.bearer(owner.token, owner.salonId)
+  const add = (n) => request(h.app).post(api('/salons/current/images')).set(auth).set('Content-Type', 'image/jpeg').send(jpeg(n))
+
+  assert.equal((await request(h.app).post(api('/salons/current/images')).set('Content-Type', 'image/jpeg').send(jpeg(1))).status, 401)
+  const a = await add(1)
+  const b = await add(2)
+  assert.equal(a.status, 201)
+  assert.equal(b.status, 201)
+  const [first, second] = b.body.data.images
+  assert.equal(b.body.data.coverUrl, first)
+
+  const cover = await request(h.app).patch(api('/salons/current/images/cover')).set(auth).send({ url: second })
+  assert.equal(cover.status, 200)
+  assert.deepEqual(cover.body.data.images, [second, first])
+  assert.equal(cover.body.data.coverUrl, second)
+
+  const settings = await request(h.app).get(api('/salons/current')).set(auth)
+  assert.deepEqual(settings.body.data.salon.images, [second, first])
+
+  assert.equal((await request(h.app).delete(api('/salons/current/images')).set(auth).send({ url: '/uploads/salons/x/nope.jpg' })).status, 404)
+  const del = await request(h.app).delete(api('/salons/current/images')).set(auth).send({ url: second })
+  assert.equal(del.status, 200)
+  assert.deepEqual(del.body.data.images, [first])
+  assert.equal(del.body.data.coverUrl, first)
+
+  fs.rmSync(path.join(__dirname, '..', 'uploads', 'salons', String(owner.salonId)), { recursive: true, force: true })
+})

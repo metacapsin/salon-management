@@ -1,14 +1,15 @@
+const crypto = require('crypto')
 const express = require('express')
 const env = require('../../config/env')
 const ApiError = require('../../utils/apiError')
 const { sendSuccess } = require('../../utils/response')
 const { sendMail } = require('../../utils/mailer')
-const { hashToken } = require('../../utils/crypto')
+const { hashToken, randomToken } = require('../../utils/crypto')
 const { withTransaction } = require('../../utils/transaction')
 const { z, email, newPassword, loginPassword, personName, token } = require('../../utils/schemas')
 const { validate, limiter, requireAllowedOrigin } = require('../../middleware/common')
 const { authenticate } = require('../../middleware/auth')
-const { User, Session, Membership, Salon } = require('../../models')
+const { User, Session, Membership, Salon, VerificationToken } = require('../../models')
 const { recordAudit } = require('../audit/audit.service')
 const svc = require('./auth.service')
 
@@ -177,30 +178,58 @@ router.post('/logout', requireAllowedOrigin, async (req, res) => {
 })
 
 // ---------- password reset ----------
+// Email par 6 digit OTP jaata he (10 minute, galat 5 baar likhne par band, naya OTP 30 second baad).
+// DB me sirf OTP ka hash rehta he. Email ho ya na ho, jawab hamesha same.
+const RESET_OTP_RESEND_MS = 30 * 1000
+const RESET_OTP_MAX_ATTEMPTS = 5
+const INVALID_OTP = () => new ApiError(400, 'INVALID_OTP', 'This code is wrong or has expired. Ask for a new one.', { fieldErrors: { otp: 'Wrong or expired code.' } })
+const otpHash = (userId, code) => hashToken(`password_reset:${userId}:${code}`)
+
 router.post('/password-reset', validate({ body: z.strictObject({ email }) }), async (req, res) => {
   const user = await User.findOne({ normalizedEmail: req.valid.body.email })
   if (user && user.active) {
-    const resetToken = await svc.issueToken({ purpose: 'password_reset', userId: user._id, ttlMs: env.PASSWORD_RESET_TTL_MS })
-    await sendMail({
-      to: user.email,
-      subject: 'Reset your Galora password',
-      text: `Use this link to choose a new password:\n${env.PUBLIC_APP_URL}/reset-password?token=${resetToken}\n\nIt works once and expires in 30 minutes. If you did not ask for this, ignore this email.`,
-    })
+    const latest = await VerificationToken.findOne({ purpose: 'password_reset', userId: user._id }).sort({ createdAt: -1 }).lean()
+    const coolingDown = latest && Date.now() - new Date(latest.createdAt).getTime() < RESET_OTP_RESEND_MS
+    if (!coolingDown) {
+      const code = String(crypto.randomInt(0, 1000000)).padStart(6, '0')
+      await VerificationToken.updateMany({ purpose: 'password_reset', userId: user._id, usedAt: null }, { usedAt: new Date() })
+      await VerificationToken.create({
+        purpose: 'password_reset',
+        tokenHash: hashToken(randomToken(32)),
+        userId: user._id,
+        payload: { codeHash: otpHash(user._id, code), attempts: 0 },
+        expiresAt: new Date(Date.now() + env.PASSWORD_RESET_TTL_MS),
+      })
+      const minutes = Math.round(env.PASSWORD_RESET_TTL_MS / 60000)
+      await svc.sendPasswordResetEmail(user, code, minutes)
+    }
   }
-  // Email ho ya na ho, jawab same.
-  sendSuccess(req, res, { message: 'If that email is registered, we have sent a reset link.' })
+  sendSuccess(req, res, { message: 'If that email is registered, we have sent a 6 digit code to it.' })
 })
 
 router.post(
   '/password-reset/confirm',
-  validate({ body: z.strictObject({ token, password: newPassword }) }),
+  validate({ body: z.strictObject({ email, otp: z.string().regex(/^\d{6}$/, 'Enter the 6 digit code.'), password: newPassword }) }),
   async (req, res) => {
-    const record = await svc.consumeToken('password_reset', req.valid.body.token)
-    if (!record) throw INVALID_LINK()
-    const user = await User.findById(record.userId)
-    if (!user || !user.active) throw INVALID_LINK()
+    const { email: addr, otp, password } = req.valid.body
+    const user = await User.findOne({ normalizedEmail: addr })
+    if (!user || !user.active) throw INVALID_OTP()
 
-    user.passwordHash = await svc.hashPassword(req.valid.body.password)
+    const record = await VerificationToken.findOne({ purpose: 'password_reset', userId: user._id, usedAt: null, expiresAt: { $gt: new Date() } }).sort({ createdAt: -1 })
+    if (!record || (record.payload?.attempts ?? 0) >= RESET_OTP_MAX_ATTEMPTS) throw INVALID_OTP()
+
+    const given = Buffer.from(otpHash(user._id, otp))
+    const stored = Buffer.from(String(record.payload?.codeHash ?? ''))
+    const matches = given.length === stored.length && crypto.timingSafeEqual(given, stored)
+    if (!matches) {
+      await VerificationToken.updateOne({ _id: record._id }, { $inc: { 'payload.attempts': 1 } })
+      throw INVALID_OTP()
+    }
+    // Single-use: ek hi baar chalega
+    const claimed = await VerificationToken.updateOne({ _id: record._id, usedAt: null }, { usedAt: new Date() })
+    if (claimed.modifiedCount !== 1) throw INVALID_OTP()
+
+    user.passwordHash = await svc.hashPassword(password)
     user.failedLoginCount = 0
     user.firstFailedAt = null
     user.lockUntil = null
@@ -282,6 +311,23 @@ me.get('/me', authenticate, async (req, res) => {
 })
 me.get('/me/memberships', authenticate, async (req, res) => {
   sendSuccess(req, res, { memberships: await svc.listMemberships(req.user._id) })
+})
+
+// Login ke baad password badalna: purana password dena zaroori; ye wala login chalta rahta he, baaki sab jagah ke login band ho jate hain.
+const changePasswordBody = z.strictObject({ currentPassword: loginPassword, newPassword })
+me.post('/me/password', limiter({ windowMs: 15 * 60 * 1000, limit: 10 }), authenticate, validate({ body: changePasswordBody }), async (req, res) => {
+  const { currentPassword, newPassword: next } = req.valid.body
+  if (!(await svc.verifyPasswordAgainst(req.user, currentPassword))) {
+    throw new ApiError(400, 'WRONG_PASSWORD', 'Your current password is not correct.', { fieldErrors: { currentPassword: 'Incorrect password.' } })
+  }
+  if (currentPassword === next) {
+    throw new ApiError(400, 'SAME_PASSWORD', 'Choose a password different from your current one.', { fieldErrors: { newPassword: 'Must be different from your current password.' } })
+  }
+  req.user.passwordHash = await svc.hashPassword(next)
+  await req.user.save()
+  await Session.updateMany({ userId: req.user._id, familyId: { $ne: req.familyId }, revokedAt: null }, { revokedAt: new Date() })
+  await recordAudit(req, { actorId: req.user._id, action: 'auth.password_changed', entityType: 'user', entityId: req.user._id })
+  sendSuccess(req, res, { changed: true })
 })
 
 module.exports = { authRouter: router, meRouter: me }

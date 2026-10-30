@@ -8,6 +8,7 @@ const { authenticate, requirePlatformAdmin } = require('../../middleware/auth')
 const { Salon, Membership, User, AuditEvent } = require('../../models')
 const { recordAudit } = require('../audit/audit.service')
 const env = require('../../config/env')
+const { MAX_BYTES, addSalonImage } = require('../../utils/uploads')
 const svc = require('../auth/auth.service')
 const { adminRouter: contactInquiryRoutes } = require('../contact/contact.routes')
 
@@ -129,6 +130,20 @@ async function loadSalon(id) {
   if (!salon) throw new ApiError(404, 'NOT_FOUND', 'Salon not found.')
   return salon
 }
+
+// Salon ki ek photo upload (body = seedhi image file, JSON nahi). Max 5; pehli photo cover banti he.
+router.post(
+  '/salons/:id/images',
+  express.raw({ type: ['image/jpeg', 'image/png', 'image/webp'], limit: MAX_BYTES }),
+  validate({ params: z.object({ id: objectId }) }),
+  async (req, res) => {
+    const salon = await loadSalon(req.valid.params.id)
+    addSalonImage(salon, req.body)
+    await salon.save()
+    await recordAudit(req, { action: 'platform.salon_image_added', entityType: 'salon', entityId: salon._id })
+    sendSuccess(req, res, { images: salon.images, coverUrl: salon.coverUrl }, { status: 201 })
+  },
+)
 
 // Ek salon ki detail: business jaankari aur team ka role-wise ginti. Customers/billing nahi.
 router.get('/salons/:id', validate({ params: z.object({ id: objectId }) }), async (req, res) => {

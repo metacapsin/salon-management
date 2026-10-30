@@ -3,6 +3,7 @@ const assert = require('node:assert/strict')
 const h = require('./helpers')
 
 const api = (path) => `/api/v1${path}`
+const otpFromMail = (to) => h.lastMailTo(to).text.match(/code is (\d{6})/)[1]
 const cookieOf = (res) => (res.headers['set-cookie'] || []).find((c) => c.startsWith('galora_rt='))
 
 before(h.connect)
@@ -119,25 +120,42 @@ test('password reset: generic reply, single-use token, old sessions revoked, new
   assert.equal(known.status, 200)
   assert.deepEqual(known.body.data, unknown.body.data)
 
-  const token = h.tokenFromMail('reset@x.com')
+  const confirm = (body) => h.request(h.app).post(api('/auth/password-reset/confirm')).send({ email: 'reset@x.com', ...body })
+  const otp = otpFromMail('reset@x.com')
+  assert.equal(h.lastMailTo('ghost@x.com'), undefined) // jo registered nahi, use email nahi jaati
   const newPassword = 'a-brand-new-password-1'
-  assert.equal((await h.request(h.app).post(api('/auth/password-reset/confirm')).send({ token, password: 'short' })).status, 400)
-  assert.equal((await h.request(h.app).post(api('/auth/password-reset/confirm')).send({ token, password: newPassword })).status, 200)
-  assert.equal((await h.request(h.app).post(api('/auth/password-reset/confirm')).send({ token, password: newPassword })).status, 400) // dobara nahi chalega
+  assert.equal((await confirm({ otp, password: 'short' })).status, 400)
+  const wrong = await confirm({ otp: otp === '000000' ? '111111' : '000000', password: newPassword })
+  assert.equal(wrong.status, 400)
+  assert.equal(wrong.body.error.code, 'INVALID_OTP')
+  assert.equal((await confirm({ otp, password: newPassword })).status, 200)
+  assert.equal((await confirm({ otp, password: newPassword })).status, 400) // dobara nahi chalega
 
   assert.equal((await h.request(h.app).get(api('/me')).set(h.bearer(oldAccess))).status, 401)
   assert.equal((await h.request(h.app).post(api('/auth/login')).send({ email: 'reset@x.com', password: h.PASSWORD })).status, 401)
   assert.equal((await h.request(h.app).post(api('/auth/login')).send({ email: 'reset@x.com', password: newPassword })).status, 200)
 })
 
-test('password reset token expires after 30 minutes', async () => {
+test('password reset code expires after 10 minutes', async () => {
   await h.createVerifiedUser('exp@x.com')
   await h.request(h.app).post(api('/auth/password-reset')).send({ email: 'exp@x.com' })
-  const token = h.tokenFromMail('exp@x.com')
+  const otp = otpFromMail('exp@x.com')
   await h.models.VerificationToken.updateMany({ purpose: 'password_reset' }, { expiresAt: new Date(Date.now() - 1000) })
-  const res = await h.request(h.app).post(api('/auth/password-reset/confirm')).send({ token, password: 'a-brand-new-password-1' })
+  const res = await h.request(h.app).post(api('/auth/password-reset/confirm')).send({ email: 'exp@x.com', otp, password: 'a-brand-new-password-1' })
   assert.equal(res.status, 400)
-  assert.equal(res.body.error.code, 'INVALID_TOKEN')
+  assert.equal(res.body.error.code, 'INVALID_OTP')
+})
+
+test('password reset code is locked after 5 wrong tries, even with the right code', async () => {
+  await h.createVerifiedUser('otplock@x.com')
+  await h.request(h.app).post(api('/auth/password-reset')).send({ email: 'otplock@x.com' })
+  const otp = otpFromMail('otplock@x.com')
+  const wrong = otp === '000000' ? '111111' : '000000'
+  for (let i = 0; i < 5; i++) await h.request(h.app).post(api('/auth/password-reset/confirm')).send({ email: 'otplock@x.com', otp: wrong, password: 'a-brand-new-password-1' })
+  const res = await h.request(h.app).post(api('/auth/password-reset/confirm')).send({ email: 'otplock@x.com', otp, password: 'a-brand-new-password-1' })
+  assert.notEqual(res.status, 200) // 400 (code locked) ya 429 (rate limit): dono me password nahi badla
+  const login = await h.request(h.app).post(api('/auth/login')).send({ email: 'otplock@x.com', password: 'a-brand-new-password-1' })
+  assert.equal(login.status === 401 || login.status === 429, true)
 })
 
 test('audit never stores passwords or tokens', async () => {
@@ -198,4 +216,33 @@ test('owner approval: a rejected request can never sign in', async () => {
   const login = await h.request(h.app).post(api('/auth/login')).send({ email, password: h.PASSWORD })
   assert.equal(login.status, 403)
   assert.equal(login.body.error.code, 'ACCOUNT_REJECTED')
+})
+
+test('change password: needs the current password, keeps this login, ends the other logins', async () => {
+  await h.createVerifiedUser('chg@x.com')
+  const first = await h.loginAs('chg@x.com')
+  const second = await h.loginAs('chg@x.com')
+  const url = api('/me/password')
+  const NEW = 'a-brand-new-passphrase-1'
+  const call = (s, body) => h.request(h.app).post(url).set('Authorization', `Bearer ${s.token}`).send(body)
+
+  assert.equal((await h.request(h.app).post(url).send({ currentPassword: h.PASSWORD, newPassword: NEW })).status, 401)
+
+  const wrong = await call(first, { currentPassword: 'not-the-password', newPassword: NEW })
+  assert.equal(wrong.status, 400)
+  assert.ok(wrong.body.error.fieldErrors.currentPassword)
+
+  assert.equal((await call(first, { currentPassword: h.PASSWORD, newPassword: 'short' })).status, 400)
+  assert.equal((await call(first, { currentPassword: h.PASSWORD, newPassword: h.PASSWORD })).status, 400)
+
+  const ok = await call(first, { currentPassword: h.PASSWORD, newPassword: NEW })
+  assert.equal(ok.status, 200)
+
+  // is login ka token chalta he, doosre login ka band
+  assert.equal((await h.request(h.app).get(api('/me')).set('Authorization', `Bearer ${first.token}`)).status, 200)
+  assert.equal((await h.request(h.app).get(api('/me')).set('Authorization', `Bearer ${second.token}`)).status, 401)
+
+  // purana password band, naya chalta he
+  assert.equal((await h.request(h.app).post(api('/auth/login')).send({ email: 'chg@x.com', password: h.PASSWORD })).status, 401)
+  assert.equal((await h.request(h.app).post(api('/auth/login')).send({ email: 'chg@x.com', password: NEW })).status, 200)
 })

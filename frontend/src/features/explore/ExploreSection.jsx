@@ -20,7 +20,7 @@ import '../../styles/explore.css'
 // login tab maangte hain jab customer kisi salon par click kare (taaki owner ko pata chale kaun dekh raha hai).
 // Saare chunav URL me rehte hain (?city=Delhi&area=Rohini&mode=home), isliye link share ya refresh karne par bhi wahi dikhta hai.
 export default function ExploreSection() {
-  const { status, customer, logout } = useCustomer()
+  const { status } = useCustomer()
   const [params] = useSearchParams()
   const navigate = useNavigate()
   // Filter badalne par URL ka ?city=.. badalta hai. #find-salon saath rakhna zaroori hai, warna landing page ye section hata deta hai.
@@ -156,14 +156,6 @@ export default function ExploreSection() {
             <p className="ex-hero__eyebrow">Galora</p>
             <h2>Find Your Perfect Salon</h2>
             <p>Discover the best beauty and grooming services near you.</p>
-            {status === 'authenticated' && (
-              <p className="ex-header__user">
-                {customer.name} · +91 {customer.phone}{' '}
-                <button type="button" className="ex-header__logout" onClick={logout}>
-                  Log out
-                </button>
-              </p>
-            )}
           </div>
           <div className="ex-hero__image" aria-hidden="true" />
         </div>

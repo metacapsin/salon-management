@@ -5,6 +5,7 @@ import { Avatar, Box, Button, Chip, Dialog, IconButton, Link, Typography, useMed
 import { getSalonDetail, recordSalonView } from '../../api/publicApi'
 import QueryState from '../../components/QueryState'
 import { formatMoney } from '../../utils/formatMoney'
+import SalonReviews from '../reviews/SalonReviews'
 import OfferList from './OfferList'
 import SalonCover from './SalonCover'
 import SalonMap from './SalonMap'
@@ -171,7 +172,7 @@ export default function SalonDialog({ salon, onClose }) {
           gridTemplateRows: { xs: 'auto', md: '100%' },
         }}
       >
-        <SalonCover salon={salon} titleId="salon-dialog-title" sx={{ minHeight: { xs: 220, md: '100%' } }} />
+        <SalonCover salon={detail ?? salon} titleId="salon-dialog-title" sx={{ minHeight: { xs: 220, md: '100%' } }} />
 
         {/* Beech: upar owner/tiles (fixed), neeche services (sirf ye scroll). Chhote screen par sab ek saath neeche scroll hota hai. */}
         <Box sx={{ display: 'flex', flexDirection: 'column', minHeight: 0, minWidth: 0 }}>
@@ -183,6 +184,9 @@ export default function SalonDialog({ salon, onClose }) {
                 </Box>
                 <Box sx={{ flex: 1, minHeight: 0, overflowY: { md: 'auto' }, p: { xs: 2, md: 3 }, pt: { md: 2 } }}>
                   <Services detail={detail} />
+                  <Box sx={{ mt: 3 }}>
+                    <SalonReviews salonId={detail.id} />
+                  </Box>
                   {/* Chhote screen par map/booking sabse neeche aata hai (alag side column nahi hota) */}
                   <Box sx={{ display: { xs: 'block', md: 'none' }, mt: 3 }}>
                     <LocationSide detail={detail} onBook={book} />

@@ -4,6 +4,7 @@ import { Ionicons } from '@expo/vector-icons'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { cancelMyBooking, fetchMyBookings } from '../../api/publicApi'
 import { friendlyError } from '../../api/client'
+import Button from '../../components/Button'
 import { StatusBadge } from '../../components/Chips'
 import { EmptyState, ErrorState, LoadingState } from '../../components/States'
 import { COLORS, FONT, RADIUS } from '../../config/theme'
@@ -12,7 +13,7 @@ import { formatDate, formatMoney } from '../../utils/formatMoney'
 // Customer-friendly wording for the status (the server's status names stay the same).
 const LABEL = { pending: 'Waiting for salon', no_show: 'Missed' }
 
-function BookingRow({ booking, onCancel, cancelling, error }) {
+function BookingRow({ booking, onCancel, onReview, cancelling, error }) {
   const [confirming, setConfirming] = useState(false)
   return (
     <View style={styles.card}>
@@ -50,6 +51,9 @@ function BookingRow({ booking, onCancel, cancelling, error }) {
       ) : ['pending', 'confirmed'].includes(booking.status) ? (
         <Text style={styles.muted}>Too close to the start time to cancel online. Please call the salon.</Text>
       ) : null}
+
+      {booking.canReview ? <Button title="Rate this visit" icon="star-outline" variant="secondary" onPress={onReview} style={styles.review} /> : null}
+      {booking.reviewId ? <Button title="Edit your review" icon="create-outline" variant="secondary" onPress={onReview} style={styles.review} /> : null}
     </View>
   )
 }
@@ -85,7 +89,7 @@ export default function MyBookingsScreen({ navigation }) {
       contentContainerStyle={styles.content}
       data={bookings.data ?? []}
       keyExtractor={(b) => String(b.id)}
-      renderItem={({ item }) => <BookingRow booking={item} cancelling={busyId === item.id} error={errors[item.id]} onCancel={() => cancel.mutate(item.id)} />}
+      renderItem={({ item }) => <BookingRow booking={item} cancelling={busyId === item.id} error={errors[item.id]} onCancel={() => cancel.mutate(item.id)} onReview={() => navigation.navigate('Review', { bookingId: item.id })} />}
       ListEmptyComponent={empty}
       refreshControl={<RefreshControl refreshing={bookings.isRefetching} onRefresh={bookings.refetch} tintColor={COLORS.brown} />}
     />
@@ -103,6 +107,7 @@ const styles = StyleSheet.create({
   muted: { flex: 1, fontSize: 13, color: COLORS.muted },
   total: { fontSize: 16, fontWeight: '700', color: COLORS.ink, marginTop: 2 },
   error: { fontSize: 13, color: COLORS.error },
+  review: { marginTop: 8 },
   cancel: { minHeight: 44, justifyContent: 'center', alignSelf: 'flex-start' },
   cancelText: { color: COLORS.error, fontWeight: '600', fontSize: 14 },
   confirmRow: { flexDirection: 'row', alignItems: 'center', flexWrap: 'wrap', gap: 8, marginTop: 6 },

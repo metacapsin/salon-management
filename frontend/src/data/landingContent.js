@@ -16,6 +16,15 @@ export const images = {
   about: '/images/about-salon.jpg',
 }
 
+// Hero ke slider ki 5 photos (sirf sajawat, isliye alt khali)
+export const heroSlides = [
+  { src: images.hero, alt: '' },
+  { src: photo('1522337360788-8b13dee7a37e', 1800), alt: '' },
+  { src: '/images/bridal-makeup.jpg', alt: '' },
+  { src: photo('1570172619644-dfd03ed5d881', 1800), alt: '' },
+  { src: photo('1516975080664-ed2fc6a32937', 1800), alt: '' },
+]
+
 // 6 features. icon ka naam components/Icon.jsx se aata hai.
 export const features = [
   {

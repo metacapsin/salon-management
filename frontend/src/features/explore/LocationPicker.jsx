@@ -1,4 +1,6 @@
 import PlaceAutocomplete from '../../components/PlaceAutocomplete'
+import SelectBox from '../../components/SelectBox'
+import { EX_SELECT_SX } from './selectStyle'
 import { samePlace } from '../../utils/geo'
 
 // "Kahan?" wala hissa: city (type karke) + area, ya "Near me". Ye sirf dikhata hai; location dhundhne ka kaam ExplorePage karta hai
@@ -19,14 +21,14 @@ export default function LocationPicker({ cities, city, area, nearMe, locating, n
 
         <label className="ex-field">
           <span>Area</span>
-          <select value={area} disabled={areas.length === 0} onChange={(e) => onChange({ area: e.target.value })}>
-            <option value="">{areas.length ? `All areas in ${city}` : 'All areas'}</option>
-            {areas.map((a) => (
-              <option key={a.area} value={a.area}>
-                {a.area} ({a.salonCount})
-              </option>
-            ))}
-          </select>
+          <SelectBox
+            value={area}
+            disabled={areas.length === 0}
+            onChange={(e) => onChange({ area: e.target.value })}
+            inputProps={{ 'aria-label': 'Area' }}
+            sx={EX_SELECT_SX}
+            options={[{ value: '', label: areas.length ? `All areas in ${city}` : 'All areas' }, ...areas.map((a) => ({ value: a.area, label: `${a.area} (${a.salonCount})` }))]}
+          />
         </label>
 
         <button type="button" className={nearMe ? 'ex-btn ex-btn--active' : 'ex-btn'} onClick={nearMe ? onClearNearMe : onNearMe} disabled={locating}>

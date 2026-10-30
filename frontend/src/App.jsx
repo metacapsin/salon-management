@@ -11,7 +11,6 @@ import CustomerLoginPage from './pages/explore/CustomerLoginPage'
 import LandingPage from './pages/landing/LandingPage'
 import LoginPage from './pages/LoginPage'
 import RegisterPage from './pages/RegisterPage'
-import ResetPasswordPage from './pages/ResetPasswordPage'
 import VerifyEmailPage from './pages/VerifyEmailPage'
 
 // Login ke baad wale (bhaari, MUI wale) pages tabhi download hote hain jab zaroorat ho, taaki login page jaldi khule.
@@ -28,6 +27,7 @@ const BillingPage = lazy(() => import('./pages/BillingPage'))
 const CreateBillPage = lazy(() => import('./pages/CreateBillPage'))
 const InvoiceDetailPage = lazy(() => import('./pages/InvoiceDetailPage'))
 const OffersPage = lazy(() => import('./pages/OffersPage'))
+const ReviewsPage = lazy(() => import('./pages/ReviewsPage'))
 const StaffPage = lazy(() => import('./pages/StaffPage'))
 const CustomersPage = lazy(() => import('./pages/CustomersPage'))
 const AppointmentsPage = lazy(() => import('./pages/AppointmentsPage'))
@@ -110,7 +110,7 @@ function App() {
             <Route path="/register" element={<RegisterPage />} />
             <Route path="/verify-email" element={<VerifyEmailPage />} />
             <Route path="/forgot-password" element={<ForgotPasswordPage />} />
-            <Route path="/reset-password" element={<ResetPasswordPage />} />
+            <Route path="/reset-password" element={<Navigate to="/forgot-password" replace />} />
             <Route path="/accept-invitation" element={<AcceptInvitationPage />} />
           </Route>
 
@@ -159,6 +159,9 @@ function App() {
               </Route>
               <Route element={<RequireCapability capability="offers.read" />}>
                 <Route path="/offers" element={<OffersPage />} />
+              </Route>
+              <Route element={<RequireCapability capability="reviews.read" />}>
+                <Route path="/reviews" element={<ReviewsPage />} />
               </Route>
 
               {/* Ye pehle se bane hue pages hain (login wale kaam ke saath), ab naye dhanche ke andar khulte hain */}

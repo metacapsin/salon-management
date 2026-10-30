@@ -1,13 +1,15 @@
 import { useState } from 'react'
 import { keepPreviousData, useQuery } from '@tanstack/react-query'
-import { Box, Chip, MenuItem, Pagination, Paper, TableBody, TableCell, TableContainer, TableHead, TableRow, TextField, Typography } from '@mui/material'
+import { Button, MenuItem, Paper, TableBody, TableCell, TableContainer, TableHead, TableRow, TextField, Typography } from '@mui/material'
 import { listContactInquiries } from '../../api/platformApi'
-import QueryState from '../../components/QueryState'
+import AdminQueryState from '../../components/admin/AdminQueryState'
+import PageHeader from '../../components/admin/PageHeader'
+import SearchField from '../../components/admin/SearchField'
+import StatusPill from '../../components/admin/StatusPill'
+import TablePager from '../../components/admin/TablePager'
 import { INQUIRY_STATUSES, statusInfo } from '../../data/inquiry'
 import InquiryDialog from './InquiryDialog'
 import ResponsiveTable from '../../components/ResponsiveTable'
-
-const FILTER_FIELD_SX = { width: 150, '& .MuiInputBase-input': { fontSize: 13, py: 0.75 } }
 
 // Website ke Contact Us form se aaye sawaal: dekho, filter karo, status badlo, notes likho, customer se baat karo.
 export default function AdminInquiries() {
@@ -24,7 +26,6 @@ export default function AdminInquiries() {
   const inquiries = query.data?.data.inquiries ?? []
   const counts = query.data?.data.counts
   const total = query.data?.meta?.total ?? 0
-  const pageCount = Math.max(1, Math.ceil(total / 20))
 
   function setFilter(name, value) {
     setPage(1)
@@ -37,49 +38,28 @@ export default function AdminInquiries() {
   ]
 
   return (
-    <Box sx={{ maxWidth: 1200 }}>
-      <Typography variant="h4" component="h1" sx={{ fontWeight: 800, color: 'primary.main', mb: 0.5 }}>
-        Contact inquiries
-      </Typography>
-      <Typography color="text.secondary" sx={{ mb: 2 }}>
-        Messages sent from the website Contact Us form.
-      </Typography>
+    <>
+      <PageHeader title="Contact inquiries" subtitle="Messages sent from the website Contact Us form." />
 
-      <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1.5, mb: 2 }}>
-        {cards.map((c) => {
-          const active = filters.status === c.status
-          return (
-            <Paper
-              key={c.label}
-              component="button"
-              type="button"
-              variant="outlined"
-              onClick={() => setFilter('status', c.status)}
-              aria-pressed={active}
-              sx={{ px: 2, py: 1, minWidth: 110, textAlign: 'left', cursor: 'pointer', font: 'inherit', borderColor: active ? 'primary.main' : 'divider', borderWidth: active ? 2 : 1, bgcolor: 'background.paper' }}
-            >
-              <Typography variant="caption" color="text.secondary" sx={{ display: 'block' }}>
-                {c.label}
-              </Typography>
-              <Typography variant="h5" sx={{ fontWeight: 800 }}>
-                {c.value ?? '–'}
-              </Typography>
-            </Paper>
-          )
-        })}
-      </Box>
+      <div className="ad-filtercards" role="group" aria-label="Filter by status">
+        {cards.map((c) => (
+          <button key={c.label} type="button" className="ad-filtercard" onClick={() => setFilter('status', c.status)} aria-pressed={filters.status === c.status}>
+            <span>{c.label}</span>
+            <strong>{c.value ?? '–'}</strong>
+          </button>
+        ))}
+      </div>
 
-      <Box
-        component="form"
+      <form
         role="search"
+        className="ad-toolbar"
         onSubmit={(e) => {
           e.preventDefault()
           setFilter('q', text.trim())
         }}
-        sx={{ display: 'flex', flexWrap: 'wrap', gap: 1, mb: 2, alignItems: 'center' }}
       >
-        <TextField size="small" label="Search" placeholder="Name, email, phone, message" value={text} onChange={(e) => setText(e.target.value)} sx={{ ...FILTER_FIELD_SX, width: 220 }} slotProps={{ htmlInput: { maxLength: 100 } }} />
-        <TextField select size="small" label="Status" value={filters.status} onChange={(e) => setFilter('status', e.target.value)} sx={FILTER_FIELD_SX}>
+        <SearchField value={text} onChange={setText} placeholder="Search name, email, phone or message" label="Search inquiries" />
+        <TextField select size="small" label="Status" className="ad-filter" value={filters.status} onChange={(e) => setFilter('status', e.target.value)}>
           <MenuItem value="">All</MenuItem>
           {INQUIRY_STATUSES.map((s) => (
             <MenuItem key={s.value} value={s.value}>
@@ -87,14 +67,14 @@ export default function AdminInquiries() {
             </MenuItem>
           ))}
         </TextField>
-        <TextField size="small" type="date" label="From" value={filters.from} onChange={(e) => setFilter('from', e.target.value)} slotProps={{ inputLabel: { shrink: true } }} sx={FILTER_FIELD_SX} />
-        <TextField size="small" type="date" label="To" value={filters.to} onChange={(e) => setFilter('to', e.target.value)} slotProps={{ inputLabel: { shrink: true } }} sx={FILTER_FIELD_SX} />
-        <Box component="button" type="submit" sx={{ px: 2, py: 0.75, border: 0, borderRadius: 1, bgcolor: 'primary.main', color: 'primary.contrastText', cursor: 'pointer', font: 'inherit', fontSize: 13 }}>
+        <TextField size="small" type="date" label="From" className="ad-filter ad-filter--date" value={filters.from} onChange={(e) => setFilter('from', e.target.value)} slotProps={{ inputLabel: { shrink: true } }} />
+        <TextField size="small" type="date" label="To" className="ad-filter ad-filter--date" value={filters.to} onChange={(e) => setFilter('to', e.target.value)} slotProps={{ inputLabel: { shrink: true } }} />
+        <Button type="submit" variant="outlined">
           Search
-        </Box>
-      </Box>
+        </Button>
+      </form>
 
-      <QueryState query={query} isEmpty={inquiries.length === 0} empty={<Paper variant="outlined" sx={{ p: 3 }}>No inquiries match these filters.</Paper>}>
+      <AdminQueryState query={query} isEmpty={inquiries.length === 0} empty={{ icon: 'mail', title: 'No inquiries match these filters', text: 'Change the status, dates or search words to see more.' }}>
         <TableContainer component={Paper}>
           <ResponsiveTable size="small" aria-label="Contact inquiries">
             <TableHead>
@@ -111,12 +91,12 @@ export default function AdminInquiries() {
                 return (
                   <TableRow key={i.id} hover tabIndex={0} onClick={() => setOpenId(i.id)} onKeyDown={(e) => e.key === 'Enter' && setOpenId(i.id)} sx={{ cursor: 'pointer' }}>
                     <TableCell>
-                      <Typography component="span" sx={{ fontWeight: 600 }}>
-                        {i.name}
-                      </Typography>
-                      <Typography variant="caption" sx={{ display: 'block' }} color="text.secondary">
-                        {i.email} · {i.phone}
-                      </Typography>
+                      <div className="ad-cell">
+                        <span className="ad-cell-strong">{i.name}</span>
+                        <span className="ad-cell-sub">
+                          {i.email} · {i.phone}
+                        </span>
+                      </div>
                     </TableCell>
                     <TableCell sx={{ maxWidth: 360 }}>
                       <Typography variant="body2" sx={{ display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden', overflowWrap: 'anywhere' }}>
@@ -124,7 +104,7 @@ export default function AdminInquiries() {
                       </Typography>
                     </TableCell>
                     <TableCell>
-                      <Chip size="small" label={status.label} color={status.color} />
+                      <StatusPill label={status.label} tone={status.color} />
                     </TableCell>
                     <TableCell sx={{ whiteSpace: 'nowrap' }}>{new Date(i.createdAt).toLocaleString()}</TableCell>
                   </TableRow>
@@ -133,13 +113,10 @@ export default function AdminInquiries() {
             </TableBody>
           </ResponsiveTable>
         </TableContainer>
-        <Typography variant="caption" color="text.secondary" sx={{ display: 'block', mt: 1 }}>
-          {total} inquir{total === 1 ? 'y' : 'ies'} found
-        </Typography>
-        {pageCount > 1 && <Pagination sx={{ mt: 1 }} count={pageCount} page={page} onChange={(_, p) => setPage(p)} />}
-      </QueryState>
+        <TablePager page={page} total={total} onChange={setPage} noun="inquiries" />
+      </AdminQueryState>
 
       {openId && <InquiryDialog id={openId} onClose={() => setOpenId(null)} />}
-    </Box>
+    </>
   )
 }

@@ -5,6 +5,10 @@ const unwrap = (r) => r.data
 export const createSalon = (body) => request('/salons', { method: 'POST', body, salon: false }).then(unwrap)
 export const getCurrentSalon = () => request('/salons/current').then(unwrap)
 export const updateSalon = (body) => request('/salons/current', { method: 'PATCH', body }).then(unwrap)
+// Salon ki photos (owner): file seedhi bhejte hain; max 5, pehli photo cover.
+export const uploadSalonPhoto = (file) => request('/salons/current/images', { method: 'POST', body: file }).then(unwrap)
+export const removeSalonPhoto = (url) => request('/salons/current/images', { method: 'DELETE', body: { url } }).then(unwrap)
+export const makeCoverPhoto = (url) => request('/salons/current/images/cover', { method: 'PATCH', body: { url } }).then(unwrap)
 export const saveHours = (body) => request('/salons/current/hours', { method: 'PUT', body }).then(unwrap)
 
 export const listTeam = (page) => request(`/users?page=${page}&pageSize=20`)

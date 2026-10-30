@@ -1,7 +1,7 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { Controller, useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { Alert, Box, Button, Chip, MenuItem, TextField, Typography } from '@mui/material'
+import { Alert, Box, Button, Chip, MenuItem, Snackbar, TextField, Typography } from '@mui/material'
 import { fieldErrorsOf, friendlyError } from '../../api/client'
 import CityAutocomplete from '../../components/CityAutocomplete'
 import { stateOfCity } from '../../data/indianCities'
@@ -11,7 +11,11 @@ import { applyServerFieldErrors, FACILITIES, salonSchema, slugify } from '../../
 
 // Salon ki basic details. Naya salon banate waqt (mode="create") slug naam se apne aap bhar jaata hai.
 // Props: initial, onSubmit(values), submitLabel, readOnly, mode, showSettings
-export default function SalonForm({ initial, onSubmit, submitLabel, readOnly = false, mode = 'edit' }) {
+// Settings page: section ('info' | 'address' | 'booking') sirf wahi hissa dikhata he, baaki chhupa deta he (form ek hi rehta he,
+// isliye ek Save sab hisse save karta he). onDirtyChange(bool) = unsaved badlav ki khabar, onErrorSection(section) = galti wale hisse par le jaao.
+const FIELD_SECTION = { name: 'info', slug: 'info', ownerName: 'info', phone: 'info', about: 'info', audience: 'info', facilities: 'info', timezone: 'info', area: 'address', line1: 'address', city: 'address', state: 'address', pincode: 'address', lat: 'address', lng: 'address', receptionDiscountLimitPercent: 'booking' }
+
+export default function SalonForm({ initial, onSubmit, submitLabel, readOnly = false, mode = 'edit', section, onDirtyChange, onErrorSection }) {
   const [formError, setFormError] = useState('')
   const [saved, setSaved] = useState(false)
   const {
@@ -21,7 +25,8 @@ export default function SalonForm({ initial, onSubmit, submitLabel, readOnly = f
     setValue,
     control,
     watch,
-    formState: { errors, isSubmitting, dirtyFields },
+    reset,
+    formState: { errors, isSubmitting, dirtyFields, isDirty },
   } = useForm({
     resolver: zodResolver(salonSchema),
     defaultValues: {
@@ -49,10 +54,24 @@ export default function SalonForm({ initial, onSubmit, submitLabel, readOnly = f
     setSaved(false)
     try {
       await onSubmit(values)
+      reset(values) // ab ye saved haal he: unsaved badlav ka nishaan hat jaye
       setSaved(true)
     } catch (error) {
       applyServerFieldErrors(fieldErrorsOf(error), setError)
       setFormError(friendlyError(error))
+    }
+  }
+
+  useEffect(() => {
+    onDirtyChange?.(isDirty)
+  }, [isDirty, onDirtyChange])
+
+  // Galti kisi chhupe hisse me ho to wahan le jao, warna user ko pata hi nahi chalega ki save kyun nahi hua
+  function invalid(errs) {
+    const first = Object.keys(errs).find((k) => FIELD_SECTION[k])
+    if (first) {
+      onErrorSection?.(FIELD_SECTION[first])
+      setFormError('Some fields need your attention. Please fix the highlighted fields and save again.')
     }
   }
 
@@ -73,11 +92,12 @@ export default function SalonForm({ initial, onSubmit, submitLabel, readOnly = f
   }
 
   return (
-    <Box component="form" onSubmit={handleSubmit(submit)} noValidate sx={{ display: 'grid', gap: 1.5, maxWidth: 640, gridTemplateColumns: { xs: '1fr', sm: '1fr 1fr' }, alignItems: 'start', '& > .full': { gridColumn: '1 / -1' }, '& .MuiInputBase-input': { fontSize: '0.875rem', py: 1 } }}>
+    <Box component="form" onSubmit={handleSubmit(submit, invalid)} noValidate sx={{ display: 'grid', gap: 1.5, gridTemplateColumns: { xs: '1fr', sm: '1fr 1fr' }, alignItems: 'start', '& > .full': { gridColumn: '1 / -1' }, '& .MuiInputBase-input': { fontSize: '0.875rem', py: 1 }, ...(section && { [`& [data-section]:not([data-section="${section}"])`]: { display: 'none' } }) }}>
       {formError && <Alert className="full" severity="error">{formError}</Alert>}
       <TextField
         size="small"
         label="Salon name"
+        data-section="info"
         disabled={readOnly}
         {...nameField}
         onChange={(e) => {
@@ -89,16 +109,18 @@ export default function SalonForm({ initial, onSubmit, submitLabel, readOnly = f
       <TextField
         size="small"
         label="Booking page address"
+        data-section="info"
         disabled={readOnly}
         {...field(register, errors, 'slug')}
         helperText={errors.slug?.message ?? 'Lowercase letters, digits and hyphens. Used in your public booking link.'}
         slotProps={{ htmlInput: { autoCapitalize: 'none', spellCheck: false } }}
       />
-      <TextField size="small" label="Owner name" disabled={readOnly} {...field(register, errors, 'ownerName')} />
-      <TextField size="small" label="Contact number" type="tel" disabled={readOnly} {...field(register, errors, 'phone')} />
+      <TextField size="small" label="Owner name" data-section="info" disabled={readOnly} {...field(register, errors, 'ownerName')} />
+      <TextField size="small" label="Contact number" type="tel" data-section="info" disabled={readOnly} {...field(register, errors, 'phone')} />
       <TextField
         size="small"
         className="full"
+        data-section="info"
         label="About the salon"
         multiline
         minRows={2}
@@ -110,7 +132,7 @@ export default function SalonForm({ initial, onSubmit, submitLabel, readOnly = f
         name="audience"
         control={control}
         render={({ field: f }) => (
-          <TextField size="small" select label="Salon is for" disabled={readOnly} value={f.value} onChange={f.onChange}>
+          <TextField size="small" select label="Salon is for" data-section="info" disabled={readOnly} value={f.value} onChange={f.onChange}>
             <MenuItem value="unisex">Men and women</MenuItem>
             <MenuItem value="women">Women</MenuItem>
             <MenuItem value="men">Men</MenuItem>
@@ -120,12 +142,13 @@ export default function SalonForm({ initial, onSubmit, submitLabel, readOnly = f
       <TextField
         size="small"
         label="Area / locality"
+        data-section="address"
         disabled={readOnly}
         {...field(register, errors, 'area')}
         helperText={errors.area?.message ?? 'For example Rohini or Bandra West. Customers find your salon by this.'}
       />
-      <TextField size="small" className="full" label="Address" disabled={readOnly} {...field(register, errors, 'line1')} />
-      <Box className="full" sx={{ display: 'grid', gap: 1.5, gridTemplateColumns: { xs: '1fr', sm: '1fr 1fr 1fr' } }}>
+      <TextField size="small" className="full" label="Address" data-section="address" disabled={readOnly} {...field(register, errors, 'line1')} />
+      <Box className="full" data-section="address" sx={{ display: 'grid', gap: 1.5, gridTemplateColumns: { xs: '1fr', sm: '1fr 1fr 1fr' } }}>
         <Controller
           name="city"
           control={control}
@@ -150,7 +173,7 @@ export default function SalonForm({ initial, onSubmit, submitLabel, readOnly = f
         <TextField size="small" label="State" disabled={readOnly} {...field(register, errors, 'state')} />
         <TextField size="small" label="Pincode" disabled={readOnly} {...field(register, errors, 'pincode')} />
       </Box>
-      <Box className="full">
+      <Box className="full" data-section="address">
         <Typography variant="subtitle2" sx={{ mb: 1 }}>
           Map location
         </Typography>
@@ -168,7 +191,7 @@ export default function SalonForm({ initial, onSubmit, submitLabel, readOnly = f
           Stand inside the salon and press the button. Customers see your salon on the map with this.
         </Typography>
       </Box>
-      <Box className="full">
+      <Box className="full" data-section="info">
         <Typography variant="subtitle2" sx={{ mb: 1 }}>
           Facilities
         </Typography>
@@ -198,6 +221,7 @@ export default function SalonForm({ initial, onSubmit, submitLabel, readOnly = f
       <TextField
         size="small"
         label="Timezone"
+        data-section="info"
         {...field(register, errors, 'timezone')}
         helperText={errors.timezone?.message ?? 'All salons use Asia/Kolkata in this version.'}
         slotProps={{ htmlInput: { readOnly: true } }}
@@ -206,6 +230,7 @@ export default function SalonForm({ initial, onSubmit, submitLabel, readOnly = f
         <TextField
         size="small"
           label="Reception discount limit (%)"
+          data-section="booking"
           type="number"
           disabled={readOnly}
           {...field(register, errors, 'receptionDiscountLimitPercent')}
@@ -213,13 +238,36 @@ export default function SalonForm({ initial, onSubmit, submitLabel, readOnly = f
           slotProps={{ htmlInput: { min: 0, max: 100, step: 1 } }}
         />
       )}
-      {saved && <Alert className="full" severity="success">Saved.</Alert>}
-      {!readOnly && (
+      {saved && !section && <Alert className="full" severity="success">Saved.</Alert>}
+      {!readOnly && !section && (
         <Box className="full">
           <Button type="submit" variant="contained" disabled={isSubmitting}>
             {isSubmitting ? 'Saving…' : submitLabel}
           </Button>
         </Box>
+      )}
+      {!readOnly && section && (
+        <Box
+          className="full"
+          sx={{ position: 'sticky', bottom: 0, zIndex: 2, mt: 1, mx: { xs: -2, md: -2.5 }, mb: { xs: -2, md: -2.5 }, px: { xs: 2, md: 2.5 }, py: 1.25, display: 'flex', alignItems: 'center', justifyContent: 'flex-end', flexWrap: 'wrap', gap: 1.5, bgcolor: '#fffdf8', borderTop: '1px solid #eadfd3', borderRadius: '0 0 12px 12px' }}
+        >
+          <Typography variant="body2" sx={{ color: isDirty ? '#a9801f' : 'text.secondary', fontWeight: isDirty ? 700 : 400, flexGrow: 1 }}>
+            {isDirty ? '● You have unsaved changes' : 'All changes saved'}
+          </Typography>
+          <Button variant="text" onClick={() => reset()} disabled={!isDirty || isSubmitting} sx={{ textTransform: 'none' }}>
+            Discard
+          </Button>
+          <Button type="submit" variant="contained" disabled={isSubmitting || !isDirty} sx={{ textTransform: 'none', fontWeight: 700, px: 3 }}>
+            {isSubmitting ? 'Saving…' : submitLabel}
+          </Button>
+        </Box>
+      )}
+      {section && (
+        <Snackbar open={saved} autoHideDuration={3000} onClose={() => setSaved(false)} anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}>
+          <Alert severity="success" variant="filled" onClose={() => setSaved(false)}>
+            Settings saved.
+          </Alert>
+        </Snackbar>
       )}
     </Box>
   )

@@ -61,6 +61,8 @@ const salonSchema = new Schema(
     // Public (customer ko dikhne wala) profile
     about: { type: String, default: '', maxlength: 500 },
     coverUrl: { type: String, default: '' },
+    // Salon ki photos (max 5). Pehli photo hi cover banti he. Path "/uploads/salons/<id>/<file>" ke roop me.
+    images: { type: [{ type: String, maxlength: 300 }], default: [], validate: [(v) => v.length <= 5, 'A salon can have at most 5 photos.'] },
     audience: { type: String, enum: ['women', 'men', 'unisex'], default: 'unisex' },
     serviceModes: {
       salonVisit: { type: Boolean, default: true },
@@ -570,7 +572,7 @@ invoiceCounterSchema.index({ salonId: 1, year: 1 }, { unique: true })
 const notificationSchema = new Schema(
   {
     salonId: { type: Schema.Types.ObjectId, ref: 'Salon', required: true },
-    type: { type: String, enum: ['salon_viewed', 'booking_created', 'booking_cancelled'], required: true },
+    type: { type: String, enum: ['salon_viewed', 'booking_created', 'booking_cancelled', 'review_received'], required: true },
     title: { type: String, required: true, maxlength: 200 },
     body: { type: String, default: '', maxlength: 500 },
     // salon_viewed: anonymous viewer ki id, taaki ek hi customer baar-baar notification na bheje
@@ -583,6 +585,62 @@ notificationSchema.index({ salonId: 1, createdAt: -1 })
 notificationSchema.index({ salonId: 1, type: 1, viewerKey: 1, createdAt: -1 })
 // 60 din baad purani khabrein apne-aap hat jaati hain
 notificationSchema.index({ createdAt: 1 }, { expireAfterSeconds: 60 * 24 * 3600 })
+
+// ---------- reviews: completed appointment ke baad customer ka rating + feedback. Ek appointment par sirf ek ----------
+const reviewSchema = new Schema(
+  {
+    salonId: { type: Schema.Types.ObjectId, ref: 'Salon', required: true },
+    bookingId: { type: Schema.Types.ObjectId, ref: 'Booking', required: true },
+    customerId: { type: Schema.Types.ObjectId, ref: 'Customer', required: true },
+    customerName: { type: String, required: true, trim: true, maxlength: 100 }, // copy: baad me naam badle to bhi review me wahi dikhe
+    rating: { type: Number, required: true, min: 1, max: 5, validate: [Number.isInteger, 'Rating must be a whole number.'] },
+    comment: { type: String, default: '', trim: true, maxlength: 1000 },
+    images: { type: [{ type: String, maxlength: 300 }], default: [], validate: [(v) => v.length <= 3, 'A review can have at most 3 photos.'] },
+    editedAt: { type: Date, default: null },
+    helpfulCount: { type: Number, default: 0, min: 0 }, // "Helpful" dabane walon ki ginti (asli list ReviewHelpful me)
+    // Salon owner/manager ka jawab (ek review par ek reply, dobara likhne par badal jata he)
+    reply: {
+      type: new Schema({ text: { type: String, required: true, trim: true, maxlength: 500 }, repliedAt: { type: Date, required: true }, repliedBy: { type: Schema.Types.ObjectId, ref: 'User' } }, { _id: false }),
+      default: null,
+    },
+    schemaVersion: { type: Number, default: 1 },
+  },
+  baseOptions,
+)
+// Database level par bhi duplicate rokte hain: ek booking = ek review (race me do request aayein to bhi)
+reviewSchema.index({ bookingId: 1 }, { unique: true })
+reviewSchema.index({ salonId: 1, createdAt: -1 })
+reviewSchema.index({ customerId: 1, createdAt: -1 })
+
+// ---------- reviewHelpful: kaun sa customer kis review ko "Helpful" maanta he. Ek customer ek review par ek hi baar ----------
+const reviewHelpfulSchema = new Schema(
+  {
+    salonId: { type: Schema.Types.ObjectId, ref: 'Salon', required: true },
+    reviewId: { type: Schema.Types.ObjectId, ref: 'Review', required: true },
+    customerId: { type: Schema.Types.ObjectId, ref: 'Customer', required: true },
+  },
+  { timestamps: { createdAt: true, updatedAt: false } },
+)
+reviewHelpfulSchema.index({ reviewId: 1, customerId: 1 }, { unique: true })
+reviewHelpfulSchema.index({ customerId: 1, reviewId: 1 })
+
+// ---------- customerNotifications: customer ki apni khabrein (review request, review submit confirmation) ----------
+const customerNotificationSchema = new Schema(
+  {
+    customerId: { type: Schema.Types.ObjectId, ref: 'Customer', required: true },
+    salonId: { type: Schema.Types.ObjectId, ref: 'Salon', required: true },
+    bookingId: { type: Schema.Types.ObjectId, ref: 'Booking', required: true },
+    type: { type: String, enum: ['review_request', 'review_submitted'], required: true },
+    title: { type: String, required: true, maxlength: 200 },
+    body: { type: String, default: '', maxlength: 500 },
+    readAt: { type: Date, default: null },
+  },
+  { timestamps: { createdAt: true, updatedAt: false } },
+)
+// Ek booking par har type ki sirf ek khabar (review request dobara nahi jaati)
+customerNotificationSchema.index({ bookingId: 1, type: 1 }, { unique: true })
+customerNotificationSchema.index({ customerId: 1, createdAt: -1 })
+customerNotificationSchema.index({ createdAt: 1 }, { expireAfterSeconds: 90 * 24 * 3600 })
 
 // ---------- contactInquiries: website ke Contact Us form se aaye sawaal. Salon se nahi jude (platform level), sirf Super Admin dekhta hai ----------
 const contactInquirySchema = new Schema(
@@ -649,6 +707,9 @@ module.exports = {
   Payment: mongoose.model('Payment', paymentSchema),
   InvoiceCounter: mongoose.model('InvoiceCounter', invoiceCounterSchema),
   Notification: mongoose.model('Notification', notificationSchema),
+  Review: mongoose.model('Review', reviewSchema),
+  ReviewHelpful: mongoose.model('ReviewHelpful', reviewHelpfulSchema),
+  CustomerNotification: mongoose.model('CustomerNotification', customerNotificationSchema),
   Membership: mongoose.model('Membership', membershipSchema),
   Session: mongoose.model('Session', sessionSchema),
   VerificationToken: mongoose.model('VerificationToken', verificationTokenSchema),

@@ -43,7 +43,10 @@ export const setSessionLostHandler = (fn) => {
 
 async function send(path, { method = 'GET', body, auth = true, salon = true } = {}) {
   const headers = {}
-  if (body !== undefined) headers['Content-Type'] = 'application/json'
+  // File (Blob) seedhi bheji jaati he; baaki sab JSON.
+  const isFile = typeof Blob !== 'undefined' && body instanceof Blob
+  if (isFile) headers['Content-Type'] = body.type
+  else if (body !== undefined) headers['Content-Type'] = 'application/json'
   if (auth && accessToken) headers.Authorization = `Bearer ${accessToken}`
   if (salon && activeSalonId) headers['X-Salon-Id'] = activeSalonId
 
@@ -52,7 +55,7 @@ async function send(path, { method = 'GET', body, auth = true, salon = true } = 
     response = await fetch(`${API_BASE}${path}`, {
       method,
       headers,
-      body: body === undefined ? undefined : JSON.stringify(body),
+      body: body === undefined ? undefined : isFile ? body : JSON.stringify(body),
     })
   } catch {
     throw new ApiError(0, 'NETWORK_ERROR', 'Could not reach the server.')

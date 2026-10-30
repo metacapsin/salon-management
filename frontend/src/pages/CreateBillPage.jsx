@@ -17,8 +17,10 @@ import {
   TableHead,
   TableRow,
   TextField,
+  Tooltip,
   Typography,
 } from '@mui/material'
+import CloseIcon from '@mui/icons-material/Close'
 import { createInvoice, listBillableAppointments, previewInvoice } from '../api/billingApi'
 import { friendlyError } from '../api/client'
 import { NAME_ERROR, NAME_PATTERN } from '../utils/validators'
@@ -140,12 +142,16 @@ export default function CreateBillPage() {
   const quoteError = quote.isError ? friendlyError(quote.error) : ''
 
   return (
-    <Box sx={{ maxWidth: 900 }}>
+    <Box>
       <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 2 }}>
         <Typography variant="h4" component="h1" sx={{ fontWeight: 800, color: 'primary.main', flexGrow: 1 }}>
           Create new bill
         </Typography>
-        <Button onClick={() => navigate('/billing')}>Cancel</Button>
+        <Tooltip title="Cancel">
+          <IconButton aria-label="Cancel" onClick={() => navigate('/billing')} sx={{ color: '#7a5a14' }}>
+            <CloseIcon />
+          </IconButton>
+        </Tooltip>
       </Box>
 
       <Paper sx={{ p: 2, mb: 2 }}>
@@ -296,9 +302,6 @@ export default function CreateBillPage() {
                 <Row label="Subtotal" value={q.subtotal} />
                 {q.offer && <Row label={`Offer: ${q.offer.title}`} value={-q.offer.discount} />}
                 {q.membership && <Row label={`Membership: ${q.membership.planName}`} value={-q.membership.discount} />}
-                <Row label="Amount before tax" value={q.taxableAmount} />
-                <Row label={`CGST ${q.tax.ratePercent / 2}%`} value={q.tax.cgst} />
-                <Row label={`SGST ${q.tax.ratePercent / 2}%`} value={q.tax.sgst} />
                 <Row label="Total" value={q.total} bold />
               </TableBody>
             </Table>

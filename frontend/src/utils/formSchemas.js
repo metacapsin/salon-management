@@ -35,7 +35,10 @@ export const registerSchema = z.object({
 })
 
 export const forgotSchema = z.object({ email: emailField })
-export const resetSchema = z.object({ password: newPasswordField })
+export const resetSchema = z.object({
+  otp: z.string().trim().regex(/^\d{6}$/, 'Enter the 6 digit code.'),
+  password: newPasswordField,
+})
 
 export const acceptSchema = z.object({
   name: z.string().trim().max(100, 'Name can be at most 100 characters.').refine((v) => v === '' || NAME_PATTERN.test(v), NAME_ERROR),

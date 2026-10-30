@@ -9,6 +9,7 @@ export const MAIN_NAV = [
   { to: '/packages', label: 'Packages & Memberships', icon: 'package', capability: 'packages.read' },
   { to: '/billing', label: 'Billing', icon: 'card', capability: 'billing.read' },
   { to: '/offers', label: 'Offers', icon: 'tag', capability: 'offers.read' },
+  { to: '/reviews', label: 'Reviews', icon: 'star', capability: 'reviews.read' },
   { to: '/settings', label: 'Settings', icon: 'settings', capability: 'settings.read' },
 ]
 

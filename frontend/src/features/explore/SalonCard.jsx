@@ -1,4 +1,5 @@
-import { useState } from 'react'
+import PhotoSlider from './PhotoSlider'
+import { photosOf } from './salonPhotos'
 
 const AUDIENCE_LABEL = { women: 'Women', men: 'Men', unisex: 'Unisex' }
 const MAX_TAGS = 3
@@ -6,21 +7,20 @@ const MAX_TAGS = 3
 // Ek salon ka card: photo, naam, rating + asli review count, doori, services, kam se kam price, aur do buttons.
 // "View Details" popup kholta hai (services, map, owner); "Book Now" seedha booking page par le jaata hai. Dono me login chahiye.
 export default function SalonCard({ salon, onOpen, onBook }) {
-  const [imageFailed, setImageFailed] = useState(false)
-  const showImage = salon.coverUrl && !imageFailed
   const { average, count } = salon.rating
   const extraTags = salon.tags.length - MAX_TAGS
 
   return (
     <article className="ex-card">
       <div className="ex-card__media">
-        {showImage ? (
-          <img src={salon.coverUrl} alt="" loading="lazy" onError={() => setImageFailed(true)} />
-        ) : (
-          <div className="ex-card__placeholder" aria-hidden="true">
-            {salon.name.charAt(0)}
-          </div>
-        )}
+        <PhotoSlider
+          images={photosOf(salon)}
+          fallback={
+            <div className="ex-card__placeholder" aria-hidden="true">
+              {salon.name.charAt(0)}
+            </div>
+          }
+        />
         {salon.offer && <span className="ex-card__offer">🏷️ {salon.offer.text}</span>}
         <span className="ex-card__aud">{AUDIENCE_LABEL[salon.audience]}</span>
       </div>

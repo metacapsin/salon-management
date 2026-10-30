@@ -1,6 +1,8 @@
 import { useState } from 'react'
 import { Drawer, useMediaQuery } from '@mui/material'
+import SelectBox from '../../components/SelectBox'
 import { PRICE_BANDS, RATINGS } from './filterOptions'
+import { EX_SELECT_SX } from './selectStyle'
 
 const MODES = [
   { value: '', label: 'All' },
@@ -17,13 +19,7 @@ function Select({ label, value, options, onChange }) {
   return (
     <label className="ex-field ex-field--inline">
       <span>{label}</span>
-      <select value={value} onChange={(e) => onChange(e.target.value)}>
-        {options.map((o) => (
-          <option key={o.value} value={o.value}>
-            {o.label}
-          </option>
-        ))}
-      </select>
+      <SelectBox value={value} onChange={(e) => onChange(e.target.value)} options={options} inputProps={{ 'aria-label': label }} sx={EX_SELECT_SX} />
     </label>
   )
 }

@@ -1,11 +1,15 @@
 import { useState } from 'react'
 import { Link as RouterLink } from 'react-router-dom'
 import { keepPreviousData, useQuery } from '@tanstack/react-query'
-import { Alert, Box, Button, Chip, MenuItem, Pagination, Paper, TableBody, TableCell, TableContainer, TableHead, TableRow, TextField, Typography } from '@mui/material'
+import { Alert, Button, MenuItem, TableBody, TableCell, TableContainer, TableHead, TableRow, TextField, Paper } from '@mui/material'
 import { listPlatformSalons } from '../../api/platformApi'
-import QueryState from '../../components/QueryState'
-import CreateSalonDialog from '../../features/admin/CreateSalonDialog'
+import AdminQueryState from '../../components/admin/AdminQueryState'
+import PageHeader from '../../components/admin/PageHeader'
+import SearchField from '../../components/admin/SearchField'
+import StatusPill from '../../components/admin/StatusPill'
+import TablePager from '../../components/admin/TablePager'
 import ResponsiveTable from '../../components/ResponsiveTable'
+import CreateSalonDialog from '../../features/admin/CreateSalonDialog'
 
 // Galora par registered saare salons. Search aur status filter server par chalta he.
 export default function AdminSalons() {
@@ -18,66 +22,71 @@ export default function AdminSalons() {
   const query = useQuery({ queryKey: ['platform', 'salons', page, q, status], queryFn: () => listPlatformSalons({ page, q, status }), placeholderData: keepPreviousData })
   const salons = query.data?.data.salons ?? []
   const total = query.data?.meta?.total ?? 0
-  const pageCount = Math.max(1, Math.ceil(total / 20))
+  const filtered = Boolean(q || status)
 
   return (
-    <Box sx={{ maxWidth: 1100 }}>
-      <Box sx={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: 2, flexWrap: 'wrap', mb: 2 }}>
-        <Box>
-          <Typography variant="h4" component="h1" sx={{ fontWeight: 800, color: 'primary.main', mb: 0.5 }}>
-            Salons
-          </Typography>
-          <Typography color="text.secondary">{query.data ? `${total} salon${total === 1 ? '' : 's'}` : ' '}</Typography>
-        </Box>
-        <Button variant="contained" onClick={() => setCreating(true)}>
-          Create salon
-        </Button>
-      </Box>
+    <>
+      <PageHeader
+        title="Salons"
+        subtitle={query.data ? `${total} salon${total === 1 ? '' : 's'} on the platform` : 'Every salon registered on Galora.'}
+        actions={
+          <Button variant="contained" onClick={() => setCreating(true)}>
+            Create salon
+          </Button>
+        }
+      />
       {notice && (
-        <Alert severity={notice.emailSent ? 'success' : 'warning'} onClose={() => setNotice(null)} sx={{ mb: 2 }}>
+        <Alert severity={notice.emailSent && !notice.photosFailed ? 'success' : 'warning'} onClose={() => setNotice(null)} sx={{ mb: 2 }}>
           {notice.emailSent
             ? `Salon created. A welcome email was sent to ${notice.email}.`
             : `Salon created, but the email to ${notice.email} could not be sent. Please tell the owner their sign-in details yourself.`}
+          {notice.photosFailed ? ` ${notice.photosFailed} photo(s) could not be uploaded.` : ''}
         </Alert>
       )}
       {creating && <CreateSalonDialog onClose={() => setCreating(false)} onCreated={setNotice} />}
 
-      <Box
-        component="form"
+      <form
         role="search"
+        className="ad-toolbar"
         onSubmit={(e) => {
           e.preventDefault()
           setPage(1)
           setQ(text.trim())
         }}
-        sx={{ display: 'flex', gap: 2, mb: 2, flexWrap: 'wrap' }}
       >
-        <TextField size="small" label="Search" placeholder="Name, city, owner" value={text} onChange={(e) => setText(e.target.value)} sx={{ width: 180, '& .MuiInputBase-input': { fontSize: 13, py: 0.75 } }} slotProps={{ htmlInput: { maxLength: 100 } }} />
+        <SearchField value={text} onChange={setText} placeholder="Search by name, city or owner" label="Search salons" />
         <TextField
           select
           size="small"
           label="Status"
+          className="ad-filter"
           value={status}
           onChange={(e) => {
             setPage(1)
             setStatus(e.target.value)
           }}
-          sx={{ width: 110, '& .MuiInputBase-input': { fontSize: 13, py: 0.75 } }}
         >
           <MenuItem value="">All</MenuItem>
           <MenuItem value="active">Active</MenuItem>
           <MenuItem value="suspended">Suspended</MenuItem>
         </TextField>
-      </Box>
+        <Button type="submit" variant="outlined">
+          Search
+        </Button>
+      </form>
 
-      <QueryState query={query} isEmpty={salons.length === 0}>
+      <AdminQueryState
+        query={query}
+        isEmpty={salons.length === 0}
+        empty={{ icon: 'store', title: filtered ? 'No salons match your search' : 'No salons yet', text: filtered ? 'Try a different name, city or status.' : 'Salons appear here once an owner registers or you create one.' }}
+      >
         <TableContainer component={Paper}>
           <ResponsiveTable size="small" aria-label="Salons">
             <TableHead>
               <TableRow>
-                <TableCell>Salon</TableCell>
+                <TableCell sx={{ minWidth: 220 }}>Salon</TableCell>
                 <TableCell>City</TableCell>
-                <TableCell>Owner</TableCell>
+                <TableCell sx={{ minWidth: 230 }}>Owner</TableCell>
                 <TableCell>Team</TableCell>
                 <TableCell>Status</TableCell>
                 <TableCell>Registered</TableCell>
@@ -87,21 +96,23 @@ export default function AdminSalons() {
               {salons.map((s) => (
                 <TableRow key={s.id} hover>
                   <TableCell>
-                    <RouterLink to={`/admin/salons/${s.id}`}>{s.name}</RouterLink>
-                    <Typography variant="caption" sx={{ display: 'block' }} color="text.secondary">
-                      {s.slug}
-                    </Typography>
+                    <div className="ad-cell">
+                      <RouterLink className="ad-link" to={`/admin/salons/${s.id}`}>
+                        {s.name}
+                      </RouterLink>
+                      <span className="ad-cell-sub">{s.slug}</span>
+                    </div>
                   </TableCell>
                   <TableCell>{s.city || '—'}</TableCell>
                   <TableCell>
-                    {s.ownerName || '—'}
-                    <Typography variant="caption" sx={{ display: 'block' }} color="text.secondary">
-                      {s.ownerEmail}
-                    </Typography>
+                    <div className="ad-cell">
+                      <span className="ad-cell-strong">{s.ownerName || '—'}</span>
+                      {s.ownerEmail && <span className="ad-cell-sub">{s.ownerEmail}</span>}
+                    </div>
                   </TableCell>
                   <TableCell>{s.memberCount}</TableCell>
                   <TableCell>
-                    <Chip size="small" label={s.status} color={s.status === 'active' ? 'success' : 'warning'} />
+                    <StatusPill label={s.status} tone={s.status === 'active' ? 'success' : 'warning'} />
                   </TableCell>
                   <TableCell sx={{ whiteSpace: 'nowrap' }}>{new Date(s.createdAt).toLocaleDateString()}</TableCell>
                 </TableRow>
@@ -109,8 +120,8 @@ export default function AdminSalons() {
             </TableBody>
           </ResponsiveTable>
         </TableContainer>
-        {pageCount > 1 && <Pagination sx={{ mt: 2 }} count={pageCount} page={page} onChange={(_, p) => setPage(p)} />}
-      </QueryState>
-    </Box>
+        <TablePager page={page} total={total} onChange={setPage} noun="salons" />
+      </AdminQueryState>
+    </>
   )
 }

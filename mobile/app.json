@@ -26,6 +26,7 @@
       "expo-font",
       "expo-status-bar",
       ["expo-location", { "locationWhenInUsePermission": "Galora uses your location to show salons near you." }],
+      ["expo-image-picker", { "photosPermission": "Galora uses your photos so you can add pictures to your salon review.", "cameraPermission": false, "microphonePermission": false }],
       ["expo-build-properties", { "android": { "usesCleartextTraffic": true } }]
     ]
   }

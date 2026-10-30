@@ -1,7 +1,8 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { keepPreviousData, useQuery } from '@tanstack/react-query'
-import { Alert, Box, Button, Chip, MenuItem, Paper, TableBody, TableCell, TableContainer, TableHead, TableRow, TextField, Typography } from '@mui/material'
+import { Alert, Box, Button, Chip, IconButton, MenuItem, Paper, TableBody, TableCell, TableContainer, TableHead, TableRow, TextField, Tooltip, Typography } from '@mui/material'
+import CloseIcon from '@mui/icons-material/Close'
 import { getBillingSummary, listInvoices } from '../api/billingApi'
 import { useAuth } from '../auth/AuthContext'
 import { roleCan } from '../auth/permissions'
@@ -73,34 +74,48 @@ export default function BillingPage() {
 
       {summaryQuery.isError && <Alert severity="error" sx={{ mb: 2 }}>Could not load the billing totals.</Alert>}
       <section className="gl-stats" aria-label="Billing totals" style={{ marginBottom: 24, gridTemplateColumns: 'repeat(auto-fit, minmax(160px, 1fr))' }}>
-        <StatCard icon="rupee" label="Total billed" value={s ? formatPaise(s.billed) : '—'} note={s ? `${s.invoices} invoices (incl. GST ${formatPaise(s.tax)})` : ''} />
+        <StatCard icon="rupee" label="Total billed" value={s ? formatPaise(s.billed) : '—'} note={s ? `${s.invoices} invoices${s.tax > 0 ? ` (incl. GST ${formatPaise(s.tax)} on older bills)` : ''}` : ''} />
         <StatCard icon="check" label="Amount received" value={s ? formatPaise(s.received) : '—'} note={s && s.refunded ? `after ${formatPaise(s.refunded)} refunds` : 'cash, UPI and card'} />
         <StatCard icon="clock" label="Pending payments" value={s ? formatPaise(s.pending) : '—'} note={s ? `${s.pendingCount} unpaid or partly paid` : ''} />
         <StatCard icon="card" label="Invoices" value={s ? String(s.invoices) : '—'} note="void bills not counted" />
       </section>
 
-      {/* Saare filters ek hi line me (jagah kam ho to hi neeche aate hain) */}
-      <Box sx={{ display: 'flex', gap: 1, mb: 2, flexWrap: 'wrap', alignItems: 'flex-start', '& .MuiFormControl-root': { width: 'auto' } }}>
-        <TextField size="small" label="Search invoice, name or mobile number" value={filters.search} onChange={set('search')} sx={{ flex: '1 1 260px', minWidth: 220 }} />
-        <TextField size="small" type="date" label="From" value={filters.from} onChange={set('from')} slotProps={{ inputLabel: { shrink: true } }} error={Boolean(rangeBad)} sx={{ width: 140 }} />
-        <TextField size="small" type="date" label="To" value={filters.to} onChange={set('to')} slotProps={{ inputLabel: { shrink: true } }} error={Boolean(rangeBad)} helperText={rangeBad ? 'To is before From.' : ''} sx={{ width: 140 }} />
-      </Box>
-      {/* Doosri line: method aur status */}
-      <Box sx={{ display: 'flex', gap: 1, mb: 2, flexWrap: 'wrap', alignItems: 'center', '& .MuiFormControl-root': { width: 240, minWidth: 240, flexShrink: 0 } }}>
-        <TextField select size="small" label="Payment method" value={filters.method} onChange={set('method')} sx={{ width: 240 }}>
+      {/* Filters: desktop par ek hi row (search ~35%), tablet par 2 rows, mobile par ek ke neeche ek */}
+      <Box
+        sx={{
+          display: 'grid',
+          gap: 1.5,
+          mb: 2,
+          alignItems: 'start',
+          gridTemplateColumns: { xs: 'minmax(0, 1fr)', sm: 'repeat(2, minmax(0, 1fr))', md: 'repeat(4, minmax(0, 1fr))', lg: 'minmax(0, 2.2fr) repeat(4, minmax(0, 1fr)) auto' },
+          '& .MuiInputBase-root': { height: 44, bgcolor: '#fff' },
+          '& .MuiFormControl-root': { width: '100%' },
+          '& .search': { gridColumn: { sm: '1 / -1', lg: 'auto' } },
+        }}
+      >
+        <TextField className="search" size="small" label="Search invoice, name or mobile" value={filters.search} onChange={set('search')} />
+        <TextField size="small" type="date" label="From" value={filters.from} onChange={set('from')} slotProps={{ inputLabel: { shrink: true } }} error={Boolean(rangeBad)} />
+        <TextField size="small" type="date" label="To" value={filters.to} onChange={set('to')} slotProps={{ inputLabel: { shrink: true } }} error={Boolean(rangeBad)} helperText={rangeBad ? 'To is before From.' : ''} />
+        <TextField select size="small" label="Payment method" value={filters.method} onChange={set('method')} slotProps={{ inputLabel: { shrink: true } }}>
           <MenuItem value="">All</MenuItem>
           <MenuItem value="cash">Cash</MenuItem>
           <MenuItem value="upi">UPI</MenuItem>
           <MenuItem value="card">Card</MenuItem>
         </TextField>
-        <TextField select size="small" label="Payment status" value={filters.paymentStatus} onChange={set('paymentStatus')} sx={{ width: 240 }}>
+        <TextField select size="small" label="Payment status" value={filters.paymentStatus} onChange={set('paymentStatus')} slotProps={{ inputLabel: { shrink: true } }}>
           <MenuItem value="">All</MenuItem>
           <MenuItem value="paid">Paid</MenuItem>
           <MenuItem value="partial">Partly paid</MenuItem>
           <MenuItem value="unpaid">Pending</MenuItem>
         </TextField>
         {filtered && (
-          <Button size="small" onClick={() => { setFilters({ search: '', from: '', to: '', method: '', paymentStatus: '' }); setPage(1) }}>Clear</Button>
+          <Box sx={{ gridColumn: { xs: '1 / -1', md: 'auto' }, justifySelf: { xs: 'start', md: 'center' } }}>
+            <Tooltip title="Clear filters">
+              <IconButton aria-label="Clear filters" onClick={() => { setFilters({ search: '', from: '', to: '', method: '', paymentStatus: '' }); setPage(1) }} sx={{ color: '#7a5a14', border: '1px solid #e3d3b4', height: 44, width: 44, borderRadius: 2 }}>
+                <CloseIcon fontSize="small" />
+              </IconButton>
+            </Tooltip>
+          </Box>
         )}
       </Box>
 

@@ -1,14 +1,16 @@
 import { useEffect, useMemo, useState } from 'react'
-import { Image, Linking, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native'
+import { Linking, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import { useQuery } from '@tanstack/react-query'
 import { fetchSalon, recordSalonView } from '../../api/publicApi'
 import { friendlyError } from '../../api/client'
 import Button from '../../components/Button'
+import PhotoGallery from '../../components/PhotoGallery'
 import { Ionicons } from '@expo/vector-icons'
 import { ErrorState, LoadingState } from '../../components/States'
 import { COLORS, FONT, RADIUS } from '../../config/theme'
 import { formatDate, formatMoney } from '../../utils/formatMoney'
+import SalonReviews from './SalonReviews'
 
 // Google Maps directions: by the saved location (lat/lng) when the salon has one, otherwise by its address text.
 // This https link opens the Maps app on a phone and Google Maps in a browser.
@@ -24,7 +26,6 @@ export default function SalonDetailScreen({ route, navigation }) {
   const { id } = route.params
   const insets = useSafeAreaInsets()
   const [picked, setPicked] = useState([])
-  const [imageFailed, setImageFailed] = useState(false)
   const [mapError, setMapError] = useState('')
   const salon = useQuery({ queryKey: ['public', 'salon', id], queryFn: () => fetchSalon(id) })
 
@@ -53,13 +54,7 @@ export default function SalonDetailScreen({ route, navigation }) {
   return (
     <View style={styles.screen}>
       <ScrollView contentContainerStyle={{ paddingBottom: 110 + insets.bottom }}>
-        {data.coverUrl && !imageFailed ? (
-          <Image source={{ uri: data.coverUrl }} style={styles.cover} onError={() => setImageFailed(true)} accessibilityIgnoresInvertColors />
-        ) : (
-          <View style={[styles.cover, styles.placeholder]}>
-            <Text style={styles.initial}>{data.name?.[0]?.toUpperCase() ?? 'G'}</Text>
-          </View>
-        )}
+        <PhotoGallery photos={data.images?.length ? data.images : data.coverUrl ? [data.coverUrl] : []} name={data.name} height={220} />
 
         <View style={styles.pad}>
           <Text style={styles.name}>{data.name}</Text>
@@ -132,6 +127,8 @@ export default function SalonDetailScreen({ route, navigation }) {
               </View>
             ))}
           </View>
+
+          <SalonReviews salonId={id} onEdit={(bookingId) => navigation.navigate('Review', { bookingId })} />
         </View>
       </ScrollView>
 

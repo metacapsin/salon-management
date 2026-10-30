@@ -190,7 +190,49 @@ function sendApprovalEmail(user, { adminCreated = false, salonName = '' } = {}) 
   return sendMail({ to: user.email, subject: adminCreated ? 'Your Galora account is ready' : 'Your Galora account is approved', text, html })
 }
 
+// Forgot password: 6 digit OTP wali email (same Galora look as the approval email).
+function sendPasswordResetEmail(user, code, minutes) {
+  const text = [
+    `Hi ${user.name},`,
+    '',
+    `Your Galora password reset code is ${code}.`,
+    '',
+    `Enter this code on the reset page to choose a new password. It is valid for ${minutes} minutes and works only once.`,
+    'Please do not share this code with anyone. Our team will never ask for it.',
+    '',
+    'If you did not ask for this, you can safely ignore this email. Your password will not change.',
+    '',
+    'Warm regards,',
+    'Team Galora',
+  ].join('\n')
+
+  const digits = String(code)
+    .split('')
+    .map((d) => `<td style="width:44px;height:54px;text-align:center;background:#faf6f1;border:1px solid #e3d3c0;border-radius:8px;font-size:28px;font-weight:bold;color:#8a5a3b;font-family:'Courier New',monospace;">${d}</td>`)
+    .join('<td style="width:8px;"></td>')
+
+  const html = `<!doctype html>
+<html><body style="margin:0;padding:24px;background:#faf6f1;font-family:Arial,Helvetica,sans-serif;color:#3b2a1f;">
+  <table role="presentation" width="100%" cellpadding="0" cellspacing="0"><tr><td align="center">
+    <table role="presentation" width="560" cellpadding="0" cellspacing="0" style="max-width:560px;background:#ffffff;border-radius:12px;overflow:hidden;">
+      <tr><td style="background:#8a5a3b;padding:20px 28px;color:#ffffff;font-size:22px;font-weight:bold;">Galora</td></tr>
+      <tr><td style="padding:28px;">
+        <p style="margin:0 0 12px;font-size:18px;font-weight:bold;">Hi ${escapeHtml(user.name)}, reset your password</p>
+        <p style="margin:0 0 22px;line-height:1.6;">We got a request to reset your Galora password. Use this code to continue:</p>
+        <table role="presentation" cellpadding="0" cellspacing="0" align="center" style="margin:0 auto 22px;"><tr>${digits}</tr></table>
+        <p style="margin:0 0 20px;line-height:1.6;font-size:14px;text-align:center;color:#6b5646;">This code is valid for <strong>${minutes} minutes</strong> and works only once.</p>
+        <p style="margin:0;line-height:1.6;font-size:14px;color:#6b5646;">For your safety, never share this code with anyone. Our team will never ask for it.</p>
+      </td></tr>
+      <tr><td style="padding:16px 28px;background:#faf6f1;font-size:12px;color:#8b7767;">If you did not ask for this, you can safely ignore this email. Your password will not change.</td></tr>
+    </table>
+  </td></tr></table>
+</body></html>`
+
+  return sendMail({ to: user.email, subject: `${code} is your Galora password reset code`, text, html })
+}
+
 module.exports = {
+  sendPasswordResetEmail,
   REFRESH_COOKIE,
   hashPassword,
   verifyPasswordAgainst,

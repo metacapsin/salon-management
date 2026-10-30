@@ -8,6 +8,7 @@ const { authenticate, requireSalon, can } = require('../../middleware/auth')
 const { Salon, Branch, Membership, Service } = require('../../models')
 const { roleCan } = require('../../config/permissions')
 const { recordAudit } = require('../audit/audit.service')
+const { MAX_BYTES, addSalonImage, removeSalonImage, makeCoverImage } = require('../../utils/uploads')
 
 const router = express.Router()
 
@@ -125,6 +126,8 @@ async function fullSalon(salon) {
     facilities: salon.facilities,
     address: salon.address,
     logoUrl: salon.logoUrl,
+    coverUrl: salon.coverUrl,
+    images: salon.images ?? [],
     publicBookingEnabled: salon.publicBookingEnabled,
     settings: salon.settings,
     version: salon.version,
@@ -194,6 +197,27 @@ router.post('/', authenticate, validate({ body: createSalonBody }), async (req, 
 router.get('/current', authenticate, requireSalon, async (req, res) => {
   if (!roleCan(req.role, 'settings.read')) return sendSuccess(req, res, { salon: summary(req.salon), role: req.role })
   sendSuccess(req, res, { salon: await fullSalon(req.salon), role: req.role, publishBlockers: await publishReadiness(req.salon) })
+})
+
+// Salon ki photos (owner): body = seedhi image file. Max 5, pehli photo cover.
+const photoUrlBody = z.strictObject({ url: z.string().min(1).max(300) })
+router.post('/current/images', authenticate, requireSalon, can('settings.write'), express.raw({ type: ['image/jpeg', 'image/png', 'image/webp'], limit: MAX_BYTES }), async (req, res) => {
+  addSalonImage(req.salon, req.body)
+  await req.salon.save()
+  await recordAudit(req, { action: 'salon.image_added', entityType: 'salon', entityId: req.salon._id })
+  sendSuccess(req, res, { images: req.salon.images, coverUrl: req.salon.coverUrl }, { status: 201 })
+})
+router.delete('/current/images', authenticate, requireSalon, can('settings.write'), validate({ body: photoUrlBody }), async (req, res) => {
+  removeSalonImage(req.salon, req.valid.body.url)
+  await req.salon.save()
+  await recordAudit(req, { action: 'salon.image_removed', entityType: 'salon', entityId: req.salon._id })
+  sendSuccess(req, res, { images: req.salon.images, coverUrl: req.salon.coverUrl })
+})
+router.patch('/current/images/cover', authenticate, requireSalon, can('settings.write'), validate({ body: photoUrlBody }), async (req, res) => {
+  makeCoverImage(req.salon, req.valid.body.url)
+  await req.salon.save()
+  await recordAudit(req, { action: 'salon.cover_changed', entityType: 'salon', entityId: req.salon._id })
+  sendSuccess(req, res, { images: req.salon.images, coverUrl: req.salon.coverUrl })
 })
 
 router.patch('/current', authenticate, requireSalon, can('settings.write'), validate({ body: updateSalonBody }), async (req, res) => {

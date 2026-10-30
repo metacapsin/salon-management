@@ -8,6 +8,7 @@ const { authenticate, requireSalon, can } = require('../../middleware/auth')
 const { Booking, Branch, Service, Staff } = require('../../models')
 const { recordAudit } = require('../audit/audit.service')
 const { withTransaction } = require('../../utils/transaction')
+const { requestReview } = require('../reviews/reviews.service')
 const { bookingBenefits } = require('./benefits')
 const { buildSlots, dateInRange, isRealDate } = require('./slots')
 
@@ -194,6 +195,10 @@ router.patch(
     booking.status = status
     await booking.save()
     await recordAudit(req, { action: 'booking.status_changed', entityType: 'booking', entityId: booking._id, changes: { before, after: status } })
+    if (status === 'completed') {
+      // Review request customer ko jati he; ye fail ho to bhi appointment ka status badal chuka he, isliye sirf log karte hain
+      await requestReview(booking).catch((error) => console.error('Review request failed:', error.message))
+    }
     sendSuccess(req, res, { booking: present(booking) })
   },
 )

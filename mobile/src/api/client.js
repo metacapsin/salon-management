@@ -32,14 +32,17 @@ export const setSessionLostHandler = (fn) => {
 
 async function send(path, { method = 'GET', body, auth = true, salon = true, token } = {}) {
   const headers = { Accept: 'application/json' }
-  if (body !== undefined) headers['Content-Type'] = 'application/json'
+  // A photo (Blob) goes as the raw file with its own type; everything else is JSON.
+  const isFile = typeof Blob !== 'undefined' && body instanceof Blob
+  if (isFile) headers['Content-Type'] = body.type
+  else if (body !== undefined) headers['Content-Type'] = 'application/json'
   if (token) headers.Authorization = `Bearer ${token}`
   else if (auth && accessToken) headers.Authorization = `Bearer ${accessToken}`
   if (salon && activeSalonId) headers['X-Salon-Id'] = activeSalonId
 
   let response
   try {
-    response = await fetch(`${API_BASE}${path}`, { method, headers, body: body === undefined ? undefined : JSON.stringify(body) })
+    response = await fetch(`${API_BASE}${path}`, { method, headers, body: body === undefined ? undefined : isFile ? body : JSON.stringify(body) })
   } catch {
     throw new ApiError(0, 'NETWORK_ERROR', 'Could not reach the server.')
   }
@@ -169,8 +172,12 @@ export function friendlyError(error, fallback = 'Something went wrong. Please tr
   return error.message || `${fallback} (${error.status} ${error.code})`
 }
 
-// "Forgot password": the server emails a reset link (it opens the website's reset page). It always answers the same,
-// whether or not the email is registered.
+// "Forgot password": the server emails a 6 digit code. It always answers the same, whether or not the email is registered.
 export async function requestPasswordReset(email) {
   await send('/auth/password-reset', { method: 'POST', body: { email }, auth: false, salon: false })
+}
+
+// Second step: the emailed code plus the new password (at least 12 characters).
+export async function confirmPasswordReset({ email, otp, password }) {
+  await send('/auth/password-reset/confirm', { method: 'POST', body: { email, otp, password }, auth: false, salon: false })
 }

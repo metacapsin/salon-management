@@ -9,3 +9,4 @@ dist/
 .claude/
 .DS_Store
 .git-nested-backup/
+backend/uploads/

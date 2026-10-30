@@ -7,6 +7,8 @@ const CAPABILITIES = {
   'users.manage': ['owner'],
   'audit.read': ['owner', 'manager'],
   'notifications.read': ['owner', 'manager'],
+  'reviews.read': ['owner', 'manager'],
+  'reviews.reply': ['owner', 'manager'],
   'appointments.read': ['owner', 'manager', 'receptionist'],
   'appointments.write': ['owner', 'manager', 'receptionist'],
   'customers.read': ['owner', 'manager', 'receptionist'],

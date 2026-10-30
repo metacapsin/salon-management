@@ -5,6 +5,7 @@ const cookieParser = require('cookie-parser')
 const mongoose = require('mongoose')
 const env = require('./config/env')
 const { requestContext, notFound, errorHandler } = require('./middleware/common')
+const { UPLOAD_ROOT } = require('./utils/uploads')
 const { authRouter, meRouter } = require('./modules/auth/auth.routes')
 const mobileAuthRoutes = require('./modules/auth/mobileAuth.routes')
 const salonRoutes =require('./modules/salons/salons.routes')
@@ -23,6 +24,8 @@ const salonCustomerRoutes = require('./modules/customers/salonCustomers.routes')
 const bookingRoutes = require('./modules/bookings/bookings.routes')
 const invoiceRoutes = require('./modules/billing/invoices.routes')
 const notificationRoutes = require('./modules/notifications/notifications.routes')
+const reviewRoutes = require('./modules/reviews/reviews.routes')
+const ownerReviewRoutes = require('./modules/reviews/ownerReviews.routes')
 const platformRoutes = require('./modules/platform/platform.routes')
 const { publicRouter: contactRoutes } = require('./modules/contact/contact.routes')
 
@@ -39,6 +42,15 @@ app.use(
     allowedHeaders: ['Content-Type', 'Authorization', 'X-Salon-Id', 'Idempotency-Key'],
   }),
 )
+// Salon photos. Dusre origin (web 5173 / mobile) ke <img> ko dikhane ke liye cross-origin allowed.
+app.use(
+  '/uploads',
+  (req, res, next) => {
+    res.set('Cross-Origin-Resource-Policy', 'cross-origin')
+    next()
+  },
+  express.static(UPLOAD_ROOT, { maxAge: '7d', index: false, dotfiles: 'ignore' }),
+)
 app.use(express.json({ limit: '100kb' }))
 app.use(cookieParser())
 
@@ -54,6 +66,7 @@ app.use('/api/v1/auth', authRouter)
 app.use('/api/v1', meRouter)
 app.use('/api/v1/customer', customerRoutes)
 app.use('/api/v1/public', publicRoutes)
+app.use('/api/v1/public', reviewRoutes)
 app.use('/api/v1/salons', salonRoutes)
 app.use('/api/v1/users', userRoutes)
 app.use('/api/v1/services', serviceRoutes)
@@ -67,6 +80,7 @@ app.use('/api/v1/customers', salonCustomerRoutes)
 app.use('/api/v1/bookings', bookingRoutes)
 app.use('/api/v1/invoices', invoiceRoutes)
 app.use('/api/v1/notifications', notificationRoutes)
+app.use('/api/v1/reviews', ownerReviewRoutes)
 app.use('/api/v1/audit-events', auditRoutes)
 app.use('/api/v1/platform', platformRoutes)
 app.use('/api/v1/contact', contactRoutes)

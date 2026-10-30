@@ -8,6 +8,7 @@ import QueryState from '../../components/QueryState'
 import BookingForm from '../../features/explore/BookingForm'
 import SalonCover from '../../features/explore/SalonCover'
 import SalonMap from '../../features/explore/SalonMap'
+import CustomerBell from '../../features/reviews/CustomerBell'
 import { formatMoney } from '../../utils/formatMoney'
 import Logo from '../landing/Logo'
 import '../../styles/landing.css'
@@ -69,6 +70,7 @@ export default function BookingPage() {
             <Link to="/explore" style={{ color: '#fff', textDecoration: 'none' }}>
               All salons
             </Link>
+            <CustomerBell />
             <span>{customer.name}</span>
             <button type="button" className="ex-header__logout" onClick={logout}>
               Log out

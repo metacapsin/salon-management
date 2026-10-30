@@ -1,0 +1,929 @@
+/* =====================================================================
+   Platform Admin panel ki styling (plain CSS, koi library nahi).
+   Sab kuch ".gl-admin" ke andar hi lagta he (AdminLayout us class ko lagata he), isliye salon owner ke dashboard par koi asar nahi.
+   Naye admin-only classes "ad-" se shuru hote hain. Rang: dark brown #2e1b0f, gold #e6c767, cream #faf6f0, white.
+
+   Fehrist: 1. Tokens  2. Sidebar  3. Header  4. Page (title, toolbar, panel)  5. Pills, stats, lists  6. States  7. Detail  8. Responsive
+   ===================================================================== */
+
+/* ---------- 1. Tokens ---------- */
+.gl-admin {
+  --ad-espresso: #2e1b0f;
+  --ad-gold: #e6c767;
+  --ad-gold-deep: #8a6a1f;
+  --ad-cream: #faf6f0;
+  --ad-head: #f5eee2;
+  --ad-line: #e9e0d4;
+  --ad-muted: #6f5a47;
+  --ad-radius: 10px;
+  background: var(--ad-cream);
+}
+
+/* ---------- 2. Sidebar ---------- */
+.gl-admin .gl-sidebar {
+  background: var(--ad-espresso); /* sapaat rang, koi gradient nahi */
+  border-right: 0;
+  padding: 16px 12px;
+}
+
+.gl-admin .gl-brand {
+  margin-bottom: 8px;
+  padding: 4px 6px 18px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.09);
+}
+
+.gl-admin .gl-brand__mark {
+  width: 40px;
+  height: 40px;
+  border-radius: 10px;
+  background: var(--ad-gold);
+  color: var(--ad-espresso);
+  font-size: 1.5rem;
+  box-shadow: none;
+}
+
+.gl-admin .gl-brand__name {
+  font-size: 1.45rem;
+  color: var(--ad-gold);
+}
+
+.gl-admin .gl-brand__sub {
+  font-size: 0.64rem;
+  font-weight: 600;
+  letter-spacing: 0.16em;
+  color: rgba(255, 255, 255, 0.6);
+}
+
+.gl-admin .gl-sidebar__toggle {
+  width: 34px;
+  height: 34px;
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  border-radius: 8px;
+  background: transparent;
+  color: rgba(255, 255, 255, 0.78);
+}
+
+.gl-admin .gl-sidebar__toggle:hover {
+  border-color: rgba(255, 255, 255, 0.3);
+  background: rgba(255, 255, 255, 0.08);
+  color: #fff;
+  box-shadow: none;
+}
+
+.gl-admin .gl-nav__heading {
+  margin: 22px 12px 6px;
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  color: rgba(255, 255, 255, 0.45);
+}
+
+.gl-admin .gl-nav > .gl-nav__heading:first-child {
+  margin-top: 14px;
+}
+
+.gl-admin .gl-nav__link {
+  min-height: 42px;
+  margin-bottom: 2px;
+  padding: 0 12px;
+  border-radius: 8px;
+  color: rgba(255, 255, 255, 0.76);
+  font-size: 0.9rem;
+  font-weight: 500;
+  letter-spacing: 0;
+  transition: background 0.15s ease, color 0.15s ease;
+}
+
+.gl-admin .gl-nav__link svg {
+  opacity: 0.9;
+  transition: none;
+}
+
+.gl-admin .gl-nav__link:hover {
+  background: rgba(255, 255, 255, 0.07);
+  color: #fff;
+  transform: none;
+}
+
+.gl-admin .gl-nav__link:hover svg {
+  opacity: 1;
+  transform: none;
+}
+
+.gl-admin .gl-nav__link.active {
+  background: rgba(230, 199, 103, 0.14);
+  box-shadow: none;
+  color: var(--ad-gold);
+  font-weight: 600;
+}
+
+.gl-admin .gl-nav__link.active::before {
+  left: -12px;
+  top: 8px;
+  bottom: 8px;
+  width: 3px;
+  box-shadow: none;
+  background: var(--ad-gold);
+}
+
+.ad-nav__count {
+  margin-left: auto;
+  min-width: 22px;
+  padding: 1px 7px;
+  border-radius: 999px;
+  background: var(--ad-gold);
+  color: var(--ad-espresso);
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-align: center;
+}
+
+/* Sidebar ke sabse neeche: kaun login he + sign out */
+.ad-sidebar-user {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: auto;
+  padding: 14px 6px 4px;
+  border-top: 1px solid rgba(255, 255, 255, 0.09);
+}
+
+.ad-sidebar-user__text {
+  min-width: 0;
+  flex: 1;
+  line-height: 1.25;
+}
+
+.ad-sidebar-user__text strong,
+.ad-sidebar-user__text span {
+  display: block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.ad-sidebar-user__text strong {
+  color: #fff;
+  font-size: 0.85rem;
+}
+
+.ad-sidebar-user__text span {
+  color: rgba(255, 255, 255, 0.58);
+  font-size: 0.75rem;
+}
+
+.ad-sidebar-user__out {
+  display: grid;
+  place-items: center;
+  flex: none;
+  width: 36px;
+  height: 36px;
+  border: 0;
+  border-radius: 8px;
+  background: transparent;
+  color: rgba(255, 255, 255, 0.72);
+  cursor: pointer;
+}
+
+.ad-sidebar-user__out:hover {
+  background: rgba(255, 255, 255, 0.09);
+  color: #fff;
+}
+
+@media (min-width: 1024px) {
+  .gl-admin.gl-app--collapsed .gl-sidebar {
+    padding: 16px 10px;
+  }
+
+  .gl-admin.gl-app--collapsed .gl-nav__link.active::before {
+    left: -10px;
+  }
+
+  .gl-admin.gl-app--collapsed .ad-nav__count,
+  .gl-admin.gl-app--collapsed .ad-sidebar-user__text {
+    display: none;
+  }
+
+  .gl-admin.gl-app--collapsed .ad-sidebar-user {
+    flex-direction: column;
+    padding-inline: 0;
+  }
+}
+
+/* ---------- 3. Header ---------- */
+.gl-admin .gl-header {
+  min-height: 64px;
+  padding: 10px 32px;
+  background: #fff;
+  backdrop-filter: none;
+  border-bottom: 1px solid var(--ad-line);
+}
+
+.ad-crumbs {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.875rem;
+  color: var(--ad-muted);
+  white-space: nowrap;
+}
+
+.ad-crumbs strong {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  color: var(--ad-espresso);
+  font-weight: 700;
+}
+
+.ad-crumbs svg {
+  flex: none;
+  transform: rotate(-90deg);
+  opacity: 0.55;
+}
+
+.ad-header__who {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding-right: 4px;
+  line-height: 1.25;
+}
+
+.ad-header__who-text {
+  text-align: right;
+  min-width: 0;
+}
+
+.ad-header__who-text strong,
+.ad-header__who-text span {
+  display: block;
+  max-width: 220px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.ad-header__who-text strong {
+  font-size: 0.85rem;
+  color: var(--ad-espresso);
+}
+
+.ad-header__who-text span {
+  font-size: 0.75rem;
+  color: var(--ad-muted);
+}
+
+.gl-admin .gl-iconbtn {
+  border-radius: 8px;
+  min-width: 40px;
+  min-height: 40px;
+}
+
+/* ---------- 4. Page: title, toolbar, panel ---------- */
+.gl-admin .gl-content {
+  padding: 28px 32px 56px;
+}
+
+.ad-page {
+  width: 100%;
+}
+
+.ad-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 12px 24px;
+  margin-bottom: 24px;
+}
+
+.ad-head__text {
+  min-width: 0;
+}
+
+.ad-head h1 {
+  font-family: var(--gl-heading-font);
+  font-size: 1.75rem;
+  font-weight: 700;
+  line-height: 1.2;
+  color: var(--ad-espresso);
+  overflow-wrap: anywhere;
+}
+
+.ad-head p {
+  margin-top: 4px;
+  max-width: 62ch;
+  font-size: 0.9rem;
+  color: var(--ad-muted);
+}
+
+.ad-head__actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+}
+
+.gl-admin a.ad-back {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 8px;
+  color: var(--ad-muted);
+  font-size: 0.85rem;
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.gl-admin a.ad-back:hover {
+  color: var(--ad-espresso);
+}
+
+.gl-admin a.ad-back svg {
+  transform: rotate(90deg);
+}
+
+.ad-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.ad-toolbar .ad-search {
+  flex: 1 1 260px;
+  max-width: 400px;
+  width: auto;
+}
+
+.ad-toolbar .ad-filter {
+  flex: 0 0 auto;
+  width: 160px;
+}
+
+.ad-toolbar .ad-filter--date {
+  width: 168px;
+}
+
+.ad-panel {
+  background: #fff;
+  border: 1px solid var(--ad-line);
+  border-radius: var(--ad-radius);
+}
+
+.ad-panel--pad {
+  padding: 20px;
+}
+
+.ad-panel__head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 16px 20px;
+  border-bottom: 1px solid var(--ad-line);
+}
+
+.ad-panel__head h2 {
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--ad-espresso);
+}
+
+.ad-panel__head p {
+  margin-top: 2px;
+  font-size: 0.8125rem;
+  color: var(--ad-muted);
+}
+
+.gl-admin a.ad-link {
+  color: var(--ad-espresso);
+  font-weight: 600;
+  text-decoration: none;
+  overflow-wrap: anywhere;
+}
+
+.gl-admin a.ad-link:hover {
+  color: var(--ad-gold-deep);
+  text-decoration: underline;
+}
+
+.ad-cell-sub {
+  display: block;
+  margin-top: 2px;
+  font-size: 0.78rem;
+  line-height: 1.35;
+  color: var(--ad-muted);
+  overflow-wrap: anywhere;
+}
+
+.ad-cell {
+  min-width: 0;
+}
+
+.ad-cell-strong {
+  font-weight: 600;
+  overflow-wrap: anywhere;
+}
+
+.ad-cell-muted {
+  color: var(--ad-muted);
+}
+
+.ad-row-actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 8px;
+}
+
+.ad-roles {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px 8px;
+  padding: 2px 0;
+}
+
+.ad-pager {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px 16px;
+  padding: 14px 2px 0;
+}
+
+.ad-pager__info {
+  font-size: 0.8125rem;
+  color: var(--ad-muted);
+}
+
+/* ---------- 5. Pills, stats, lists ---------- */
+.ad-pill {
+  display: inline-flex;
+  font-family: 'Inter', system-ui, 'Segoe UI', Roboto, sans-serif;
+  align-items: center;
+  gap: 6px;
+  padding: 3px 10px;
+  border-radius: 999px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  line-height: 1.5;
+  white-space: nowrap;
+  text-transform: capitalize;
+}
+
+.ad-pill__dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: currentColor;
+}
+
+.ad-pill--success {
+  background: #e6f3e8;
+  color: #1f5a2b;
+}
+
+.ad-pill--warning {
+  background: #fdf1d6;
+  color: #7a5200;
+}
+
+.ad-pill--danger {
+  background: #fbe9e9;
+  color: #8f1f24;
+}
+
+.ad-pill--info {
+  background: #e4f0fb;
+  color: #164a7a;
+}
+
+.ad-pill--neutral {
+  background: #eee7dc;
+  color: #5a4634;
+}
+
+.ad-stats {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+.ad-stat {
+  display: grid;
+  align-content: start;
+  gap: 4px;
+  padding: 18px 20px;
+  background: #fff;
+  border: 1px solid var(--ad-line);
+  border-radius: var(--ad-radius);
+  color: inherit;
+  text-decoration: none;
+}
+
+.ad-stat--link {
+  transition: border-color 0.15s ease;
+}
+
+.ad-stat--link:hover {
+  border-color: #cdbba3;
+}
+
+.ad-stat__icon {
+  display: grid;
+  place-items: center;
+  width: 36px;
+  height: 36px;
+  margin-bottom: 8px;
+  border-radius: 8px;
+  background: var(--ad-head);
+  color: var(--ad-espresso);
+}
+
+.ad-stat__icon--gold {
+  background: #fbf3d7;
+  color: var(--ad-gold-deep);
+}
+
+.ad-stat__icon--success {
+  background: #e6f3e8;
+  color: #1f5a2b;
+}
+
+.ad-stat__icon--warning {
+  background: #fdf1d6;
+  color: #7a5200;
+}
+
+.ad-stat__label {
+  font-size: 0.8125rem;
+  font-weight: 600;
+  color: var(--ad-muted);
+}
+
+.ad-stat__value {
+  font-family: var(--gl-heading-font);
+  font-size: 2rem;
+  font-weight: 700;
+  line-height: 1.15;
+  color: var(--ad-espresso);
+}
+
+.ad-stat__hint {
+  font-size: 0.78rem;
+  color: var(--ad-muted);
+}
+
+.ad-split {
+  display: grid;
+  grid-template-columns: minmax(0, 2fr) minmax(0, 1fr);
+  gap: 16px;
+  align-items: start;
+}
+
+.ad-rows {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.ad-rows li {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 14px 20px;
+  border-top: 1px solid var(--ad-line);
+}
+
+.ad-rows li:first-child {
+  border-top: 0;
+}
+
+.ad-rows__main {
+  min-width: 0;
+}
+
+.ad-quick {
+  display: grid;
+  gap: 8px;
+  padding: 16px 20px 20px;
+}
+
+.ad-quick a {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 12px;
+  border: 1px solid var(--ad-line);
+  border-radius: 8px;
+  color: var(--ad-espresso);
+  font-size: 0.9rem;
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.ad-quick a:hover {
+  background: var(--ad-head);
+  border-color: #d6c9b6;
+}
+
+.ad-quick a svg:first-child {
+  flex: none;
+  color: var(--ad-gold-deep);
+}
+
+.ad-quick a .ad-nav__count {
+  background: var(--ad-espresso);
+  color: var(--ad-gold);
+}
+
+/* Inquiry status filter cards (Total / New / ...) */
+.ad-filtercards {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.ad-filtercard {
+  flex: 1 1 120px;
+  max-width: 190px;
+  display: grid;
+  gap: 2px;
+  padding: 12px 16px;
+  border: 1px solid var(--ad-line);
+  border-radius: var(--ad-radius);
+  background: #fff;
+  color: var(--ad-espresso);
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+  transition: border-color 0.15s ease, background 0.15s ease;
+}
+
+.ad-filtercard:hover {
+  border-color: #cdbba3;
+}
+
+.ad-filtercard[aria-pressed='true'] {
+  border-color: var(--ad-espresso);
+  background: var(--ad-head);
+  box-shadow: inset 0 0 0 1px var(--ad-espresso);
+}
+
+.ad-filtercard span {
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: var(--ad-muted);
+}
+
+.ad-filtercard strong {
+  font-family: var(--gl-heading-font);
+  font-size: 1.5rem;
+  line-height: 1.2;
+}
+
+/* ---------- 6. Loading, error, empty ---------- */
+.ad-skeleton {
+  padding: 8px 0;
+}
+
+.ad-skeleton__row {
+  display: block;
+  width: var(--w, 90%);
+  height: 16px;
+  margin: 20px;
+  border-radius: 6px;
+  background: #efe7da;
+  animation: ad-pulse 1.3s ease-in-out infinite;
+}
+
+@keyframes ad-pulse {
+  50% {
+    opacity: 0.45;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ad-skeleton__row {
+    animation: none;
+  }
+}
+
+.ad-notice {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 16px;
+  border: 1px solid;
+  border-radius: var(--ad-radius);
+}
+
+.ad-notice p {
+  flex: 1;
+  margin: 0;
+  font-size: 0.9rem;
+}
+
+.ad-notice svg {
+  flex: none;
+}
+
+.ad-notice--error {
+  background: #fbeeee;
+  border-color: #efc9cb;
+  color: #7a1b20;
+}
+
+.ad-notice--warning {
+  background: #fdf4de;
+  border-color: #ecd9a4;
+  color: #6b4a00;
+}
+
+.gl-admin .gl-empty-state {
+  padding: 48px 16px;
+}
+
+.gl-admin .gl-empty-state__icon {
+  background: var(--ad-head);
+  color: var(--ad-gold-deep);
+}
+
+.gl-admin .gl-empty-state h3 {
+  font-size: 1.15rem;
+  color: var(--ad-espresso);
+}
+
+.gl-admin .gl-empty-state p {
+  color: var(--ad-muted);
+}
+
+/* ---------- 7. Detail page ---------- */
+.ad-detail {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0 40px;
+  margin: 0;
+  padding: 4px 20px 8px;
+}
+
+.ad-field {
+  padding: 14px 0;
+  border-bottom: 1px solid var(--ad-line);
+  min-width: 0;
+}
+
+.ad-field--wide {
+  grid-column: 1 / -1;
+}
+
+.ad-field dt {
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--ad-muted);
+}
+
+.ad-field dd {
+  margin: 4px 0 0;
+  font-size: 0.95rem;
+  color: var(--ad-espresso);
+  overflow-wrap: anywhere;
+}
+
+.ad-title-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px;
+}
+
+/* ---------- 8. Responsive ---------- */
+@media (max-width: 1023px) {
+  .gl-admin .gl-header {
+    padding: 8px 20px;
+    flex-wrap: nowrap;
+  }
+
+  .gl-admin .gl-content {
+    padding: 20px 20px 40px;
+  }
+
+  .ad-split {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  /* Drawer ke andar kaam ki cheezein hi dikhein */
+  .gl-admin .gl-sidebar {
+    box-shadow: 8px 0 32px rgba(0, 0, 0, 0.35);
+  }
+}
+
+@media (max-width: 720px) {
+  .ad-header__who-text {
+    display: none;
+  }
+
+  .ad-stats {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 12px;
+  }
+
+  .ad-stat {
+    padding: 14px 16px;
+  }
+
+  /* Akela bacha hua aakhri card poori chaudai le */
+  .ad-stats > :last-child:nth-child(odd) {
+    grid-column: 1 / -1;
+  }
+
+  /* Card ban chuki row me do-line wala cell daayein taraf jura rahe */
+  .gl-admin .gl-rtable .ad-cell {
+    text-align: right;
+  }
+
+  .ad-stat__value {
+    font-size: 1.65rem;
+  }
+
+  /* Responsive table ke card (720px se kam) admin ke rang me */
+  .gl-admin .gl-rtable tr {
+    border-radius: var(--ad-radius);
+    border-color: var(--ad-line);
+  }
+
+  .ad-row-actions {
+    justify-content: flex-end;
+  }
+}
+
+@media (max-width: 599px) {
+  .gl-admin .gl-header {
+    padding: 8px 12px;
+  }
+
+  /* Chhoti patti me sirf ab wala page naam, "Platform admin" aur avatar chhupa do */
+  .ad-crumbs > span:first-child,
+  .ad-crumbs > span:nth-child(2) > svg:first-child,
+  .ad-header__who {
+    display: none;
+  }
+
+  .gl-admin .gl-content {
+    padding: 16px 12px 32px;
+  }
+
+  .ad-head h1 {
+    font-size: 1.45rem;
+  }
+
+  .ad-head__actions,
+  .ad-head__actions .MuiButton-root {
+    width: 100%;
+  }
+
+  .ad-toolbar .ad-search,
+  .ad-toolbar .ad-filter,
+  .ad-toolbar .ad-filter--date {
+    flex: 1 1 100%;
+    max-width: none;
+    width: 100%;
+  }
+
+  .ad-toolbar .MuiButton-root {
+    width: 100%;
+  }
+
+  .ad-detail {
+    grid-template-columns: minmax(0, 1fr);
+    padding-inline: 16px;
+  }
+
+  .ad-filtercard {
+    flex: 1 1 calc(50% - 6px);
+    max-width: none;
+  }
+
+  .ad-rows li {
+    padding: 12px 16px;
+  }
+
+  .ad-panel__head {
+    padding: 14px 16px;
+  }
+
+  .ad-pager {
+    justify-content: center;
+  }
+}

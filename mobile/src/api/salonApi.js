@@ -98,3 +98,20 @@ export async function updateSalonSettings(body) {
   const { data } = await request('/salons/current', { method: 'PATCH', body })
   return data.salon
 }
+
+// ---------- Reviews (Owner / Manager) ----------
+// Only this salon's reviews: the salon comes from the login (X-Salon-Id), the server checks it.
+// -> { summary: { average, count, breakdown }, reviews, page, pageSize, total }
+export async function fetchReviews({ page = 1, pageSize = 10, rating } = {}) {
+  const query = new URLSearchParams({ page: String(page), pageSize: String(pageSize), ...(rating ? { rating: String(rating) } : {}) })
+  const { data } = await request(`/reviews?${query}`)
+  return data
+}
+export async function replyToReview(id, text) {
+  const { data } = await request(`/reviews/${id}/reply`, { method: 'PUT', body: { text } })
+  return data.review
+}
+export async function removeReviewReply(id) {
+  const { data } = await request(`/reviews/${id}/reply`, { method: 'DELETE' })
+  return data.review
+}

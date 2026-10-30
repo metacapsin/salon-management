@@ -351,22 +351,15 @@ html:has(.lp) {
   scroll-margin-top: 0;
 }
 
-.lp-hero__image {
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  object-position: center;
-}
-
-/* Gehra parda: left me zyada (text ke neeche), right me kam (photo dikhe) */
+/* Gehra parda: left me zyada (text ke neeche), right me kam (photo dikhe).
+   Slider ke buttons iske upar rehte hain, isliye parde par click na ruke. */
 .lp-hero__shade {
   position: absolute;
   inset: 0;
+  pointer-events: none;
   background:
-    linear-gradient(100deg, rgba(36, 21, 11, 0.94) 0%, rgba(36, 21, 11, 0.78) 45%, rgba(36, 21, 11, 0.35) 100%),
-    linear-gradient(to top, rgba(36, 21, 11, 0.7), transparent 35%);
+    linear-gradient(100deg, rgba(36, 21, 11, 0.7) 0%, rgba(36, 21, 11, 0.4) 45%, rgba(36, 21, 11, 0.05) 100%),
+    linear-gradient(to top, rgba(36, 21, 11, 0.55), transparent 30%);
 }
 
 .lp-hero__inner {
@@ -375,6 +368,10 @@ html:has(.lp) {
   grid-template-columns: minmax(0, 1.25fr) minmax(0, 0.75fr);
   gap: 48px;
   align-items: center;
+}
+
+.lp-hero__copy {
+  text-shadow: 0 1px 14px rgba(0, 0, 0, 0.55); /* parda halka hai, text photo par bhi padhe */
 }
 
 .lp-hero h1 {

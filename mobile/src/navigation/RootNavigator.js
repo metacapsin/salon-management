@@ -1,4 +1,6 @@
 import { NavigationContainer } from '@react-navigation/native'
+import { useQuery } from '@tanstack/react-query'
+import { fetchMyNotifications } from '../api/publicApi'
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs'
 import { createNativeStackNavigator } from '@react-navigation/native-stack'
 import { navTheme, stackOptions, tabIcon, tabOptions } from './options'
@@ -16,7 +18,10 @@ import AdminUsersScreen from '../screens/admin/AdminUsersScreen'
 import BookScreen from '../screens/customer/BookScreen'
 import FindSalonScreen from '../screens/customer/FindSalonScreen'
 import MyBookingsScreen from '../screens/customer/MyBookingsScreen'
+import NotificationsScreen, { NOTIFICATIONS_KEY } from '../screens/customer/NotificationsScreen'
 import ProfileScreen from '../screens/customer/ProfileScreen'
+import ReviewScreen from '../screens/customer/ReviewScreen'
+import ReviewsScreen from '../screens/salon/ReviewsScreen'
 import SalonDetailScreen from '../screens/customer/SalonDetailScreen'
 import ComingSoonScreen from '../screens/ComingSoonScreen'
 import MoreScreen from '../screens/MoreScreen'
@@ -59,6 +64,7 @@ const MORE_SCREENS = [
   { name: 'Packages & Memberships', label: 'Packages & Memberships', icon: 'gift-outline', capability: 'packages.read', component: PackagesScreen },
   { name: 'Billing', label: 'Billing', icon: 'card-outline', capability: 'billing.read', component: BillingScreen },
   { name: 'Offers', label: 'Offers', icon: 'pricetag-outline', capability: 'offers.read', component: OffersScreen },
+  { name: 'Reviews', label: 'Reviews', icon: 'star-outline', capability: 'reviews.read', component: ReviewsScreen },
   { name: 'Settings', label: 'Settings', icon: 'settings-outline', capability: 'settings.read', component: SettingsScreen },
 ]
 
@@ -98,10 +104,14 @@ function AdminStack() {
 
 // Customer app: Home (Find a Salon), Bookings and Profile as tabs; salon details and booking open on top of them.
 function CustomerTabs() {
+  // Unread count on the Alerts tab (same query as the notifications screen, so it stays in step with it)
+  const notifications = useQuery({ queryKey: NOTIFICATIONS_KEY, queryFn: fetchMyNotifications, refetchInterval: 60_000 })
+  const unread = notifications.data?.unreadCount ?? 0
   return (
     <Tab.Navigator screenOptions={tabOptions}>
       <Tab.Screen name="Home" component={FindSalonScreen} options={{ headerShown: false, tabBarLabel: 'Home', tabBarIcon: tabIcon('home-outline') }} />
       <Tab.Screen name="Bookings" component={MyBookingsScreen} options={{ title: 'My appointments', tabBarLabel: 'Bookings', tabBarIcon: tabIcon('calendar-outline') }} />
+      <Tab.Screen name="Alerts" component={NotificationsScreen} options={{ title: 'Notifications', tabBarLabel: 'Alerts', tabBarBadge: unread > 0 ? unread : undefined, tabBarIcon: tabIcon('notifications-outline') }} />
       <Tab.Screen name="Profile" component={ProfileScreen} options={{ tabBarIcon: tabIcon('person-outline') }} />
     </Tab.Navigator>
   )
@@ -113,6 +123,7 @@ function CustomerStack() {
       <Stack.Screen name="CustomerHome" component={CustomerTabs} options={{ headerShown: false }} />
       <Stack.Screen name="SalonDetail" component={SalonDetailScreen} options={({ route }) => ({ title: route.params?.name ?? 'Salon' })} />
       <Stack.Screen name="Book" component={BookScreen} options={{ title: 'Book appointment' }} />
+      <Stack.Screen name="Review" component={ReviewScreen} options={{ title: 'Your review' }} />
     </Stack.Navigator>
   )
 }

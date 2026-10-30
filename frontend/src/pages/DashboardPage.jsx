@@ -72,7 +72,7 @@ export default function DashboardPage() {
   const address = [salon?.address?.line1, salon?.address?.city, salon?.address?.state, salon?.address?.pincode].filter(Boolean).join(', ')
 
   return (
-    <Box sx={{ maxWidth: 1000 }}>
+    <Box>
       <Box
         sx={{
           p: { xs: 3, md: 4 },

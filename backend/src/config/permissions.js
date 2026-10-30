@@ -9,6 +9,8 @@ const CAPABILITIES = {
   'users.manage': ['owner'], // invite karna, role badalna, deactivate karna
   'audit.read': ['owner', 'manager'],
   'notifications.read': ['owner', 'manager'],
+  'reviews.read': ['owner', 'manager'], // customer reviews dekhna
+  'reviews.reply': ['owner', 'manager'], // reviews ka jawab dena
   'appointments.read': ['owner', 'manager', 'receptionist'],
   'appointments.write': ['owner', 'manager', 'receptionist'],
   'customers.read': ['owner', 'manager', 'receptionist'],

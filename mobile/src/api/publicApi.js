@@ -64,3 +64,40 @@ export async function cancelMyBooking(id) {
   const { data } = await request(`/public/my-bookings/${id}/cancel`, { ...asCustomer, method: 'POST' })
   return data.booking
 }
+
+// ---------- Reviews and the customer's own notifications ----------
+// Everything here is the customer's own data; the server checks that on every call.
+
+// -> { notifications: [{ id, type, title, body, unread, createdAt, bookingId, salonName, canReview }], unreadCount }
+export async function fetchMyNotifications() {
+  const { data } = await request('/public/notifications', asCustomer)
+  return data
+}
+export const markNotificationRead = (id) => request(`/public/notifications/${id}/read`, { ...asCustomer, method: 'POST' })
+export const markAllNotificationsRead = () => request('/public/notifications/read-all', { ...asCustomer, method: 'POST' })
+
+// -> { booking: { salonName, services, date, ... }, canReview, review: null | { id, rating, comment, images } }
+export async function fetchReviewContext(bookingId) {
+  const { data } = await request(`/public/my-bookings/${bookingId}/review`, asCustomer)
+  return data
+}
+export async function submitReview(bookingId, body) {
+  const { data } = await request(`/public/my-bookings/${bookingId}/review`, { ...asCustomer, method: 'POST', body })
+  return data.review
+}
+export async function editReview(id, body) {
+  const { data } = await request(`/public/reviews/${id}`, { ...asCustomer, method: 'PATCH', body })
+  return data.review
+}
+
+// "Helpful" on someone else's review: one vote per customer, the server counts the real votes. -> { helpfulCount, isHelpful }
+export async function setReviewHelpful(id, on) {
+  const { data } = await request(`/public/reviews/${id}/helpful`, { ...asCustomer, method: on ? 'PUT' : 'DELETE' })
+  return data
+}
+
+// A salon's real reviews, newest first. -> { summary: { average, count, breakdown }, reviews, page, pageSize, total }
+export async function fetchSalonReviews(salonId, page = 1) {
+  const { data } = await request(`/public/salons/${salonId}/reviews?page=${page}&pageSize=5`, asCustomer)
+  return data
+}

@@ -24,10 +24,10 @@ const today = () => new Date().toLocaleDateString('en-CA', { timeZone: 'Asia/Kol
 
 test('list: search, customer, date, method and payment-status filters, pagination', async () => {
   const s = await setup('lst1@x.com', 'lst-one')
-  const a = await bill(s, '9810000001', 'Riya Sharma') // 118000
+  const a = await bill(s, '9810000001', 'Riya Sharma') // 100000
   const b = await bill(s, '9810000002', 'Meera Joshi')
   const c = await bill(s, '9810000003', 'Riya Verma')
-  await pay(s, a, 118000, 'upi')
+  await pay(s, a, 100000, 'upi')
   await pay(s, b, 50000, 'cash')
 
   const ids = (r) => r.body.data.invoices.map((i) => i.id)
@@ -65,22 +65,22 @@ test('summary: billed, received, pending; refunds reduce received; void bills ig
   const a = await bill(s, '9810000001', 'A')
   const b = await bill(s, '9810000002', 'B')
   const v = await bill(s, '9810000003', 'V')
-  await pay(s, a, 118000)
+  await pay(s, a, 100000)
   await pay(s, b, 40000)
-  await post(s.auth, `/invoices/${a.id}/refunds`, { requestKey: key(), method: 'cash', amount: 18000, note: 'discount given later' })
+  await post(s.auth, `/invoices/${a.id}/refunds`, { requestKey: key(), method: 'cash', amount: 10000, note: 'discount given later' })
   await post(s.auth, `/invoices/${v.id}/void`, { note: 'wrong customer' })
 
   const sum = (await get(s.auth, '/invoices/summary')).body.data
   assert.equal(sum.summary.invoices, 2)
-  assert.equal(sum.summary.billed, 236000)
-  assert.equal(sum.summary.received, 100000 + 40000)
-  assert.equal(sum.summary.pending, 236000 - 140000)
-  assert.equal(sum.summary.refunded, 18000)
-  assert.equal(sum.summary.tax, 36000)
+  assert.equal(sum.summary.billed, 200000)
+  assert.equal(sum.summary.received, 90000 + 40000)
+  assert.equal(sum.summary.pending, 200000 - 130000)
+  assert.equal(sum.summary.refunded, 10000)
+  assert.equal(sum.summary.tax, 0)
   assert.equal(sum.summary.pendingCount, 2)
   assert.equal(sum.recent.length, 3)
   assert.equal((await get(s.auth, '/invoices/summary?from=2099-01-01')).body.data.summary.billed, 0)
-  assert.equal((await get(s.auth, `/invoices/summary?from=${today()}&to=${today()}`)).body.data.summary.billed, 236000)
+  assert.equal((await get(s.auth, `/invoices/summary?from=${today()}&to=${today()}`)).body.data.summary.billed, 200000)
 })
 
 test('list and summary are tenant-isolated and need login', async () => {

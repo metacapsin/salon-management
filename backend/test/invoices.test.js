@@ -28,16 +28,16 @@ const booking = (s, phone, svcs, extra = {}) =>
 
 const walkIn = (s, lines, extra = {}) => ({ requestKey: key(), customerPhone: '9810000001', customerName: 'Riya', lines: lines.map(([svc, quantity]) => ({ serviceId: String(svc._id), quantity })), ...extra })
 
-test('walk-in invoice: server computes subtotal, 18% GST (9+9) and total in paise; unique number; validation', async () => {
+test('walk-in invoice: server computes subtotal, no GST and total in paise; unique number; validation', async () => {
   const s = await setup('inv1@x.com', 'inv-one')
   const res = await post(s.auth, '/invoices', walkIn(s, [[s.hair, 2]]))
   assert.equal(res.status, 201, JSON.stringify(res.body))
   const inv = res.body.data.invoice
   assert.match(inv.invoiceNumber, /^GLM-\d{4}-000001$/)
   assert.equal(inv.subtotal, 100000) // 2 x Rs 500
-  assert.deepEqual({ ...inv.tax }, { ratePercent: 18, cgst: 9000, sgst: 9000, total: 18000 })
-  assert.equal(inv.total, 118000)
-  assert.equal(inv.amountDue, 118000)
+  assert.deepEqual({ ...inv.tax }, { ratePercent: 0, cgst: 0, sgst: 0, total: 0 })
+  assert.equal(inv.total, 100000)
+  assert.equal(inv.amountDue, 100000)
   assert.equal(inv.paymentStatus, 'unpaid')
 
   const second = await post(s.auth, '/invoices', walkIn(s, [[s.spa, 1]]))
@@ -54,7 +54,7 @@ test('walk-in invoice: server computes subtotal, 18% GST (9+9) and total in pais
   assert.equal((await post(s.auth, '/invoices', { ...walkIn(s, [[s.hair, 1]]), lines: [{ serviceId: String(s.hair._id), quantity: 1 }, { serviceId: String(s.hair._id), quantity: 1 }] })).status, 400) // same service twice
 
   const one = await get(s.auth, `/invoices/${inv.id}`)
-  assert.equal(one.body.data.invoice.total, 118000)
+  assert.equal(one.body.data.invoice.total, 100000)
   assert.equal(one.body.data.salon.name, 'Salon inv-one')
   assert.equal(await h.models.Invoice.countDocuments({ salonId: s.o.salonId }), 2)
 })
@@ -103,20 +103,20 @@ test('offer + membership discounts follow existing rules; invalid discounts reje
   const res = await post(s.auth, '/invoices', walkIn(s, lines, { offerId: String(offer._id) }))
   assert.equal(res.status, 201, JSON.stringify(res.body))
   const inv = res.body.data.invoice
-  // 1500: offer 10% = 150, membership 20% = 300 -> 450 off; taxable 1050; GST 189; total 1239
+  // 1500: offer 10% = 150, membership 20% = 300 -> 450 off; taxable 1050; no GST; total 1050
   assert.equal(inv.subtotal, 150000)
   assert.equal(inv.offer.discount, 15000)
   assert.equal(inv.membership.discount, 30000)
   assert.equal(inv.discountTotal, 45000)
   assert.equal(inv.taxableAmount, 105000)
-  assert.equal(inv.tax.total, 18900)
-  assert.equal(inv.total, 123900)
+  assert.equal(inv.tax.total, 0)
+  assert.equal(inv.total, 105000)
   assert.equal(await h.models.MembershipLedger.countDocuments({ type: 'invoice_discount', invoiceId: inv.id }), 1)
 
   // membership "mat lagao"
   const noMem = await post(s.auth, '/invoices', walkIn(s, lines, { applyMembership: false }))
   assert.equal(noMem.body.data.invoice.membership, null)
-  assert.equal(noMem.body.data.invoice.total, 177000)
+  assert.equal(noMem.body.data.invoice.total, 150000)
 
   // unpaid membership koi discount nahi deta
   await h.models.CustomerMembership.updateMany({}, { $set: { paymentStatus: 'pending' } })
@@ -145,7 +145,7 @@ test('package: session covers the service (no double charge), deducted once, nev
   assert.equal(ok.status, 201, JSON.stringify(ok.body))
   const inv = ok.body.data.invoice
   assert.equal(inv.subtotal, 100000) // sirf Hair Spa; Haircut package se
-  assert.equal(inv.total, 118000)
+  assert.equal(inv.total, 100000)
   assert.equal(inv.lines.find((l) => l.name === 'Haircut').lineTotal, 0)
   assert.equal(inv.lines.find((l) => l.name === 'Haircut').package.packageName, 'Hair Pack')
   assert.equal(await remaining(), 2)
@@ -212,7 +212,7 @@ test('preview gives the same numbers as the real bill and writes nothing; billab
   assert.equal(await h.models.InvoiceCounter.countDocuments({ salonId: s.o.salonId }), 0)
   const real = (await post(s.auth, '/invoices', { ...body, requestKey: key() })).body.data.invoice
   for (const k of ['subtotal', 'discountTotal', 'taxableAmount', 'total']) assert.equal(pv.body.data[k], real[k], k)
-  assert.equal(pv.body.data.total, 212400) // 2 x 1000 = 2000, 10% off = 1800, GST 324, total 2124
+  assert.equal(pv.body.data.total, 180000) // 2 x 1000 = 2000, 10% off = 1800, no GST
   assert.equal((await post(s.auth, '/invoices/preview', { ...body, total: 1 })).status, 400)
   assert.equal((await post(s.auth, '/invoices/preview', { ...body, offerId: String(new (require('mongoose').Types.ObjectId)()) })).body.error.code, 'OFFER_INVALID')
 

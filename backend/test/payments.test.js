@@ -17,7 +17,7 @@ async function setup(email, slug) {
   const hair = await h.models.Service.create({ salonId: o.salonId, name: 'Haircut', price: 1000, durationMin: 30 })
   return { o, auth, hair }
 }
-// Rs 1000 + 18% GST = 118000 paise
+// Rs 1000, no GST = 100000 paise
 const bill = async (s) => (await post(s.auth, '/invoices', { requestKey: key(), customerPhone: '9810000001', customerName: 'Riya', lines: [{ serviceId: String(s.hair._id), quantity: 1 }] })).body.data.invoice
 const pay = (s, inv, amount, extra = {}) => post(s.auth, `/invoices/${inv.id}/payments`, { requestKey: key(), method: 'cash', amount, ...extra })
 const detail = async (s, inv) => (await get(s.auth, `/invoices/${inv.id}`)).body.data
@@ -25,23 +25,23 @@ const detail = async (s, inv) => (await get(s.auth, `/invoices/${inv.id}`)).body
 test('partial then full payment: status, amount due and history', async () => {
   const s = await setup('pay1@x.com', 'pay-one')
   const inv = await bill(s)
-  assert.equal(inv.total, 118000)
+  assert.equal(inv.total, 100000)
 
   const p1 = await pay(s, inv, 50000, { method: 'upi', reference: 'UPI123' })
   assert.equal(p1.status, 201, JSON.stringify(p1.body))
   assert.equal(p1.body.data.invoice.paymentStatus, 'partial')
-  assert.equal(p1.body.data.invoice.amountDue, 68000)
+  assert.equal(p1.body.data.invoice.amountDue, 50000)
 
-  assert.equal((await pay(s, inv, 68001)).body.error.code, 'OVERPAYMENT') // thoda bhi zyada nahi
+  assert.equal((await pay(s, inv, 50001)).body.error.code, 'OVERPAYMENT') // thoda bhi zyada nahi
   assert.equal((await detail(s, inv)).invoice.amountPaid, 50000)
 
-  const p2 = await pay(s, inv, 68000, { method: 'card' })
+  const p2 = await pay(s, inv, 50000, { method: 'card' })
   assert.equal(p2.body.data.invoice.paymentStatus, 'paid')
   assert.equal(p2.body.data.invoice.amountDue, 0)
   assert.equal((await pay(s, inv, 1)).body.error.code, 'OVERPAYMENT')
 
   const d = await detail(s, inv)
-  assert.deepEqual(d.payments.map((p) => [p.type, p.method, p.amount]), [['payment', 'upi', 50000], ['payment', 'card', 68000]])
+  assert.deepEqual(d.payments.map((p) => [p.type, p.method, p.amount]), [['payment', 'upi', 50000], ['payment', 'card', 50000]])
 })
 
 test('invalid payment data is rejected', async () => {
@@ -67,27 +67,27 @@ test('duplicate payment: same key twice or at once records one payment; two diff
   // wahi key doosri amount ke saath = galat istemaal
   assert.equal((await post(s.auth, `/invoices/${inv.id}/payments`, { ...body, method: 'upi' })).status, 200) // replay returns the original
 
-  // 88000 baaki: do alag 60000 ek saath -> sirf ek jeete
-  const race = await Promise.all([pay(s, inv, 60000), pay(s, inv, 60000)])
+  // 70000 baaki: do alag 40000 ek saath -> sirf ek jeete
+  const race = await Promise.all([pay(s, inv, 40000), pay(s, inv, 40000)])
   assert.deepEqual(race.map((r) => r.status).sort(), [201, 409])
   const d = await detail(s, inv)
-  assert.equal(d.invoice.amountPaid, 90000)
+  assert.equal(d.invoice.amountPaid, 70000)
   assert.equal(d.invoice.paymentStatus, 'partial')
 })
 
 test('refund: authorised role only, reason needed, never more than received, status recomputed, audited', async () => {
   const s = await setup('pay4@x.com', 'pay-four')
   const inv = await bill(s)
-  await pay(s, inv, 118000)
+  await pay(s, inv, 100000)
 
   const refund = (amount, extra = {}) => post(s.auth, `/invoices/${inv.id}/refunds`, { requestKey: key(), method: 'cash', amount, note: 'Customer unhappy', ...extra })
   assert.equal((await refund(10000, { note: '' })).status, 400) // reason zaroori
-  assert.equal((await refund(118001)).body.error.code, 'REFUND_TOO_LARGE')
-  const r = await refund(18000)
+  assert.equal((await refund(100001)).body.error.code, 'REFUND_TOO_LARGE')
+  const r = await refund(20000)
   assert.equal(r.status, 201, JSON.stringify(r.body))
   assert.equal(r.body.data.invoice.paymentStatus, 'partial')
-  assert.equal(r.body.data.invoice.amountDue, 18000)
-  assert.equal((await refund(100001)).body.error.code, 'REFUND_TOO_LARGE') // ab sirf 100000 bacha
+  assert.equal(r.body.data.invoice.amountDue, 20000)
+  assert.equal((await refund(80001)).body.error.code, 'REFUND_TOO_LARGE') // ab sirf 80000 bacha
 
   // receptionist refund nahi kar sakta, payment kar sakta hai
   const inviteMail = 'pay4-r@x.com'

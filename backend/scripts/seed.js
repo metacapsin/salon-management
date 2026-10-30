@@ -63,7 +63,7 @@ const INDIA = [
   ['Sunrise Unisex Salon', 'sunrise-bijainagar', 'Bijainagar', 'Rajasthan', 'Station Road', 25.9304, 74.6513, 'unisex', false, 4.4, 52, 120, ['Haircut', 'Facial', 'Threading'], ''],
   ['Sakhi Beauty Parlour', 'sakhi-parlour-bijainagar', 'Bijainagar', 'Rajasthan', 'Sadar Bazar', 25.927, 74.649, 'women', true, 4.5, 38, 150, ['Facial', 'Waxing', 'Bridal'], COVER_A],
   ['Marine Drive Grooming', 'marine-drive-grooming', 'Chennai', 'Tamil Nadu', 'T. Nagar', 13.0418, 80.2341, 'men', false, 4.1, 64, 179, ['Haircut', 'Shave'], '']
-].map(([name, slug, city, state, area, lat, lng, audience, home, average, count, startingPrice, tags, coverUrl], index) => ({
+].map(([name, slug, city, state, area, lat, lng, audience, home, _demoAverage, _demoCount, startingPrice, tags, coverUrl], index) => ({
   name,
   slug,
   city,
@@ -84,7 +84,8 @@ const INDIA = [
     'address.location': { lat, lng },
     audience,
     serviceModes: { salonVisit: true, homeService: home },
-    rating: { average, count },
+    // Nakli rating nahi: rating sirf asli customer reviews se banti he (modules/reviews), isliye demo salon 0 se shuru hote hain
+    rating: { average: 0, count: 0 },
     startingPrice,
     tags,
     coverUrl,

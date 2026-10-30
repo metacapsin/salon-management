@@ -1,0 +1,146 @@
+/* ImageCarousel: brown (#2e1b0f) aur golden (#e6c767) theme. Root par z-index/transform nahi hai, taaki
+   buttons parent ke "shade" parde ke upar aa sakein (z-index 2). */
+.ic {
+  --ic-brown: #2e1b0f;
+  --ic-gold: #e6c767;
+  position: relative;
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  overflow: hidden;
+  background: var(--ic-brown); /* photo aane tak khali safed jagah nahi, brown dikhe */
+}
+
+.ic--fill {
+  position: absolute;
+  inset: 0;
+  aspect-ratio: auto;
+}
+
+.ic__slide {
+  position: absolute;
+  inset: 0;
+  transition: transform 0.8s cubic-bezier(0.65, 0, 0.35, 1);
+  will-change: transform;
+}
+
+.ic__slide--off {
+  visibility: hidden;
+  transition: none;
+}
+
+.ic__slide img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+  user-select: none;
+}
+
+/* fit="contain": poori photo + peeche usi ka blur */
+.ic__slide img.ic__img--contain {
+  position: relative;
+  object-fit: contain;
+}
+
+.ic__slide img.ic__backdrop {
+  position: absolute;
+  inset: 0;
+  object-fit: cover;
+  filter: blur(24px) brightness(0.8);
+  transform: scale(1.15);
+}
+
+/* Neeche beech me: ‹  ● ● ● ● ●  › */
+.ic__bar {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 18px;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+  pointer-events: none;
+}
+
+.ic__bar > * {
+  pointer-events: auto;
+}
+
+.ic__arrow {
+  display: grid;
+  place-items: center;
+  width: 36px;
+  height: 36px;
+  padding: 0 0 3px;
+  border: 1px solid var(--ic-gold);
+  border-radius: 50%;
+  background: rgba(46, 27, 15, 0.72);
+  color: var(--ic-gold);
+  font-size: 1.5rem;
+  line-height: 1;
+  cursor: pointer;
+  transition:
+    background 0.2s,
+    color 0.2s;
+}
+
+.ic__arrow:hover {
+  background: var(--ic-gold);
+  color: var(--ic-brown);
+}
+
+.ic__dots {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+/* Dot chhota dikhta hai par chhune ki jagah 24px hai (mobile par) */
+.ic__dot {
+  position: relative;
+  width: 24px;
+  height: 24px;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+}
+
+.ic__dot::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  border: 1px solid var(--ic-gold);
+  background: rgba(46, 27, 15, 0.6);
+  transform: translate(-50%, -50%);
+  transition:
+    width 0.3s,
+    border-radius 0.3s,
+    background 0.3s;
+}
+
+.ic__dot.is-on::after {
+  width: 24px;
+  border-radius: 6px;
+  background: var(--ic-gold);
+}
+
+.ic__arrow:focus-visible,
+.ic__dot:focus-visible {
+  outline: 2px solid var(--ic-gold);
+  outline-offset: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ic__slide,
+  .ic__dot::after {
+    transition: none;
+  }
+}

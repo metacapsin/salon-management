@@ -4,7 +4,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import { Ionicons } from '@expo/vector-icons'
 import Button from '../../components/Button'
 import TextField from '../../components/TextField'
-import { friendlyError, requestPasswordReset } from '../../api/client'
+import { confirmPasswordReset, friendlyError, requestPasswordReset } from '../../api/client'
 import { canRememberLogin } from '../../auth/tokenStore'
 import { COLORS, FONT, RADIUS } from '../../config/theme'
 import { ErrorBanner } from '../../components/States'
@@ -30,6 +30,9 @@ function TeamLoginForm({ onSubmit }) {
   const [loading, setLoading] = useState(false)
   const [forgot, setForgot] = useState(false)
   const [resetSent, setResetSent] = useState(false)
+  const [otp, setOtp] = useState('')
+  const [newPassword, setNewPassword] = useState('')
+  const [resetDone, setResetDone] = useState(false)
   const passwordRef = useRef(null)
 
   async function handleSubmit() {
@@ -62,22 +65,71 @@ function TeamLoginForm({ onSubmit }) {
     }
   }
 
+  async function changePassword() {
+    setFormError('')
+    const found = {}
+    if (!/^\d{6}$/.test(otp.trim())) found.otp = 'Enter the 6 digit code.'
+    if (newPassword.length < 12) found.newPassword = 'Password must be at least 12 characters.'
+    setErrors(found)
+    if (Object.keys(found).length > 0) return
+    setLoading(true)
+    try {
+      await confirmPasswordReset({ email: email.trim(), otp: otp.trim(), password: newPassword })
+      setResetDone(true)
+    } catch (error) {
+      setFormError(friendlyError(error))
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  function backToSignIn() {
+    setForgot(false)
+    setResetSent(false)
+    setResetDone(false)
+    setOtp('')
+    setNewPassword('')
+    setErrors({})
+    setFormError('')
+  }
+
   if (forgot) {
-    return (
-      <View>
-        <Text style={styles.subtitle}>Enter your email. If it is registered, we will send you a link to choose a new password.</Text>
-        <ErrorBanner message={formError} />
-        {resetSent ? (
+    const backLink = (
+      <Pressable onPress={backToSignIn} accessibilityRole="button" style={styles.link}>
+        <Text style={styles.linkText}>Back to sign in</Text>
+      </Pressable>
+    )
+    if (resetDone) {
+      return (
+        <View>
           <View style={styles.notice}>
             <Ionicons name="checkmark-circle" size={20} color={COLORS.success} />
-            <Text style={styles.noticeText}>If that email is registered, we have sent a reset link. Open it, set a new password, then sign in here.</Text>
+            <Text style={styles.noticeText}>Your password is changed. Sign in with the new password.</Text>
           </View>
-        ) : null}
-        <TextField label="Email" icon="mail-outline" value={email} onChangeText={setEmail} error={errors.email} placeholder="you@salon.com" keyboardType="email-address" autoCapitalize="none" autoComplete="email" autoCorrect={false} returnKeyType="send" onSubmitEditing={sendReset} />
-        <Button title={resetSent ? 'Send again' : 'Send reset link'} onPress={sendReset} loading={loading} />
-        <Pressable onPress={() => { setForgot(false); setResetSent(false); setFormError('') }} accessibilityRole="button" style={styles.link}>
-          <Text style={styles.linkText}>Back to sign in</Text>
-        </Pressable>
+          {backLink}
+        </View>
+      )
+    }
+    return (
+      <View>
+        <Text style={styles.subtitle}>{resetSent ? `We sent a 6 digit code to ${email.trim()}. It works for 10 minutes.` : 'Enter your email. If it is registered, we will send you a 6 digit code.'}</Text>
+        <ErrorBanner message={formError} />
+        {resetSent ? (
+          <>
+            <TextField label="6 digit code" icon="key-outline" value={otp} onChangeText={setOtp} error={errors.otp} placeholder="123456" keyboardType="number-pad" maxLength={6} autoComplete="one-time-code" />
+            <TextField label="New password" icon="lock-closed-outline" value={newPassword} onChangeText={setNewPassword} error={errors.newPassword} placeholder="At least 12 characters" secureTextEntry autoCapitalize="none" autoComplete="new-password" autoCorrect={false} returnKeyType="go" onSubmitEditing={changePassword} />
+            <Button title="Change password" onPress={changePassword} loading={loading} />
+            <Pressable onPress={sendReset} accessibilityRole="button" style={styles.link}>
+              <Text style={styles.linkText}>Send the code again</Text>
+            </Pressable>
+          </>
+        ) : (
+          <>
+            <TextField label="Email" icon="mail-outline" value={email} onChangeText={setEmail} error={errors.email} placeholder="you@salon.com" keyboardType="email-address" autoCapitalize="none" autoComplete="email" autoCorrect={false} returnKeyType="send" onSubmitEditing={sendReset} />
+            <Button title="Send code" onPress={sendReset} loading={loading} />
+          </>
+        )}
+        {backLink}
       </View>
     )
   }
