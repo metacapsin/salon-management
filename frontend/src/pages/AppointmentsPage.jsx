@@ -105,7 +105,7 @@ export default function AppointmentsPage() {
           Appointment saved for {created.name} on {formatDate(created.date)} at {created.time}. It is waiting for confirmation.
         </Alert>
       )}
-      <Box role="tablist" aria-label="Filter appointments" sx={{ display: 'flex', gap: 0.75, mb: 1.5, overflowX: 'auto', pb: 0.25 }}>
+      <Box role="tablist" aria-label="Filter appointments" sx={{ display: 'flex', gap: 0.75, mb: 1.5, flexWrap: 'wrap' }}>
         {FILTERS.map((f) => {
           const active = status === f.value
           return (

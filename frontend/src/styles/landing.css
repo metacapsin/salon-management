@@ -54,7 +54,8 @@ html:has(.lp) {
   max-width: 100%;
 }
 
-.lp a {
+/* :where() = zero specificity, taaki .lp-btn--outline/--gold ka color is se na dabe */
+:where(.lp) a {
   color: inherit;
 }
 
