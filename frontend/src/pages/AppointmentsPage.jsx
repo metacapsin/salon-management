@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { useLocation, useNavigate } from 'react-router-dom'
 import { keepPreviousData, useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
-import { Alert, Avatar, Box, Button, Chip, Link, Pagination, Paper, TableBody, TableCell, TableContainer, TableHead, TableRow, Typography } from '@mui/material'
+import { Alert, Avatar, Box, Button, Chip, Link, Pagination, Paper, TableBody, TableCell, TableContainer, TableHead, TableRow, Typography, useMediaQuery } from '@mui/material'
 import AddIcon from '@mui/icons-material/Add'
 import PhoneIcon from '@mui/icons-material/PhoneOutlined'
 import { friendlyError } from '../api/client'
@@ -13,6 +13,7 @@ import BenefitsDialog from '../features/appointments/BenefitsDialog'
 import { benefitsKey } from '../features/appointments/benefitsKey'
 import { formatMoney } from '../utils/formatMoney'
 import ResponsiveTable from '../components/ResponsiveTable'
+import AppointmentsMobileList from '../features/appointments/AppointmentsMobileList'
 
 // Pending (New requests) sabse pehle, taaki owner ko jo kaam baki hai wo pehle dikhe
 const FILTERS = [
@@ -56,6 +57,7 @@ export default function AppointmentsPage() {
   const [showCreated, setShowCreated] = useState(true)
   const [benefitsFor, setBenefitsFor] = useState(null) // jis appointment ke benefits dikha rahe hain
   const canBenefits = roleCan(role, 'packages.sell') || roleCan(role, 'memberships.sell')
+  const isMobile = useMediaQuery('(max-width:720px)')
 
   const query = useQuery({
     queryKey: ['salon', activeSalonId, 'bookings', status, page],
@@ -105,7 +107,7 @@ export default function AppointmentsPage() {
           Appointment saved for {created.name} on {formatDate(created.date)} at {created.time}. It is waiting for confirmation.
         </Alert>
       )}
-      <Box role="tablist" aria-label="Filter appointments" sx={{ display: 'flex', gap: 0.75, mb: 1.5, flexWrap: 'wrap' }}>
+      <Box role="tablist" aria-label="Filter appointments" sx={{ display: 'flex', gap: 0.75, mb: 1.5, flexWrap: { xs: 'nowrap', md: 'wrap' }, overflowX: { xs: 'auto', md: 'visible' }, mx: { xs: -1.5, md: 0 }, px: { xs: 1.5, md: 0 }, scrollbarWidth: 'none', '&::-webkit-scrollbar': { display: 'none' } }}>
         {FILTERS.map((f) => {
           const active = status === f.value
           return (
@@ -130,6 +132,9 @@ export default function AppointmentsPage() {
       )}
 
       <QueryState query={query} isEmpty={bookings.length === 0} empty={<Alert severity="info">No appointments here yet. When a customer books from the Explore page, it will show up here.</Alert>}>
+        {isMobile ? (
+          <AppointmentsMobileList bookings={bookings} statusStyle={STATUS_STYLE} actions={ACTIONS} canWrite={canWrite} canBenefits={canBenefits} busy={change.isPending} onChange={change.mutate} onBenefits={setBenefitsFor} />
+        ) : (
         <TableContainer component={Paper}>
           <ResponsiveTable
             size="medium"
@@ -251,6 +256,7 @@ export default function AppointmentsPage() {
             </TableBody>
           </ResponsiveTable>
         </TableContainer>
+        )}
         {pageCount > 1 && <Pagination sx={{ mt: 1.5 }} count={pageCount} page={page} onChange={(_, p) => setPage(p)} />}
       </QueryState>
       {benefitsFor && <BenefitsDialog booking={benefitsFor} onClose={() => setBenefitsFor(null)} />}

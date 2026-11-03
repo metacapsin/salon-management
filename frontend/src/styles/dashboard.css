@@ -1826,3 +1826,152 @@
     padding-inline: 8px;
   }
 }
+
+/* New appointment: compact form (sirf .gl-form--compact par asar). Naam + phone aur date + time ek row me, 480px se chhote screen par stack. */
+.gl-appt-new {
+  width: 100%;
+  padding: 28px 32px;
+}
+
+.gl-appt-new .gl-panel__head {
+  margin-bottom: 18px;
+}
+
+.gl-form--compact {
+  gap: 18px;
+  padding: 0;
+}
+
+.gl-form--compact .gl-form__row {
+  gap: 18px;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  align-items: start;
+}
+
+.gl-form--compact .gl-field {
+  gap: 4px;
+  min-width: 0;
+}
+
+.gl-form--compact .gl-field label {
+  font-size: 0.82rem;
+}
+
+.gl-form--compact .gl-input {
+  min-height: 44px;
+  height: 44px;
+  border-radius: 8px;
+}
+
+.gl-form--compact .gl-textarea {
+  height: 88px;
+  min-height: 88px;
+  padding: 10px 14px;
+}
+
+.gl-form--compact .gl-input,
+.gl-form--compact .MuiSelect-select {
+  font-size: 0.95rem;
+}
+
+.gl-form--compact .gl-form__actions .gl-btn {
+  min-height: 44px;
+  height: 44px;
+}
+
+.gl-form--compact .MuiOutlinedInput-root {
+  min-height: 44px;
+  border-radius: 8px;
+}
+
+.gl-form--compact .MuiSelect-select.MuiSelect-select {
+  min-height: 0;
+  padding-top: 10px;
+  padding-bottom: 10px;
+}
+
+.gl-form--compact .gl-form__intro {
+  padding: 8px 12px;
+  font-size: 0.82rem;
+}
+
+@media (max-width: 720px) {
+  .gl-appt-new {
+    padding: 18px 16px;
+  }
+}
+
+@media (max-width: 400px) {
+  .gl-appt-new {
+    padding: 18px 16px;
+  }
+
+  .gl-form--compact .gl-form__row--stack-xs {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+/* Compact form: outline sirf hover/focus par ek patli border (gold hover, brown focus); upar wali glow ring nahi. Dropdowns bhi inputs jaise. */
+.gl-form--compact .gl-input:hover {
+  border-color: var(--gl-gold);
+}
+
+.gl-form--compact .gl-input:focus,
+.gl-form--compact .gl-input:focus-visible {
+  border-color: var(--gl-brown-mid);
+  box-shadow: none;
+  outline: none;
+}
+
+.gl-form--compact .MuiOutlinedInput-root .MuiOutlinedInput-notchedOutline {
+  border-width: 1.5px;
+  border-color: #cdb9a4;
+}
+
+.gl-form--compact .MuiOutlinedInput-root:hover .MuiOutlinedInput-notchedOutline {
+  border-color: var(--gl-gold);
+}
+
+.gl-form--compact .MuiOutlinedInput-root.Mui-focused .MuiOutlinedInput-notchedOutline {
+  border-width: 1.5px;
+  border-color: var(--gl-brown-mid);
+}
+
+.gl-form--compact .gl-field--error .gl-input,
+.gl-form--compact .gl-field--error .gl-input:hover,
+.gl-form--compact .gl-field--error .gl-input:focus {
+  border-color: var(--gl-red);
+}
+
+.gl-form--compact .MuiOutlinedInput-root.Mui-error .MuiOutlinedInput-notchedOutline,
+.gl-form--compact .MuiOutlinedInput-root.Mui-error:hover .MuiOutlinedInput-notchedOutline,
+.gl-form--compact .MuiOutlinedInput-root.Mui-error.Mui-focused .MuiOutlinedInput-notchedOutline {
+  border-color: var(--gl-red);
+}
+
+/* Error/hint text form ki jagah nahi gheratey (absolute, gap ke andar), taaki likhte/chunte waqt form upar-neeche na hile. */
+.gl-form--compact .gl-field {
+  position: relative;
+}
+
+.gl-form--compact .gl-field > .gl-field__error,
+.gl-form--compact .gl-field > .gl-field__hint {
+  position: absolute;
+  top: calc(100% + 1px);
+  left: 0;
+  right: 0;
+  margin: 0;
+  font-size: 0.78rem;
+  line-height: 16px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+@media (max-width: 560px) {
+  .gl-form--compact .gl-field > .gl-field__error,
+  .gl-form--compact .gl-field > .gl-field__hint {
+    position: static;
+    white-space: normal;
+  }
+}

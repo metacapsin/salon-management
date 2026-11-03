@@ -112,7 +112,7 @@ export default function NewAppointmentPage() {
 
   return (
     <div className="gl-dashboard">
-      <section className="gl-card gl-panel gl-fade-up" style={{ maxWidth: '100%' }} aria-labelledby="gl-new-appt-title">
+      <section className="gl-card gl-panel gl-appt-new gl-fade-up" aria-labelledby="gl-new-appt-title">
         <div className="gl-panel__head">
           <h3 id="gl-new-appt-title">New appointment</h3>
         </div>
@@ -121,7 +121,8 @@ export default function NewAppointmentPage() {
             {loadError}
           </p>
         )}
-        <form className="gl-form" onSubmit={handleSubmit} noValidate>
+        <form className="gl-form gl-form--compact" onSubmit={handleSubmit} noValidate>
+          <div className="gl-form__row gl-form__row--stack-xs">
           <div className={cls('customerName')}>
             <label htmlFor="appt-customer">Customer name</label>
             <input id="appt-customer" className="gl-input" onBlur={() => checkField('customerName')} value={values.customerName} onChange={(e) => setField('customerName', e.target.value)} maxLength={100} autoComplete="off" placeholder="e.g. Priya Sharma" aria-invalid={Boolean(errors.customerName)} />
@@ -133,7 +134,9 @@ export default function NewAppointmentPage() {
             <input id="appt-phone" className="gl-input" onBlur={() => checkField('customerPhone')} type="tel" inputMode="numeric" value={values.customerPhone} onChange={(e) => setField('customerPhone', e.target.value)} maxLength={13} autoComplete="off" placeholder="10 digit mobile number" aria-invalid={Boolean(errors.customerPhone)} />
             {errors.customerPhone && <p className="gl-field__error">{errors.customerPhone}</p>}
           </div>
+          </div>
 
+          <div className="gl-form__row gl-form__row--stack-xs">
           <div className={cls('serviceId')}>
             <label htmlFor="appt-service">Service</label>
             <SelectBox
@@ -159,6 +162,7 @@ export default function NewAppointmentPage() {
               options={[{ value: '', label: staff.isPending ? 'Loading staff...' : 'Any available staff' }, ...staffList.map((s) => ({ value: s.id, label: s.title ? `${s.name} · ${s.title}` : s.name }))]}
             />
             {errors.staffId && <p className="gl-field__error">{errors.staffId}</p>}
+          </div>
           </div>
 
           <div className="gl-form__row">
