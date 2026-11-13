@@ -11,8 +11,8 @@ import { Card, Screen, SectionTitle } from '../../components/Screen'
 import TextField from '../../components/TextField'
 import { COLORS } from '../../config/theme'
 import { formatMoney } from '../../utils/formatMoney'
+import { dateError } from '../../utils/validators'
 
-const DATE_OK = /^\d{4}-\d{2}-\d{2}$/
 
 // Add a package (no params) or edit one (params.pkg). Only Owner/Manager can reach this screen.
 // The server fixes each service's price itself; we only send which services and how many sessions.
@@ -64,9 +64,9 @@ export default function PackageFormScreen({ navigation, route }) {
     if (items.length === 0) found.items = 'Add at least one service.'
     if (price.trim() === '' || !Number.isInteger(packagePrice) || packagePrice < 0) found.packagePrice = 'Enter the price in whole rupees.'
     if (validity.trim() === '' || !Number.isInteger(validityDays) || validityDays < 1 || validityDays > 1095) found.validityDays = 'Enter validity from 1 to 1095 days.'
-    if (saleStartsOn && !DATE_OK.test(saleStartsOn)) found.saleStartsOn = 'Use a date like 2026-11-01, or leave empty.'
-    if (saleEndsOn && !DATE_OK.test(saleEndsOn)) found.saleEndsOn = 'Use a date like 2026-11-30, or leave empty.'
-    if (saleStartsOn && saleEndsOn && DATE_OK.test(saleStartsOn) && DATE_OK.test(saleEndsOn) && saleEndsOn < saleStartsOn) found.saleEndsOn = 'End date cannot be before the start date.'
+    if (dateError(saleStartsOn, { required: false })) found.saleStartsOn = dateError(saleStartsOn, { required: false })
+    if (dateError(saleEndsOn, { required: false })) found.saleEndsOn = dateError(saleEndsOn, { required: false })
+    if (saleStartsOn && saleEndsOn && !found.saleStartsOn && !found.saleEndsOn && saleEndsOn < saleStartsOn) found.saleEndsOn = 'End date cannot be before the start date.'
     setErrors(found)
     if (Object.keys(found).length) return
     const body = {

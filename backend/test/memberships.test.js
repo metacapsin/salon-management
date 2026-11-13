@@ -185,7 +185,7 @@ test('booking benefits: shows usable package sessions and membership discount, a
   const phone = '9810000101'
   await sell(s, gold.id, phone, 'mkey-ffffffff-1')
   const cp = (await post(s.auth, '/customer-packages', { packageId: pkg.id, customerPhone: phone, customerName: 'Riya', requestKey: 'pkey-ffffffff-1' })).body.data.customerPackage
-  const b = await booking(s, `+91${phone}`, [s.hair, s.spa], { status: 'completed' })
+  const b = await booking(s, phone, [s.hair, s.spa], { status: 'completed' })
 
   const first = await get(s.auth, `/bookings/${b._id}/benefits`)
   assert.equal(first.status, 200, JSON.stringify(first.body))

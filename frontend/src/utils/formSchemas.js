@@ -1,48 +1,59 @@
 // Forms ke rules (zod). Server hamesha dobara check karta hai; ye sirf jaldi feedback ke liye hai.
 import { z } from 'zod'
-import { ADDRESS_ERROR, ADDRESS_PATTERN, EMAIL_MAX_LENGTH, NAME_ERROR, NAME_PATTERN, PASSWORD_MAX_LENGTH, PHONE_ERROR, PINCODE_ERROR, PINCODE_PATTERN, isValidPhone } from './validators'
+import {
+  ADDRESS_ERROR,
+  ADDRESS_PATTERN,
+  NAME_MAX_LENGTH,
+  PINCODE_ERROR,
+  PINCODE_PATTERN,
+  cleanName,
+  dateError,
+  emailError,
+  nameError,
+  newPasswordError,
+  phoneError,
+} from './validators'
 
-export const emailField = z
-  .string()
-  .trim()
-  .toLowerCase()
-  .min(1, 'Enter your email.')
-  .max(EMAIL_MAX_LENGTH, 'Enter a valid email address.')
-  .email('Enter a valid email address.')
+// Wraps one of the plain validators (value -> message or '') as a zod rule, so every form shows the same messages.
+const checkWith = (fn) => (value, ctx) => {
+  const message = fn(value)
+  if (message) ctx.addIssue({ code: 'custom', message })
+}
 
-// Naya shared fields (naam, phone, address, PIN). max = database ki limit.
-export const nameField = (max = 100) =>
-  z.string().trim().min(1, 'Enter the name.').max(max, `Name can be at most ${max} characters.`).regex(NAME_PATTERN, NAME_ERROR)
+export const emailField = z.string().trim().toLowerCase().superRefine(checkWith(emailError))
 
-// Phone required hai; optional jagah par optionalPhoneField use karo
-export const phoneField = z.string().trim().refine(isValidPhone, PHONE_ERROR)
-export const optionalPhoneField = z.string().trim().refine((v) => v === '' || isValidPhone(v), PHONE_ERROR)
+// Names are trimmed and repeated spaces are collapsed before checking.
+export const nameField = (max = NAME_MAX_LENGTH) => z.string().transform(cleanName).superRefine(checkWith((v) => nameError(v, max)))
+export const optionalNameField = (max = NAME_MAX_LENGTH) => z.string().transform(cleanName).superRefine(checkWith((v) => (v === '' ? '' : nameError(v, max))))
+
+// Mobile number: exactly 10 digits starting 6-9. Required by default; optionalPhoneField also accepts an empty value.
+export const phoneField = z.string().trim().superRefine(checkWith((v) => phoneError(v)))
+export const optionalPhoneField = z.string().trim().superRefine(checkWith((v) => phoneError(v, { required: false })))
 
 export const addressField = (max = 200) => z.string().trim().max(max, `At most ${max} characters.`).regex(ADDRESS_PATTERN, ADDRESS_ERROR)
-// PIN optional hai: khaali chalega, bhara ho to 6 digit
+// PIN is optional: empty is fine, otherwise it must be 6 digits
 export const pincodeField = z.string().trim().refine((v) => v === '' || PINCODE_PATTERN.test(v), PINCODE_ERROR)
 
-// Password BANATE waqt: 12 se 128 characters (SRS section 19)
-export const newPasswordField = z
-  .string()
-  .min(12, 'Password must be at least 12 characters.')
-  .max(PASSWORD_MAX_LENGTH, `Password can be at most ${PASSWORD_MAX_LENGTH} characters.`)
+// When a password is CREATED or CHANGED: 12 to 20 characters. Never trimmed.
+export const newPasswordField = z.string().superRefine(checkWith(newPasswordError))
 
 export const registerSchema = z.object({
-  name: nameField(100),
+  name: nameField(),
   email: emailField,
   password: newPasswordField,
 })
 
 export const forgotSchema = z.object({ email: emailField })
 export const resetSchema = z.object({
-  otp: z.string().trim().regex(/^\d{6}$/, 'Enter the 6 digit code.'),
+  otp: z.string().trim().regex(/^\d{6}$/, 'Please enter the 6-digit code.'),
   password: newPasswordField,
 })
 
+// Accepting an invitation: existing users enter their current password (any length), new users create one (12-20,
+// which the server checks). The name is optional here (existing accounts leave it empty).
 export const acceptSchema = z.object({
-  name: z.string().trim().max(100, 'Name can be at most 100 characters.').refine((v) => v === '' || NAME_PATTERN.test(v), NAME_ERROR),
-  password: z.string().min(1, 'Enter your password.').max(PASSWORD_MAX_LENGTH),
+  name: optionalNameField(),
+  password: newPasswordField,
 })
 
 export const slugField = z
@@ -64,7 +75,7 @@ export const salonSchema = z
   .object({
     name: z.string().trim().min(2, 'Salon name must be at least 2 characters.').max(100),
     slug: slugField,
-    ownerName: nameField(100),
+    ownerName: nameField(),
     phone: optionalPhoneField,
     about: z.string().trim().max(500, 'At most 500 characters.'),
     audience: z.enum(['women', 'men', 'unisex']),
@@ -106,7 +117,7 @@ export const serviceSchema = z
   })
   .refine((v) => v.atSalon || v.atHome, { message: 'Choose at least one place.', path: ['atSalon'] })
 
-const dayField = z.string().regex(/^\d{4}-\d{2}-\d{2}$/, 'Choose a date.')
+const dayField = z.string().superRefine(checkWith((v) => dateError(v)))
 
 export const offerSchema = z
   .object({
@@ -122,7 +133,7 @@ export const offerSchema = z
   .refine((v) => v.discountType !== 'percent' || v.discountValue <= 100, { message: 'Percentage cannot be more than 100.', path: ['discountValue'] })
   .refine((v) => v.endsOn >= v.startsOn, { message: 'End date cannot be before the start date.', path: ['endsOn'] })
 
-const optionalDay = z.string().regex(/^(\d{4}-\d{2}-\d{2})?$/, 'Choose a date.')
+const optionalDay = z.string().superRefine(checkWith((v) => dateError(v, { required: false })))
 
 export const packageSchema = z
   .object({
@@ -145,11 +156,11 @@ export const packageSchema = z
 
 export const assignPackageSchema = z.object({
   packageId: z.string().min(1, 'Choose a package.'),
-  customerPhone: z.string().trim().regex(/^\d{10}$/, 'Enter a 10-digit mobile number.'),
-  customerName: nameField(100),
+  customerPhone: phoneField,
+  customerName: nameField(),
   paymentStatus: z.enum(['paid', 'pending']),
   paymentMethod: z.enum(['cash', 'upi', 'card', 'other']),
-  startsOn: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, 'Choose a date.'),
+  startsOn: dayField,
 })
 
 export const membershipPlanSchema = z

@@ -9,6 +9,7 @@ import { Card, Screen, SectionTitle } from '../../components/Screen'
 import TextField from '../../components/TextField'
 import { COLORS } from '../../config/theme'
 import { formatMoney } from '../../utils/formatMoney'
+import { cleanName, nameError, phoneError } from '../../utils/validators'
 
 const pad = (n) => String(n).padStart(2, '0')
 const iso = (d) => `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`
@@ -110,14 +111,14 @@ export default function NewAppointmentScreen({ navigation }) {
     setFormError('')
     const found = {}
     const digits = phone.trim()
-    if (name.trim().length < 2) found.customerName = 'Enter the customer name.'
-    if (!/^(91)?[6-9]\d{9}$/.test(digits)) found.customerPhone = 'Enter a 10 digit mobile number.'
+    if (nameError(name)) found.customerName = nameError(name)
+    if (phoneError(digits)) found.customerPhone = phoneError(digits)
     if (!serviceId) found.serviceId = 'Choose a service.'
     if (!startTime) found.startTime = 'Choose an available time.'
     setErrors(found)
     if (Object.keys(found).length) return
     save.mutate({
-      customerName: name.trim(),
+      customerName: cleanName(name),
       customerPhone: digits,
       serviceId,
       ...(staffId ? { staffId } : {}),
@@ -137,7 +138,7 @@ export default function NewAppointmentScreen({ navigation }) {
     <Screen>
       <Card>
         {formError ? <Text style={styles.banner}>{formError}</Text> : null}
-        <TextField label="Customer name" value={name} onChangeText={(v) => { setName(v); clear('customerName') }} error={errors.customerName} placeholder="e.g. Priya Sharma" maxLength={100} />
+        <TextField label="Customer name" value={name} onChangeText={(v) => { setName(v); clear('customerName') }} error={errors.customerName} placeholder="e.g. Priya Sharma" maxLength={35} />
         <TextField label="Mobile number" value={phone} onChangeText={(v) => { setPhone(v.replace(/[^\d]/g, '').slice(0, 12)); clear('customerPhone') }} error={errors.customerPhone} keyboardType="number-pad" placeholder="10 digit mobile number" />
       </Card>
 

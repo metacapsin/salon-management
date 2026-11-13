@@ -5,7 +5,7 @@ import { ApiError, fieldErrorsOf, friendlyError } from '../../api/client'
 import { createBooking, getSlots } from '../../api/publicApi'
 import { useCustomer } from '../../customer/CustomerAuthContext'
 import { formatMoney } from '../../utils/formatMoney'
-import { ADDRESS_ERROR, ADDRESS_PATTERN } from '../../utils/validators'
+import { addressError } from '../../utils/validators'
 import OfferList, { discountFor } from './OfferList'
 
 // yyyy-mm-dd, customer ke aaj se n din baad
@@ -59,12 +59,9 @@ export default function BookingForm({ salon, onBooked }) {
     setTime('')
   }
 
-  // Address: kam se kam 8 characters, aur sirf allowed characters (number zaroori nahi)
+  // Home-service address: required, at least 8 characters, only allowed characters
   function addressProblem(address) {
-    const text = address.trim()
-    if (text.length < 8) return 'Enter your full address.'
-    if (!ADDRESS_PATTERN.test(text.replace(/\s+/g, ' '))) return ADDRESS_ERROR
-    return ''
+    return addressError(address, { min: 8, max: 300 })
   }
 
   async function submit(e) {

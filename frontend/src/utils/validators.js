@@ -1,65 +1,126 @@
-// Form ke rules ek jagah. SRS ke hisaab se:
-// - Email: shuru/ant ke space hatao, chhote akshar karo, valid dikhna chahiye, max 254 characters.
-// - Password: login par sirf "khaali na ho" aur "128 se zyada na ho".
-//   (12-128 wali shart password BANATE waqt lagti hai, login par nahi. Warna galat password
-//    par hum bata dete ki policy kya hai, jo security ke liye theek nahi.)
+// Shared form rules. These mirror backend/src/utils/schemas.js exactly; the server always re-checks.
+// Every form should reuse these helpers so messages and rules are the same everywhere.
 
 export const EMAIL_MAX_LENGTH = 254
-export const PASSWORD_MAX_LENGTH = 128
+export const PASSWORD_MIN_LENGTH = 12
+export const PASSWORD_MAX_LENGTH = 20
+export const NAME_MIN_LENGTH = 2
+export const NAME_MAX_LENGTH = 35
 
-// Simple check: kuch@kuch.kuch. Asli check hamesha backend karega, ye sirf jaldi feedback ke liye hai.
+// ---- Messages ----
+export const EMAIL_REQUIRED = 'Email is required.'
+export const EMAIL_ERROR = 'Please enter a valid email address.'
+export const PASSWORD_REQUIRED = 'Password is required.'
+export const PASSWORD_ERROR = 'Password must be between 12 and 20 characters.'
+export const NAME_REQUIRED = 'Name is required.'
+export const NAME_ERROR = 'Please enter a valid name.'
+export const PHONE_REQUIRED = 'Mobile number is required.'
+export const PHONE_ERROR = 'Please enter a valid 10-digit mobile number.'
+export const REQUIRED_ERROR = 'This field is required.'
+
+// ---- Email ----
 const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
 
 // "  Priya@Gmail.com " -> "priya@gmail.com"
 export function normalizeEmail(email) {
-  return email.trim().toLowerCase()
+  return String(email ?? '').trim().toLowerCase()
 }
 
-// Galtiyan ek object me lauta deta hai, jaise { email: 'Enter your email.' }.
-// Khaali object ka matlab: sab theek hai.
+// Returns an error message, or '' when the email is fine.
+export function emailError(value) {
+  const email = normalizeEmail(value)
+  if (!email) return EMAIL_REQUIRED
+  if (email.length > EMAIL_MAX_LENGTH || !EMAIL_PATTERN.test(email)) return EMAIL_ERROR
+  return ''
+}
+
+// ---- Password (create / change / reset). Never trimmed or modified. ----
+export function newPasswordError(value) {
+  const password = String(value ?? '')
+  if (!password) return PASSWORD_REQUIRED
+  if (password.length < PASSWORD_MIN_LENGTH || password.length > PASSWORD_MAX_LENGTH) return PASSWORD_ERROR
+  return ''
+}
+
+// ---- Name: letters (any language), spaces, hyphen, apostrophe, dot. No digits or other symbols. ----
+export const NAME_PATTERN = /^[\p{L}\p{M}][\p{L}\p{M} .'’-]*$/u
+
+// "  Aarti    Sharma " -> "Aarti Sharma"
+export function cleanName(value) {
+  return String(value ?? '').replace(/\s+/g, ' ').trim()
+}
+
+export function nameError(value, max = NAME_MAX_LENGTH) {
+  const name = cleanName(value)
+  if (!name) return NAME_REQUIRED
+  if (name.length > max) return `Name can be at most ${max} characters.`
+  if (name.length < NAME_MIN_LENGTH || !NAME_PATTERN.test(name)) return NAME_ERROR
+  return ''
+}
+
+// ---- Indian mobile number: exactly 10 digits, first digit 6-9. No +91, spaces or symbols. ----
+export const PHONE_PATTERN = /^[6-9]\d{9}$/
+
+export function isValidPhone(value) {
+  return PHONE_PATTERN.test(String(value ?? '').trim())
+}
+
+export function phoneError(value, { required = true } = {}) {
+  const text = String(value ?? '').trim()
+  if (!text) return required ? PHONE_REQUIRED : ''
+  return PHONE_PATTERN.test(text) ? '' : PHONE_ERROR
+}
+
+// ---- Login ----
+// Returns the errors in an object, e.g. { email: 'Email is required.' }. An empty object means all good.
 export function validateLogin({ email, password }) {
   const errors = {}
-  const cleanEmail = normalizeEmail(email)
+  const emailMessage = emailError(email)
+  if (emailMessage) errors.email = emailMessage
 
-  if (!cleanEmail) {
-    errors.email = 'Enter your email.'
-  } else if (cleanEmail.length > EMAIL_MAX_LENGTH || !EMAIL_PATTERN.test(cleanEmail)) {
-    errors.email = 'Enter a valid email address.'
-  }
-
-  if (!password) {
-    errors.password = 'Enter your password.'
-  } else if (password.length > PASSWORD_MAX_LENGTH) {
-    errors.password = `Password can be at most ${PASSWORD_MAX_LENGTH} characters.`
-  }
+  const passwordMessage = newPasswordError(password)
+  if (passwordMessage) errors.password = passwordMessage
 
   return errors
 }
 
-// ---- Shared field rules (naam, phone, address, PIN) ----
-// Har form yahi use kare, taaki rules ek jagah rahein.
+// ---- Address: letters, numbers, space , . - / # ( ) & ' : ----
+export const ADDRESS_PATTERN = /^[\p{L}\p{M}\p{N} ,.\-/#()&'’:]*$/u
+export const ADDRESS_ERROR = 'Please enter a valid address.'
 
-// Naam: letters (accented bhi), space, hyphen, apostrophe, dot. Numbers aur @#$ jaise symbols nahi.
-export const NAME_PATTERN = /^[\p{L}\p{M}][\p{L}\p{M} .'’-]*$/u
-export const NAME_ERROR = 'Name me sirf letters aur spaces hon (numbers ya symbols nahi).'
+// India PIN code: 6 digits, not starting with 0
+export const PINCODE_PATTERN = /^[1-9][0-9]{5}$/
+export const PINCODE_ERROR = 'Please enter a valid 6-digit PIN code.'
 
-// Phone: optional +91 / 91 / 0, phir 10 digit jo 6-9 se shuru ho. Beech me space ya hyphen chalega.
-const PHONE_CHARS = /^\+?[0-9 -]+$/
-export const PHONE_ERROR = 'Enter a valid 10-digit mobile number (+91 optional).'
+// ---- Dates (YYYY-MM-DD). Must be a REAL calendar date. ----
+export const DATE_ERROR = 'Please enter a valid date.'
+export const DATE_REQUIRED = 'Date is required.'
 
-export function isValidPhone(value) {
-  const text = String(value).trim()
-  if (!PHONE_CHARS.test(text)) return false
-  const digits = text.replace(/\D/g, '')
-  const national = digits.length === 12 && digits.startsWith('91') ? digits.slice(2) : digits.length === 11 && digits.startsWith('0') ? digits.slice(1) : digits
-  if (text.startsWith('+') && !digits.startsWith('91')) return false
-  return /^[6-9]\d{9}$/.test(national)
+export function isRealDate(value) {
+  const text = String(value ?? '')
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(text)) return false
+  const date = new Date(text + 'T00:00:00Z')
+  return !Number.isNaN(date.getTime()) && date.toISOString().slice(0, 10) === text
 }
 
-// Address: letters, numbers, space , . - / # ( ) & ' . Number zaroori nahi.
-export const ADDRESS_PATTERN = /^[\p{L}\p{M}\p{N} ,.\-/#()&'’:]*$/u
-export const ADDRESS_ERROR = 'Address me sirf letters, numbers aur , . - / # ( ) allowed hain.'
+export function dateError(value, { required = true } = {}) {
+  const text = String(value ?? '').trim()
+  if (!text) return required ? DATE_REQUIRED : ''
+  return isRealDate(text) ? '' : DATE_ERROR
+}
 
-// India PIN: 6 digit, 0 se shuru nahi
-export const PINCODE_PATTERN = /^[1-9][0-9]{5}$/
-export const PINCODE_ERROR = 'Enter a valid 6-digit PIN code.'
+// ---- Address (free text). Letters, numbers, spaces and common punctuation. ----
+export const ADDRESS_REQUIRED = 'Address is required.'
+
+export function addressError(value, { required = true, min = 0, max = 300 } = {}) {
+  const text = String(value ?? '').replace(/\s+/g, ' ').trim()
+  if (!text) return required ? ADDRESS_REQUIRED : ''
+  if (text.length > max) return 'Address can be at most ' + max + ' characters.'
+  if (min && text.length < min) return 'Please enter your full address (at least ' + min + ' characters).'
+  return ADDRESS_PATTERN.test(text) ? '' : ADDRESS_ERROR
+}
+
+export function pincodeError(value) {
+  const text = String(value ?? '').trim()
+  return !text || PINCODE_PATTERN.test(text) ? '' : PINCODE_ERROR
+}

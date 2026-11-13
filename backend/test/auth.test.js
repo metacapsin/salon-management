@@ -10,30 +10,30 @@ before(h.connect)
 after(h.disconnect)
 
 test('register: weak password is rejected, valid one is accepted with a neutral message', async () => {
-  const weak = await h.request(h.app).post(api('/auth/register')).send({ name: 'A', email: 'weak@x.com', password: 'short' })
+  const weak = await h.request(h.app).post(api('/auth/register')).send({ name: 'Asha', email: 'weak@x.com', password: 'short' })
   assert.equal(weak.status, 400)
   assert.equal(weak.body.error.code, 'VALIDATION_ERROR')
   assert.ok(weak.body.error.fieldErrors.password)
 
-  const ok = await h.request(h.app).post(api('/auth/register')).send({ name: 'A', email: 'Reg@X.com', password: h.PASSWORD })
+  const ok = await h.request(h.app).post(api('/auth/register')).send({ name: 'Asha', email: 'Reg@X.com', password: h.PASSWORD })
   assert.equal(ok.status, 201)
   assert.ok(ok.body.requestId)
 
   // Same email dobara: bilkul wahi jawab, kuch leak nahi hota
-  const again = await h.request(h.app).post(api('/auth/register')).send({ name: 'A', email: 'reg@x.com', password: h.PASSWORD })
+  const again = await h.request(h.app).post(api('/auth/register')).send({ name: 'Asha', email: 'reg@x.com', password: h.PASSWORD })
   assert.equal(again.status, 201)
   assert.deepEqual(again.body.data, ok.body.data)
   assert.equal(await h.models.User.countDocuments({ normalizedEmail: 'reg@x.com' }), 1)
 })
 
 test('register: unknown fields are refused (no client-supplied role)', async () => {
-  const res = await h.request(h.app).post(api('/auth/register')).send({ name: 'A', email: 'sneak@x.com', password: h.PASSWORD, role: 'owner', platformRole: 'admin' })
+  const res = await h.request(h.app).post(api('/auth/register')).send({ name: 'Asha', email: 'sneak@x.com', password: h.PASSWORD, role: 'owner', platformRole: 'admin' })
   assert.equal(res.status, 400)
   assert.equal(await h.models.User.countDocuments({ normalizedEmail: 'sneak@x.com' }), 0)
 })
 
 test('login: unverified owner cannot sign in; wrong password and unknown email look identical', async () => {
-  await h.request(h.app).post(api('/auth/register')).send({ name: 'U', email: 'unv@x.com', password: h.PASSWORD })
+  await h.request(h.app).post(api('/auth/register')).send({ name: 'Uma', email: 'unv@x.com', password: h.PASSWORD })
   await h.models.User.updateOne({ normalizedEmail: 'unv@x.com' }, { approvalStatus: 'approved' })
   const unverified = await h.request(h.app).post(api('/auth/login')).send({ email: 'unv@x.com', password: h.PASSWORD })
   assert.equal(unverified.status, 403)
@@ -123,7 +123,7 @@ test('password reset: generic reply, single-use token, old sessions revoked, new
   const confirm = (body) => h.request(h.app).post(api('/auth/password-reset/confirm')).send({ email: 'reset@x.com', ...body })
   const otp = otpFromMail('reset@x.com')
   assert.equal(h.lastMailTo('ghost@x.com'), undefined) // jo registered nahi, use email nahi jaati
-  const newPassword = 'a-brand-new-password-1'
+  const newPassword = 'a-brand-new-pass-1'
   assert.equal((await confirm({ otp, password: 'short' })).status, 400)
   const wrong = await confirm({ otp: otp === '000000' ? '111111' : '000000', password: newPassword })
   assert.equal(wrong.status, 400)
@@ -141,7 +141,7 @@ test('password reset code expires after 10 minutes', async () => {
   await h.request(h.app).post(api('/auth/password-reset')).send({ email: 'exp@x.com' })
   const otp = otpFromMail('exp@x.com')
   await h.models.VerificationToken.updateMany({ purpose: 'password_reset' }, { expiresAt: new Date(Date.now() - 1000) })
-  const res = await h.request(h.app).post(api('/auth/password-reset/confirm')).send({ email: 'exp@x.com', otp, password: 'a-brand-new-password-1' })
+  const res = await h.request(h.app).post(api('/auth/password-reset/confirm')).send({ email: 'exp@x.com', otp, password: 'a-brand-new-pass-1' })
   assert.equal(res.status, 400)
   assert.equal(res.body.error.code, 'INVALID_OTP')
 })
@@ -151,10 +151,10 @@ test('password reset code is locked after 5 wrong tries, even with the right cod
   await h.request(h.app).post(api('/auth/password-reset')).send({ email: 'otplock@x.com' })
   const otp = otpFromMail('otplock@x.com')
   const wrong = otp === '000000' ? '111111' : '000000'
-  for (let i = 0; i < 5; i++) await h.request(h.app).post(api('/auth/password-reset/confirm')).send({ email: 'otplock@x.com', otp: wrong, password: 'a-brand-new-password-1' })
-  const res = await h.request(h.app).post(api('/auth/password-reset/confirm')).send({ email: 'otplock@x.com', otp, password: 'a-brand-new-password-1' })
+  for (let i = 0; i < 5; i++) await h.request(h.app).post(api('/auth/password-reset/confirm')).send({ email: 'otplock@x.com', otp: wrong, password: 'a-brand-new-pass-1' })
+  const res = await h.request(h.app).post(api('/auth/password-reset/confirm')).send({ email: 'otplock@x.com', otp, password: 'a-brand-new-pass-1' })
   assert.notEqual(res.status, 200) // 400 (code locked) ya 429 (rate limit): dono me password nahi badla
-  const login = await h.request(h.app).post(api('/auth/login')).send({ email: 'otplock@x.com', password: 'a-brand-new-password-1' })
+  const login = await h.request(h.app).post(api('/auth/login')).send({ email: 'otplock@x.com', password: 'a-brand-new-pass-1' })
   assert.equal(login.status === 401 || login.status === 429, true)
 })
 
@@ -223,7 +223,7 @@ test('change password: needs the current password, keeps this login, ends the ot
   const first = await h.loginAs('chg@x.com')
   const second = await h.loginAs('chg@x.com')
   const url = api('/me/password')
-  const NEW = 'a-brand-new-passphrase-1'
+  const NEW = 'a-brand-new-pass-2'
   const call = (s, body) => h.request(h.app).post(url).set('Authorization', `Bearer ${s.token}`).send(body)
 
   assert.equal((await h.request(h.app).post(url).send({ currentPassword: h.PASSWORD, newPassword: NEW })).status, 401)

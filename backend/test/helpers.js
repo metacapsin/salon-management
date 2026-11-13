@@ -10,7 +10,7 @@ const app = require('../src/app')
 const models = require('../src/models')
 const { outbox } = require('../src/utils/mailer')
 
-const PASSWORD = 'correct-horse-battery'
+const PASSWORD = 'correct-horse-bat1'
 
 async function connect() {
   await mongoose.connect(process.env.MONGO_URI, { serverSelectionTimeoutMS: 5000 })

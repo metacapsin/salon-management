@@ -25,7 +25,7 @@ test('mobile login: returns tokens in JSON, sets no cookie, and the access token
 })
 
 test('mobile login: same failure rules as the website (generic error, unverified, lockout)', async () => {
-  await h.request(h.app).post(api('/auth/register')).send({ name: 'U', email: 'm2@x.com', password: h.PASSWORD })
+  await h.request(h.app).post(api('/auth/register')).send({ name: 'Uma', email: 'm2@x.com', password: h.PASSWORD })
   const pending = await post(mobile('/login'), { email: 'm2@x.com', password: h.PASSWORD })
   assert.equal(pending.body.error.code, 'ACCOUNT_PENDING_APPROVAL')
   await h.models.User.updateOne({ normalizedEmail: 'm2@x.com' }, { approvalStatus: 'approved' })

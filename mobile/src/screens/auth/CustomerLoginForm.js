@@ -4,10 +4,7 @@ import Button from '../../components/Button'
 import TextField from '../../components/TextField'
 import { ErrorBanner } from '../../components/States'
 import { COLORS } from '../../config/theme'
-
-const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
-const PHONE_PATTERN = /^(91)?[6-9]\d{9}$/
-const NAME_PATTERN = /^\p{L}[\p{L} .'-]*$/u
+import { cleanName, emailError, nameError, phoneError } from '../../utils/validators'
 
 // Customer sign in, same as the website: email + mobile number -> a 6 digit code arrives on the email.
 // A new customer is asked for a name once the code is right. The same mobile number is never created twice (the server checks).
@@ -25,18 +22,16 @@ export default function CustomerLoginForm({ onRequestOtp, onVerifyOtp }) {
   const [loading, setLoading] = useState(false)
   const phoneRef = useRef(null)
 
-  const digits = phone.replace(/\D/g, '')
-
   async function sendCode() {
     const found = {}
-    if (!EMAIL_PATTERN.test(email.trim())) found.email = 'Enter a valid email address.'
-    if (!PHONE_PATTERN.test(digits)) found.phone = 'Enter a 10 digit mobile number.'
+    if (emailError(email)) found.email = emailError(email)
+    if (phoneError(phone)) found.phone = phoneError(phone)
     setErrors(found)
     setFormError('')
     if (Object.keys(found).length > 0) return
     setLoading(true)
     try {
-      const sent = await onRequestOtp(digits.slice(-10), email.trim())
+      const sent = await onRequestOtp(phone.trim(), email.trim())
       setSentTo(sent.sentTo ?? email.trim())
       // Development only, when the server has no email provider: it returns the code so login can be tried.
       if (__DEV__ && sent.devOtp) setOtp(sent.devOtp)
@@ -50,14 +45,14 @@ export default function CustomerLoginForm({ onRequestOtp, onVerifyOtp }) {
 
   async function confirmCode() {
     const found = {}
-    if (!/^\d{6}$/.test(otp)) found.otp = 'Enter the 6 digit code.'
-    if (needsName && !NAME_PATTERN.test(name.trim())) found.name = 'Enter your name (letters only).'
+    if (!/^\d{6}$/.test(otp)) found.otp = 'Please enter the 6-digit code.'
+    if (needsName && nameError(name)) found.name = nameError(name)
     setErrors(found)
     setFormError('')
     if (Object.keys(found).length > 0) return
     setLoading(true)
     try {
-      const result = await onVerifyOtp({ phone: digits.slice(-10), otp, name: needsName ? name.trim() : undefined })
+      const result = await onVerifyOtp({ phone: phone.trim(), otp, name: needsName ? cleanName(name) : undefined })
       if (result?.needsName) setNeedsName(true) // new customer: the code was right, now we need a name
     } catch (error) {
       setFormError(error?.message || 'Something went wrong. Please try again.')

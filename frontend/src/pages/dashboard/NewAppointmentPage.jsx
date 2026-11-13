@@ -5,7 +5,7 @@ import { fieldErrorsOf, friendlyError } from '../../api/client'
 import { createBooking, listBookingSlots, listServices, listStaff } from '../../api/salonApi'
 import { useAuth } from '../../auth/AuthContext'
 import SelectBox from '../../components/SelectBox'
-import { NAME_ERROR, NAME_PATTERN } from '../../utils/validators'
+import { nameError, phoneError } from '../../utils/validators'
 
 // Aaj ki tarikh "YYYY-MM-DD" (local). toISOString UTC deta hai, isliye khud banate hain.
 function dateISO(offsetDays = 0) {
@@ -65,12 +65,10 @@ export default function NewAppointmentPage() {
 
   function validate() {
     const found = {}
-    const name = values.customerName.trim()
-    if (name.length < 2) found.customerName = 'Enter the customer name.'
-    else if (!NAME_PATTERN.test(name)) found.customerName = NAME_ERROR
-    const phone = values.customerPhone.trim()
-    if (/[^\d+]/.test(phone)) found.customerPhone = 'Phone me sirf numbers hon, letters ya symbols nahi.'
-    else if (!/^(91)?[6-9]\d{9}$/.test(phone)) found.customerPhone = 'Enter a 10 digit mobile number.'
+    const nameProblem = nameError(values.customerName)
+    if (nameProblem) found.customerName = nameProblem
+    const phoneProblem = phoneError(values.customerPhone)
+    if (phoneProblem) found.customerPhone = phoneProblem
     if (!values.serviceId) found.serviceId = 'Choose a service.'
     if (!values.date) found.date = 'Choose a date.'
     else if (values.date < dateISO()) found.date = 'The date cannot be in the past.'
@@ -125,7 +123,7 @@ export default function NewAppointmentPage() {
           <div className="gl-form__row gl-form__row--stack-xs">
           <div className={cls('customerName')}>
             <label htmlFor="appt-customer">Customer name</label>
-            <input id="appt-customer" className="gl-input" onBlur={() => checkField('customerName')} value={values.customerName} onChange={(e) => setField('customerName', e.target.value)} maxLength={100} autoComplete="off" placeholder="e.g. Priya Sharma" aria-invalid={Boolean(errors.customerName)} />
+            <input id="appt-customer" className="gl-input" onBlur={() => checkField('customerName')} value={values.customerName} onChange={(e) => setField('customerName', e.target.value)} maxLength={35} autoComplete="off" placeholder="e.g. Priya Sharma" aria-invalid={Boolean(errors.customerName)} />
             {errors.customerName && <p className="gl-field__error">{errors.customerName}</p>}
           </div>
 

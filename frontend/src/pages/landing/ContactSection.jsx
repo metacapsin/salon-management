@@ -2,22 +2,17 @@ import { useState } from 'react'
 import { fieldErrorsOf, friendlyError } from '../../api/client'
 import { sendContactInquiry } from '../../api/publicApi'
 import Icon from '../../components/Icon'
-import { NAME_ERROR, NAME_PATTERN } from '../../utils/validators'
+import { emailError, nameError, phoneError } from '../../utils/validators'
 import Reveal from './Reveal'
 
 const EMPTY = { name: '', email: '', phone: '', message: '', website: '' }
-const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
-const PHONE_PATTERN = /^\+?[0-9\s()-]+$/
 
 // Browser me jaldi check (server wahi rules phir se check karta hai).
 function validate(values) {
   const found = {}
-  const digits = values.phone.replace(/\D/g, '').length
-  if (values.name.trim().length < 2) found.name = 'Please enter your full name.'
-  else if (!NAME_PATTERN.test(values.name.trim())) found.name = NAME_ERROR
-  if (!EMAIL_PATTERN.test(values.email.trim())) found.email = 'Please enter a valid email address.'
-  if (!PHONE_PATTERN.test(values.phone.trim())) found.phone = 'Phone me sirf numbers (aur + - ( )) hon, letters nahi.'
-  else if (digits < 7 || digits > 15) found.phone = 'Please enter a valid phone number (7 to 15 digits).'
+  if (nameError(values.name)) found.name = nameError(values.name)
+  if (emailError(values.email)) found.email = emailError(values.email)
+  if (phoneError(values.phone)) found.phone = phoneError(values.phone)
   if (values.message.trim().length < 10) found.message = 'Please write a short message (at least 10 characters).'
   return found
 }
@@ -109,7 +104,7 @@ export default function ContactSection() {
 
             <div className={fieldClass('name')}>
               <label htmlFor="lp-name">Full name</label>
-              <input id="lp-name" onBlur={() => checkField('name')} value={values.name} onChange={(e) => setField('name', e.target.value)} autoComplete="off" maxLength={100} aria-invalid={Boolean(errors.name)} />
+              <input id="lp-name" onBlur={() => checkField('name')} value={values.name} onChange={(e) => setField('name', e.target.value)} autoComplete="off" maxLength={35} aria-invalid={Boolean(errors.name)} />
               {errors.name && <p className="lp-field__error">{errors.name}</p>}
             </div>
 

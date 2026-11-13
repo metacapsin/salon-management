@@ -1,7 +1,7 @@
 const express = require('express')
 const ApiError = require('../../utils/apiError')
 const { sendSuccess } = require('../../utils/response')
-const { z, objectId } = require('../../utils/schemas')
+const { z, objectId, personName, optionalMobile } = require('../../utils/schemas')
 const { validate } = require('../../middleware/common')
 const { authenticate, requireSalon, can } = require('../../middleware/auth')
 const { Staff, Service } = require('../../models')
@@ -28,8 +28,8 @@ const day = z.array(interval).max(4).refine((list) => {
 const weeklyHours = z.strictObject(Object.fromEntries(DAYS.map((d) => [d, day.optional()])))
 
 const staffFields = {
-  name: z.string().trim().min(2, 'Name must be at least 2 characters.').max(100),
-  phone: z.string().trim().max(20),
+  name: personName,
+  phone: optionalMobile,
   title: z.string().trim().max(60),
   skills: z.array(z.string().trim().min(1).max(40)).max(20),
   serviceIds: z.array(objectId).max(100),

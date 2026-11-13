@@ -2,7 +2,7 @@
 const express = require('express')
 const ApiError = require('../../utils/apiError')
 const { sendSuccess } = require('../../utils/response')
-const { z, objectId } = require('../../utils/schemas')
+const { z, objectId, mobile, personName, isoDate } = require('../../utils/schemas')
 const { validate } = require('../../middleware/common')
 const { authenticate, requireSalon, can } = require('../../middleware/auth')
 const { Booking, Branch, Service, Staff } = require('../../models')
@@ -64,7 +64,7 @@ router.get('/', can('appointments.read'), validate({ query: listQuery }), async 
 
 // ---------- salon-side: naya appointment ----------
 const OPEN_STATUSES = ['pending', 'confirmed']
-const dateStr = z.string().regex(/^\d{4}-\d{2}-\d{2}$/, 'Use YYYY-MM-DD.')
+const dateStr = isoDate
 const OUT_OF_RANGE = 'Choose a date within the next 30 days.'
 const fieldError = (status, code, field, message) => new ApiError(status, code, message, { fieldErrors: { [field]: message } })
 
@@ -118,12 +118,8 @@ router.get('/slots', can('appointments.write'), validate({ query: slotsQuery }),
 })
 
 const createBody = z.strictObject({
-  customerName: z.string().trim().min(2, 'Enter the customer name.').max(100),
-  customerPhone: z
-    .string()
-    .trim()
-    .regex(/^(91)?[6-9]\d{9}$/, 'Enter a 10 digit mobile number.')
-    .transform((v) => v.slice(-10)),
+  customerName: personName,
+  customerPhone: mobile,
   serviceId: objectId,
   staffId: objectId.optional(),
   date: dateStr.refine(isRealDate, 'Choose a real date.'),

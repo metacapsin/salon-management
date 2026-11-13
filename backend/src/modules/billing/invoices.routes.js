@@ -4,7 +4,7 @@ const express = require('express')
 const mongoose = require('mongoose')
 const ApiError = require('../../utils/apiError')
 const { sendSuccess } = require('../../utils/response')
-const { z, objectId } = require('../../utils/schemas')
+const { z, objectId, mobile, personName, isoDate } = require('../../utils/schemas')
 const { validate } = require('../../middleware/common')
 const { authenticate, requireSalon, can } = require('../../middleware/auth')
 const { Invoice, InvoiceCounter, Payment, Booking, Service, Offer, Customer, CustomerPackage, PackageLedger, CustomerMembership, MembershipLedger } = require('../../models')
@@ -24,8 +24,8 @@ const phoneOf = (v) => String(v).replace(/\D/g, '').slice(-10)
 
 const bodyShape = {
   bookingId: objectId.optional(),
-  customerPhone: z.string().trim().regex(/^(91)?[6-9]\d{9}$/, 'Enter a 10 digit mobile number.').optional(),
-  customerName: z.string().trim().min(1, 'Enter the customer name.').max(100).optional(),
+  customerPhone: mobile.optional(),
+  customerName: personName.optional(),
   // Khaali ho aur booking di ho to booking ki services hi lagti hain
   lines: z.array(z.strictObject({ serviceId: objectId, quantity: z.number().int().min(1).max(20) })).max(30).optional(),
   offerId: objectId.optional(),
@@ -73,7 +73,7 @@ function dayStart(day, tz) {
 }
 const dayEnd = (day, tz) => new Date(dayStart(day, tz).getTime() + 86400000) // exclusive
 
-const dateStr = z.string().regex(/^\d{4}-\d{2}-\d{2}$/, 'Use YYYY-MM-DD.')
+const dateStr = isoDate
 const rangeQuery = { from: dateStr.optional(), to: dateStr.optional() }
 const escapeRegex = (s) => s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
 
@@ -85,7 +85,7 @@ function createdAtFilter(salon, { from, to }) {
 const listQuery = z.object({
   search: z.string().trim().max(50).optional(), // bill number, customer ka naam ya phone
   ...rangeQuery,
-  customerPhone: z.string().trim().regex(/^\d{10}$/, 'Enter a 10-digit mobile number.').optional(),
+  customerPhone: mobile.optional(),
   method: z.enum(['cash', 'upi', 'card']).optional(),
   paymentStatus: z.enum(['unpaid', 'partial', 'paid']).optional(),
   status: z.enum(['final', 'void']).optional(),
@@ -139,7 +139,7 @@ router.get('/summary', can('billing.read'), validate({ query: z.object(rangeQuer
 })
 
 // Is customer ke aise appointments jinka bill abhi nahi bana (cancelled nahi), taaki bill ke saath jod sakein
-router.get('/billable-appointments', can('billing.write'), validate({ query: z.object({ customerPhone: z.string().trim().regex(/^\d{10}$/, 'Enter a 10-digit mobile number.') }) }), async (req, res) => {
+router.get('/billable-appointments', can('billing.write'), validate({ query: z.object({ customerPhone: mobile }) }), async (req, res) => {
   const salonId = req.salon._id
   const rows = await Booking.find({ salonId, customerPhone: req.valid.query.customerPhone, status: { $ne: 'cancelled' } }).sort({ date: -1, startTime: -1 }).limit(30).lean()
   const billed = new Set((await Invoice.find({ salonId, bookingId: { $in: rows.map((r) => r._id) }, status: 'final' }).select('bookingId').lean()).map((i) => String(i.bookingId)))

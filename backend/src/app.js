@@ -32,6 +32,9 @@ const { publicRouter: contactRoutes } = require('./modules/contact/contact.route
 const app = express()
 
 app.disable('x-powered-by')
+// Server nginx ke peeche chalta he. Isse asli user ka IP milta he (warna sabka IP nginx ka hota he
+// aur login rate-limit (30 / 15 min) sab users me ek hi saath ginta he).
+app.set('trust proxy', 1)
 app.use(requestContext)
 app.use(helmet())
 // Cookies use hoti hain, isliye sirf hamara frontend allowed hai (wildcard nahi) (SEC-01).

@@ -11,6 +11,7 @@ import { COLORS, FONT, RADIUS } from '../../config/theme'
 import { formatDate, formatMoney } from '../../utils/formatMoney'
 import { todayString } from '../../utils/dates'
 import { offerText } from './SalonDetailScreen'
+import { addressError } from '../../utils/validators'
 
 const DAYS_AHEAD = 14
 
@@ -88,7 +89,7 @@ export default function BookScreen({ route, navigation }) {
   function submit() {
     setError('')
     if (!time) return setError('Choose a time.')
-    if (mode === 'home' && address.trim().length < 8) return setError('Enter your full address for home service.')
+    if (mode === 'home' && addressError(address, { min: 8, max: 300 })) return setError(addressError(address, { min: 8, max: 300 }))
     book.mutate()
   }
 

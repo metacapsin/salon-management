@@ -160,7 +160,7 @@ test('redeem: only for a completed, matching appointment; never below zero; neve
 test('expired and cancelled packages cannot be used; status filter works', async () => {
   const s = await setup('pk7@x.com', 'pk-seven')
   const pkg = (await post(s.auth, '/packages', pkgBody(s))).body.data.package
-  const mkCp = async (phone, key) => (await post(s.auth, '/customer-packages', { packageId: pkg.id, customerPhone: phone, customerName: 'C', requestKey: key })).body.data.customerPackage
+  const mkCp = async (phone, key) => (await post(s.auth, '/customer-packages', { packageId: pkg.id, customerPhone: phone, customerName: 'Chitra', requestKey: key })).body.data.customerPackage
   const expired = await mkCp('9810000021', 'key-dddddddd-1')
   const cancelled = await mkCp('9810000022', 'key-dddddddd-2')
   await mkCp('9810000023', 'key-dddddddd-3')
@@ -186,7 +186,7 @@ test('expired and cancelled packages cannot be used; status filter works', async
 test('adjust needs a reason and cannot make balance negative; pending payment can be paid once', async () => {
   const s = await setup('pk8@x.com', 'pk-eight')
   const pkg = (await post(s.auth, '/packages', pkgBody(s))).body.data.package
-  const cp = (await post(s.auth, '/customer-packages', { packageId: pkg.id, customerPhone: '9810000031', customerName: 'C', requestKey: 'key-eeeeeeee-1', paymentStatus: 'pending' })).body.data.customerPackage
+  const cp = (await post(s.auth, '/customer-packages', { packageId: pkg.id, customerPhone: '9810000031', customerName: 'Chitra', requestKey: 'key-eeeeeeee-1', paymentStatus: 'pending' })).body.data.customerPackage
   assert.equal(cp.paymentStatus, 'pending')
   const hairId = String(s.hair._id)
   assert.equal((await post(s.auth, `/customer-packages/${cp.id}/adjust`, { serviceId: hairId, sessions: -1, note: '' })).status, 400)
@@ -204,10 +204,10 @@ test('tenant isolation and roles: other salon gets 404; receptionist can sell bu
   const s = await setup('pk9@x.com', 'pk-nine')
   const other = await setup('pk9b@x.com', 'pk-nine-b')
   const pkg = (await post(s.auth, '/packages', pkgBody(s))).body.data.package
-  const cp = (await post(s.auth, '/customer-packages', { packageId: pkg.id, customerPhone: '9810000041', customerName: 'C', requestKey: 'key-ffffffff-1' })).body.data.customerPackage
+  const cp = (await post(s.auth, '/customer-packages', { packageId: pkg.id, customerPhone: '9810000041', customerName: 'Chitra', requestKey: 'key-ffffffff-1' })).body.data.customerPackage
 
   assert.equal((await h.request(h.app).get(api(`/customer-packages/${cp.id}`)).set(other.auth)).status, 404)
-  assert.equal((await post(other.auth, '/customer-packages', { packageId: pkg.id, customerPhone: '9810000042', customerName: 'C', requestKey: 'key-ffffffff-2' })).status, 400)
+  assert.equal((await post(other.auth, '/customer-packages', { packageId: pkg.id, customerPhone: '9810000042', customerName: 'Chitra', requestKey: 'key-ffffffff-2' })).status, 400)
 
   // receptionist: owner ka invite kiye bina seedha membership banate hain
   await h.createVerifiedUser('recep9@x.com')
@@ -216,5 +216,5 @@ test('tenant isolation and roles: other salon gets 404; receptionist can sell bu
   const rauth = h.bearer(rec.token, s.o.salonId)
   assert.equal((await post(rauth, '/packages', pkgBody(s, { name: 'Nope' }))).status, 403)
   assert.equal((await post(rauth, `/customer-packages/${cp.id}/adjust`, { serviceId: String(s.hair._id), sessions: 1, note: 'trying' })).status, 403)
-  assert.equal((await post(rauth, '/customer-packages', { packageId: pkg.id, customerPhone: '9810000043', customerName: 'C', requestKey: 'key-ffffffff-3' })).status, 201)
+  assert.equal((await post(rauth, '/customer-packages', { packageId: pkg.id, customerPhone: '9810000043', customerName: 'Chitra', requestKey: 'key-ffffffff-3' })).status, 201)
 })

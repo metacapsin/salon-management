@@ -9,6 +9,7 @@ import { ChoiceChips, MultiChips } from '../../components/Form'
 import { Card, Screen } from '../../components/Screen'
 import TextField from '../../components/TextField'
 import { COLORS } from '../../config/theme'
+import { addressError, nameError, phoneError, pincodeError } from '../../utils/validators'
 
 // Same list as the server (backend salons.routes.js FACILITIES).
 export const FACILITY_LABELS = {
@@ -22,10 +23,12 @@ export const FACILITY_LABELS = {
   'bridal-room': 'Bridal room',
 }
 const AUDIENCES = { Women: 'women', Men: 'men', Unisex: 'unisex' }
-const PHONE_OK = /^\+?[0-9 -]{7,20}$/
 
 // Edit the salon's details. Only the Owner can reach this screen, and the server checks the role on save.
 // The booking address (slug) and timezone are not changed here on purpose: changing the slug breaks shared links.
+// Trim and collapse repeated spaces before sending an address part
+const cleanAddr = (v) => v.replace(/\s+/g, ' ').trim()
+
 export default function SettingsFormScreen({ navigation, route }) {
   const salon = route.params.salon
   const { activeSalonId } = useAuth()
@@ -62,8 +65,13 @@ export default function SettingsFormScreen({ navigation, route }) {
     setFormError('')
     const found = {}
     if (name.trim().length < 2) found.name = 'Salon name must be at least 2 characters.'
-    if (ownerName.trim().length < 1) found.ownerName = 'Enter a name.'
-    if (phone.trim() && !PHONE_OK.test(phone.trim())) found.phone = 'Enter a valid phone number.'
+    if (nameError(ownerName)) found.ownerName = nameError(ownerName)
+    if (phoneError(phone, { required: false })) found.phone = phoneError(phone, { required: false })
+    for (const [key, value, max] of [['address.line1', line1, 200], ['address.area', area, 100], ['address.city', city, 100], ['address.state', state, 100]]) {
+      const problem = addressError(value, { required: false, max })
+      if (problem) found[key] = problem
+    }
+    if (pincodeError(pincode)) found['address.pincode'] = pincodeError(pincode)
     setErrors(found)
     if (Object.keys(found).length) return
     save.mutate({
@@ -73,7 +81,7 @@ export default function SettingsFormScreen({ navigation, route }) {
       about: about.trim(),
       audience: AUDIENCES[audience],
       facilities,
-      address: { line1: line1.trim(), area: area.trim(), city: city.trim(), state: state.trim(), pincode: pincode.trim() },
+      address: { line1: cleanAddr(line1), area: cleanAddr(area), city: cleanAddr(city), state: cleanAddr(state), pincode: pincode.trim() },
     })
   }
 
@@ -82,8 +90,8 @@ export default function SettingsFormScreen({ navigation, route }) {
       <Card>
         {formError ? <Text style={styles.banner}>{formError}</Text> : null}
         <TextField label="Salon name" value={name} onChangeText={setName} error={errors.name} maxLength={100} />
-        <TextField label="Owner name" value={ownerName} onChangeText={setOwnerName} error={errors.ownerName} maxLength={100} />
-        <TextField label="Phone" value={phone} onChangeText={setPhone} error={errors.phone} keyboardType="phone-pad" maxLength={20} />
+        <TextField label="Owner name" value={ownerName} onChangeText={setOwnerName} error={errors.ownerName} maxLength={35} />
+        <TextField label="Phone" value={phone} onChangeText={setPhone} error={errors.phone} keyboardType="phone-pad" maxLength={15} />
         <TextField label="About" value={about} onChangeText={setAbout} error={errors.about} multiline maxLength={500} style={styles.multiline} />
         <ChoiceChips label="Who is it for" options={Object.keys(AUDIENCES)} value={audience} onChange={setAudience} error={errors.audience} />
         <MultiChips

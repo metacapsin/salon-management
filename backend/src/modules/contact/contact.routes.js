@@ -2,7 +2,7 @@ const crypto = require('crypto')
 const express = require('express')
 const ApiError = require('../../utils/apiError')
 const { sendSuccess } = require('../../utils/response')
-const { z, email, objectId, pagination } = require('../../utils/schemas')
+const { z, email, objectId, pagination, mobile: phone, personName, isoDate } = require('../../utils/schemas')
 const { validate, limiter, requireAllowedOrigin } = require('../../middleware/common')
 const { INQUIRY_STATUSES } = require('../../config/inquiry')
 const { ContactInquiry } = require('../../models')
@@ -16,14 +16,9 @@ const publicRouter = express.Router()
 // Ek IP se 10 minute me 5 sawaal. Spam rokne ke liye (tests me limiter band hota hai).
 const submitLimit = limiter({ windowMs: 10 * 60_000, limit: 5 })
 
-const phone = z
-  .string()
-  .trim()
-  .max(20, 'Phone number can be at most 20 characters.')
-  .refine((v) => /^\+?[0-9\s()-]+$/.test(v) && v.replace(/\D/g, '').length >= 7 && v.replace(/\D/g, '').length <= 15, 'Enter a valid phone number.')
 
 const submitSchema = z.strictObject({
-  name: z.string().trim().min(2, 'Enter your full name.').max(100, 'Name can be at most 100 characters.'),
+  name: personName,
   email,
   phone,
   message: z.string().trim().min(10, 'Please write a short message (at least 10 characters).').max(2000, 'Message can be at most 2000 characters.'),
@@ -50,7 +45,7 @@ publicRouter.post('/', requireAllowedOrigin, submitLimit, validate({ body: submi
 // ---------- 2. Admin: sirf Super Admin. platform.routes.js isse /contact-inquiries par jodta hai, jahan authenticate + requirePlatformAdmin pehle se laga hai ----------
 const adminRouter = express.Router()
 
-const day = z.string().regex(/^\d{4}-\d{2}-\d{2}$/, 'Use the date format YYYY-MM-DD.')
+const day = isoDate
 
 // Din ki seema India ke samay (IST) me: "2026-10-24" = us din 00:00 se 23:59 IST
 const startOfDay = (d) => new Date(`${d}T00:00:00.000+05:30`)

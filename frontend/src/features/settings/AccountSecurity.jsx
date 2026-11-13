@@ -5,6 +5,7 @@ import VisibilityOutlinedIcon from '@mui/icons-material/VisibilityOutlined'
 import { changePassword } from '../../api/authApi'
 import { fieldErrorsOf, friendlyError } from '../../api/client'
 import { useAuth } from '../../auth/AuthContext'
+import { newPasswordError } from '../../utils/validators'
 
 const EMPTY = { currentPassword: '', newPassword: '', confirm: '' }
 
@@ -25,9 +26,8 @@ export default function AccountSecurity() {
 
   function validate() {
     const next = {}
-    if (!values.currentPassword) next.currentPassword = 'Enter your current password.'
-    if (values.newPassword.length < 12) next.newPassword = 'Password must be at least 12 characters.'
-    else if (values.newPassword.length > 128) next.newPassword = 'Password can be at most 128 characters.'
+    if (newPasswordError(values.currentPassword)) next.currentPassword = newPasswordError(values.currentPassword)
+    if (newPasswordError(values.newPassword)) next.newPassword = newPasswordError(values.newPassword)
     else if (values.newPassword === values.currentPassword) next.newPassword = 'Must be different from your current password.'
     if (values.confirm !== values.newPassword) next.confirm = 'Passwords do not match.'
     setErrors(next)
@@ -87,9 +87,9 @@ export default function AccountSecurity() {
       <Box component="form" onSubmit={submit} noValidate sx={{ display: 'grid', gap: 1.25, maxWidth: 400 }}>
         <Typography variant="subtitle2">Change password</Typography>
         {formError && <Alert severity="error">{formError}</Alert>}
-        <TextField size="small" label="Current password" type={type} autoComplete="current-password" value={values.currentPassword} onChange={set('currentPassword')} error={Boolean(errors.currentPassword)} helperText={errors.currentPassword} slotProps={eye} />
-        <TextField size="small" label="New password" type={type} autoComplete="new-password" value={values.newPassword} onChange={set('newPassword')} error={Boolean(errors.newPassword)} helperText={errors.newPassword ?? 'At least 12 characters.'} slotProps={eye} />
-        <TextField size="small" label="Confirm new password" type={type} autoComplete="new-password" value={values.confirm} onChange={set('confirm')} error={Boolean(errors.confirm)} helperText={errors.confirm} slotProps={eye} />
+        <TextField size="small" label="Current password" type={type} autoComplete="current-password" value={values.currentPassword} onChange={set('currentPassword')} error={Boolean(errors.currentPassword)} helperText={errors.currentPassword} slotProps={{ ...eye, htmlInput: { maxLength: 20 } }} />
+        <TextField size="small" label="New password" type={type} autoComplete="new-password" value={values.newPassword} onChange={set('newPassword')} error={Boolean(errors.newPassword)} helperText={errors.newPassword ?? '12 to 20 characters.'} slotProps={{ ...eye, htmlInput: { maxLength: 20 } }} />
+        <TextField size="small" label="Confirm new password" type={type} autoComplete="new-password" value={values.confirm} onChange={set('confirm')} error={Boolean(errors.confirm)} helperText={errors.confirm} slotProps={{ ...eye, htmlInput: { maxLength: 20 } }} />
         <Typography variant="caption" color="text.secondary">
           Other devices where you are signed in will be signed out. This device stays signed in.
         </Typography>

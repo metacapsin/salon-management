@@ -102,7 +102,6 @@
 
 /* min-height 48px: ungli se dabane layak badi (SRS: kam se kam 44px) */
 .field input,
-.field__toggle,
 .login-form__submit {
   min-height: 48px;
   box-sizing: border-box;
@@ -124,7 +123,6 @@
 
 /* Keyboard se chalne wale ko dikhna chahiye ki abhi kaun sa field active hai */
 .field input:focus-visible,
-.field__toggle:focus-visible,
 .login-form__submit:focus-visible {
   outline: 3px solid #8b5e3c;
   outline-offset: 2px;
@@ -139,16 +137,32 @@
   padding-right: 76px; /* text button ke neeche na chhupe */
 }
 
+/* Small button that sits inside the right end of the input, so it never looks like a separate box */
 .field__toggle {
   position: absolute;
-  top: 0;
-  right: 0;
-  padding: 0 14px;
+  top: 6px;
+  right: 6px;
+  bottom: 6px;
+  min-width: 56px;
+  padding: 0 12px;
   border: 0;
+  border-radius: 8px;
   background: transparent;
   color: #754c2e;
+  font: inherit;
+  font-size: 0.9rem;
   font-weight: 600;
   cursor: pointer;
+}
+
+.field__toggle:hover {
+  background: #f4ece4;
+}
+
+/* Focus ring stays inside the input instead of spilling over its border */
+.field__toggle:focus-visible {
+  outline: 2px solid #8b5e3c;
+  outline-offset: -2px;
 }
 
 .field__error {

@@ -1,17 +1,18 @@
 const express = require('express')
 const ApiError = require('../../utils/apiError')
 const { sendSuccess } = require('../../utils/response')
-const { z, objectId } = require('../../utils/schemas')
+const { z, isoDate, objectId } = require('../../utils/schemas')
 const { validate } = require('../../middleware/common')
 const { authenticate, requireSalon, can } = require('../../middleware/auth')
 const { Offer, Service } = require('../../models')
 const { recordAudit } = require('../audit/audit.service')
+const { todayIn } = require('../packages/util')
 
 const router = express.Router()
 router.use(authenticate, requireSalon)
 
 // ---------- rules ----------
-const day = z.string().regex(/^\d{4}-\d{2}-\d{2}$/, 'Use a date like 2026-11-01.')
+const day = isoDate
 
 const offerFields = {
   title: z.string().trim().min(2, 'Title must be at least 2 characters.').max(80),
@@ -91,6 +92,9 @@ router.get('/', can('offers.read'), async (req, res) => {
 
 router.post('/', can('offers.write'), validate({ body: createBody }), async (req, res) => {
   checkRules(req.valid.body)
+  if (req.valid.body.endsOn < todayIn(req.salon.timezone)) {
+    throw new ApiError(400, 'VALIDATION_ERROR', 'End date cannot be in the past.', { fieldErrors: { endsOn: 'End date cannot be in the past.' } })
+  }
   await checkServices(req, req.valid.body.serviceIds)
   const offer = await Offer.create({ ...req.valid.body, salonId: req.salon._id, createdBy: req.user._id })
   await recordAudit(req, { action: 'offer.created', entityType: 'offer', entityId: offer._id, changes: { title: offer.title } })

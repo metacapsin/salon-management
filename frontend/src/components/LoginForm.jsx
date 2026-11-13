@@ -103,6 +103,7 @@ function LoginForm({ onSuccess }) {
             type={showPassword ? 'text' : 'password'}
             name="password"
             autoComplete="current-password"
+            maxLength={20}
             value={password}
             onChange={(event) => setPassword(event.target.value)}
             aria-invalid={Boolean(fieldErrors.password)}

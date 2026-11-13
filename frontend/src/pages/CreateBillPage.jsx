@@ -23,12 +23,11 @@ import {
 import CloseIcon from '@mui/icons-material/Close'
 import { createInvoice, listBillableAppointments, previewInvoice } from '../api/billingApi'
 import { friendlyError } from '../api/client'
-import { NAME_ERROR, NAME_PATTERN } from '../utils/validators'
+import { isValidPhone, nameError } from '../utils/validators'
 import { getBookingBenefits, listCustomers, listOffers, listServices } from '../api/salonApi'
 import { useAuth } from '../auth/AuthContext'
 import { formatMoney, formatPaise } from '../utils/formatMoney'
 
-const PHONE_OK = /^\d{10}$/
 const today = () => new Date().toLocaleDateString('en-CA')
 const newKey = () => `bill-${crypto.randomUUID()}`
 
@@ -49,8 +48,9 @@ export default function CreateBillPage() {
   const [redeem, setRedeem] = useState({}) // 'cpId:serviceId' -> { customerPackageId, serviceId }
   const [submitError, setSubmitError] = useState('')
 
-  const phoneValid = PHONE_OK.test(phone)
-  const nameValid = NAME_PATTERN.test(name.trim()) // linked appointment ka naam bhi isi se guzarta hai
+  const phoneValid = isValidPhone(phone)
+  const nameProblem = name.trim() ? nameError(name) : ''
+  const nameValid = !nameError(name) // the name of a linked appointment passes the same check
   const key = ['salon', activeSalonId]
 
   const customersQuery = useQuery({
@@ -156,8 +156,8 @@ export default function CreateBillPage() {
 
       <Paper sx={{ p: 2, mb: 2 }}>
         <Typography variant="h6" sx={{ mb: 1 }}>1. Customer</Typography>
-        {/* Customer ke saare input ek hi line me (jagah kam ho to hi neeche aate hain) */}
-        <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap', alignItems: 'flex-start' }}>
+        {/* Customer ke input grid me: jagah ke hisaab se 1, 2 ya 4 column, taaki label/error kate nahi */}
+        <Box sx={{ display: 'grid', gap: 1.5, gridTemplateColumns: { xs: '1fr', sm: 'repeat(2, minmax(0, 1fr))', xl: 'repeat(4, minmax(0, 1fr))' }, alignItems: 'start' }}>
         <Autocomplete
           options={customersQuery.data?.data.customers ?? []}
           loading={customersQuery.isFetching}
@@ -167,24 +167,24 @@ export default function CreateBillPage() {
           onChange={(_, c) => pickCustomer(c)}
           noOptionsText={search.length < 2 ? 'Type a name or mobile number' : 'No customer found. Enter the details below.'}
           renderInput={(params) => <TextField {...params} size="small" label="Find an existing customer" />}
-          sx={{ width: 230, flexShrink: 0 }}
+          sx={{ width: '100%' }}
         />
           <TextField
             size="small"
             label="Mobile number"
             value={phone}
             onChange={(e) => {
-              setPhone(e.target.value.replace(/\D/g, '').slice(0, 10))
+              setPhone(e.target.value.replace(/\D/g, '').slice(0, 12))
               setBookingId('')
               setRedeem({})
             }}
             error={Boolean(phone) && !phoneValid}
-            helperText={phone && !phoneValid ? 'Enter a 10 digit mobile number.' : ''}
+            helperText={phone && !phoneValid ? 'Please enter a valid 10-digit mobile number.' : ''}
             slotProps={{ htmlInput: { inputMode: 'numeric' } }}
-            sx={{ width: 140, flexShrink: 0 }}
+            sx={{ width: '100%' }}
           />
-          <TextField size="small" label="Customer name" value={name} onChange={(e) => setName(e.target.value)} disabled={Boolean(bookingId)} error={Boolean(name.trim()) && !nameValid} helperText={name.trim() && !nameValid ? NAME_ERROR : ''} slotProps={{ htmlInput: { maxLength: 100 } }} sx={{ width: 170, flexShrink: 0 }} />
-          <TextField select size="small" label="Link an appointment (optional)" value={bookingId} onChange={(e) => pickAppointment(e.target.value)} disabled={!phoneValid} sx={{ width: 250, flexShrink: 0 }}>
+          <TextField size="small" label="Customer name" value={name} onChange={(e) => setName(e.target.value)} disabled={Boolean(bookingId)} error={Boolean(nameProblem)} helperText={nameProblem} slotProps={{ htmlInput: { maxLength: 35 } }} sx={{ width: '100%' }} />
+          <TextField select size="small" label="Link an appointment (optional)" value={bookingId} onChange={(e) => pickAppointment(e.target.value)} disabled={!phoneValid} sx={{ width: '100%' }}>
             <MenuItem value="">No appointment (walk-in)</MenuItem>
             {appointments.map((a) => (
               <MenuItem key={a.id} value={a.id}>

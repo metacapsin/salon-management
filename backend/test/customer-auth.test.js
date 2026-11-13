@@ -11,13 +11,12 @@ after(h.disconnect)
 const askOtp = (agent, phone) => agent.post(api('/customer/auth/request-otp')).send({ phone })
 const verify = (agent, body) => agent.post(api('/customer/auth/verify-otp')).send(body)
 
-test('mobile number rules: only 10 digits (6-9 start) or 12 digits with 91', async () => {
+test('mobile number rules: exactly 10 digits, first digit 6-9 (no +91 or 91 prefix)', async () => {
   const agent = h.request.agent(h.app)
-  for (const bad of ['12345', '98100abcde', '+91 98100 12345', '5810012345', '981001234567', '98100123456']) {
+  for (const bad of ['12345', '98100abcde', '+91 98100 12345', '5810012345', '981001234567', '98100123456', '919810020002', '+919810020002', '098100123']) {
     assert.equal((await askOtp(agent, bad)).status, 400, `should refuse ${bad}`)
   }
   assert.equal((await askOtp(agent, '9810020001')).status, 200)
-  assert.equal((await askOtp(agent, '919810020002')).status, 200) // 12 digit, 91 ke saath
 })
 
 test('OTP login: new customer gives a name, gets a cookie, and /me works; the SMS goes out and the code is not stored', async () => {
@@ -50,7 +49,7 @@ test('OTP login: new customer gives a name, gets a cookie, and /me works; the SM
   assert.equal((await agent.get(api('/customer/me'))).status, 401)
 })
 
-test('12 digit and 10 digit forms are the same customer; returning customer needs no name', async () => {
+test('returning customer logs in with the same 10 digit number and needs no name', async () => {
   const a = h.request.agent(h.app)
   const first = await askOtp(a, '9810020004')
   await verify(a, { phone: '9810020004', otp: first.body.data.devOtp, name: 'Meera Joshi' })
@@ -58,8 +57,8 @@ test('12 digit and 10 digit forms are the same customer; returning customer need
   // 30 second ka cooldown test me todne ke liye purane codes hata do (asli app me user ruk kar dobara maangta hai)
   await h.models.CustomerOtp.deleteMany({ phone: '9810020004' })
   const b = h.request.agent(h.app)
-  const second = await askOtp(b, '919810020004')
-  const res = await verify(b, { phone: '919810020004', otp: second.body.data.devOtp })
+  const second = await askOtp(b, '9810020004')
+  const res = await verify(b, { phone: '9810020004', otp: second.body.data.devOtp })
   assert.equal(res.status, 200, JSON.stringify(res.body))
   assert.equal(res.body.data.customer.name, 'Meera Joshi')
   assert.equal(await h.models.Customer.countDocuments({ phone: '9810020004' }), 1)

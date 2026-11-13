@@ -52,8 +52,8 @@ export default function AcceptInvitationPage() {
     <AuthLayout title="Join a salon" subtitle="Accept your invitation to start working on Galora." footer={<Link to="/login">Go to sign in</Link>}>
       <form className="login-form" onSubmit={handleSubmit(onSubmit)} noValidate>
         <FormAlert>{formError}</FormAlert>
-        <AuthField label="Your name" autoComplete="name" hint="New to Galora? Enter your name. Already have an account? Leave it empty." error={errors.name?.message} {...register('name')} />
-        <AuthPasswordField label="Password" autoComplete="new-password" hint="New account: choose at least 12 characters. Existing account: enter your current password." error={errors.password?.message} {...register('password')} />
+        <AuthField label="Your name" autoComplete="name" maxLength={35} hint="New to Galora? Enter your name. Already have an account? Leave it empty." error={errors.name?.message} {...register('name')} />
+        <AuthPasswordField label="Password" autoComplete="new-password" maxLength={20} hint="New account: choose 12 to 20 characters. Existing account: enter your current password." error={errors.password?.message} {...register('password')} />
         <button type="submit" className="login-form__submit" disabled={isSubmitting} aria-busy={isSubmitting}>
           {isSubmitting ? 'Joining…' : 'Accept invitation'}
         </button>

@@ -74,7 +74,7 @@ export default function AssignPackageDialog({ packages, initialPackageId = '', o
           )}
           <Box sx={{ display: 'grid', gap: 2, gridTemplateColumns: { xs: '1fr', sm: '1fr 1fr' } }}>
             <TextField label="Mobile number" inputMode="numeric" {...field(register, errors, 'customerPhone')} />
-            <TextField label="Customer name" {...field(register, errors, 'customerName')} />
+            <TextField label="Customer name" {...field(register, errors, 'customerName')} slotProps={{ htmlInput: { maxLength: 35 } }} />
           </Box>
           <Box sx={{ display: 'grid', gap: 2, gridTemplateColumns: { xs: '1fr', sm: '1fr 1fr 1fr' } }}>
             <Controller

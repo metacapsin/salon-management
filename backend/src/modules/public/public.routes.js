@@ -2,7 +2,7 @@
 // Sirf wahi salons dikhte hain jo active hain aur jinhone public booking chalu ki hai.
 const express = require('express')
 const { sendSuccess } = require('../../utils/response')
-const { z, objectId } = require('../../utils/schemas')
+const { z, objectId, isoDate, addressText } = require('../../utils/schemas')
 const ApiError = require('../../utils/apiError')
 const { publicUrl } = require('../../utils/uploads')
 const { validate, limiter } = require('../../middleware/common')
@@ -286,7 +286,7 @@ router.post('/salons/:id/view', authenticateCustomer, viewLimit, validate({ para
 })
 
 // ---------- booking ----------
-const dateStr = z.string().regex(/^\d{4}-\d{2}-\d{2}$/, 'Use YYYY-MM-DD.')
+const dateStr = isoDate
 const slotsQuery = z.object({ date: dateStr, duration: z.coerce.number().int().min(5).max(600) })
 const OPEN_STATUSES = ['pending', 'confirmed']
 const OUT_OF_RANGE = 'Choose a date within the next 30 days.'
@@ -311,14 +311,14 @@ router.get('/salons/:id/slots', authenticateCustomer, validate({ params: idParam
 const bookingBody = z
   .strictObject({
     mode: z.enum(['salon', 'home']).default('salon'),
-    address: z.string().trim().max(300).default(''),
+    address: addressText(300).default(''),
     note: z.string().trim().max(300).default(''),
     date: dateStr,
     startTime: z.string().regex(/^([01]\d|2[0-3]):[0-5]\d$/, 'Use HH:mm.'),
     serviceIds: z.array(objectId).min(1, 'Choose at least one service.').max(8),
     offerId: objectId.optional(),
   })
-  .refine((b) => b.mode !== 'home' || b.address.length >= 8, { message: 'Enter your full address for home service.', path: ['address'] })
+  .refine((b) => b.mode !== 'home' || b.address.length >= 8, { message: 'Please enter your full address (at least 8 characters).', path: ['address'] })
 const bookLimit = limiter({ windowMs: 10 * 60_000, limit: 10 })
 
 // POST /public/salons/:id/bookings -> logged-in customer appointment maangta hai. Naam aur phone uske account se aate hain

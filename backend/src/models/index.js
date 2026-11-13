@@ -6,13 +6,25 @@ const { SERVICE_CATEGORIES } = require('../config/serviceCategories')
 const { placeKey } = require('../utils/placeKey')
 const { INQUIRY_STATUSES } = require('../config/inquiry')
 
-const baseOptions = { timestamps: true }
+const { NAME_PATTERN, MOBILE_PATTERN } = require('../utils/schemas')
+
+// validateModifiedOnly: save() par sirf badli hui values check hoti hain. Isse purane records (purana "+91 ..." phone,
+// lamba naam) bina chhede status/version jaise update par nahi tootte; nayi ya badli hui value poori validate hoti he.
+const baseOptions = { timestamps: true, validateModifiedOnly: true }
+
+// Database-level safety net: even if a route forgets to validate, bad values cannot be saved.
+const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+const nameRule = { validator: (v) => NAME_PATTERN.test(v) && !/\s{2}/.test(v), message: 'Please enter a valid name.' }
+const mobileRule = { validator: (v) => MOBILE_PATTERN.test(v), message: 'Please enter a valid 10-digit mobile number.' }
+const optionalMobileRule = { validator: (v) => v === '' || MOBILE_PATTERN.test(v), message: 'Please enter a valid 10-digit mobile number.' }
+const emailRule = { validator: (v) => EMAIL_PATTERN.test(v), message: 'Please enter a valid email address.' }
+const optionalEmailRule = { validator: (v) => v === '' || EMAIL_PATTERN.test(v), message: 'Please enter a valid email address.' }
 
 // ---------- users: login credentials (public profile se alag rakhte hain) ----------
 const userSchema = new Schema(
   {
-    name: { type: String, required: true, trim: true, maxlength: 100 },
-    email: { type: String, required: true, trim: true, maxlength: 254 },
+    name: { type: String, required: true, trim: true, minlength: 2, maxlength: 35, validate: nameRule },
+    email: { type: String, required: true, trim: true, maxlength: 254, validate: emailRule },
     normalizedEmail: { type: String, required: true, unique: true },
     passwordHash: { type: String, required: true },
     verifiedAt: { type: Date, default: null },
@@ -40,9 +52,9 @@ const salonSchema = new Schema(
     timezone: { type: String, required: true, default: 'Asia/Kolkata' },
     currency: { type: String, enum: ['INR'], default: 'INR' },
     ownerContact: {
-      name: String,
-      email: String,
-      phone: { type: String, default: '' },
+      name: { type: String, trim: true, maxlength: 35, validate: nameRule },
+      email: { type: String, trim: true, maxlength: 254, validate: optionalEmailRule },
+      phone: { type: String, default: '', trim: true, validate: optionalMobileRule },
     },
     address: {
       line1: { type: String, default: '' },
@@ -169,8 +181,8 @@ offerSchema.index({ salonId: 1, active: 1, endsOn: 1 })
 const staffSchema = new Schema(
   {
     salonId: { type: Schema.Types.ObjectId, ref: 'Salon', required: true },
-    name: { type: String, required: true, trim: true, minlength: 2, maxlength: 100 },
-    phone: { type: String, default: '', trim: true, maxlength: 20 },
+    name: { type: String, required: true, trim: true, minlength: 2, maxlength: 35, validate: nameRule },
+    phone: { type: String, default: '', trim: true, validate: optionalMobileRule },
     title: { type: String, default: '', trim: true, maxlength: 60 }, // jaise "Senior Stylist"
     skills: [{ type: String, trim: true, maxlength: 40 }],
     // Kaun si services ye de sakta/sakti hai
@@ -237,9 +249,9 @@ verificationTokenSchema.index({ expiresAt: 1 }, { expireAfterSeconds: 24 * 3600 
 // ---------- customers: salon me aane wale log (mobile number + OTP se login, password nahi) ----------
 const customerSchema = new Schema(
   {
-    phone: { type: String, required: true, unique: true }, // hamesha 10 digit (91 hata kar)
-    name: { type: String, required: true, trim: true, maxlength: 100 },
-    email: { type: String, default: '', trim: true, lowercase: true, maxlength: 254 }, // OTP isi email par jaata he
+    phone: { type: String, required: true, unique: true, validate: mobileRule }, // always 10 digits
+    name: { type: String, required: true, trim: true, minlength: 2, maxlength: 35, validate: nameRule },
+    email: { type: String, default: '', trim: true, lowercase: true, maxlength: 254, validate: optionalEmailRule }, // OTP isi email par jaata he
     lastLoginAt: { type: Date, default: null },
     schemaVersion: { type: Number, default: 1 },
   },
@@ -249,7 +261,7 @@ const customerSchema = new Schema(
 // ---------- customerOtps: ek baar ka code. DB me sirf hash, asli code SMS me jaata hai ----------
 const customerOtpSchema = new Schema(
   {
-    phone: { type: String, required: true, index: true },
+    phone: { type: String, required: true, index: true, validate: mobileRule },
     email: { type: String, default: '' }, // khaali nahi to code is email par gaya (aur login ke baad customer ke saath jud jaata he)
     codeHash: { type: String, required: true },
     attempts: { type: Number, default: 0 },
@@ -270,8 +282,8 @@ const bookingSchema = new Schema(
     // Salon-side booking me chuna hua staff (customer ki booking me khaali). Naam copy hota hai, staff hatne par bhi list me dikhe.
     staffId: { type: Schema.Types.ObjectId, ref: 'Staff', default: null },
     staffName: { type: String, default: '' },
-    customerName: { type: String, required: true, trim: true, maxlength: 100 },
-    customerPhone: { type: String, required: true, trim: true, maxlength: 20 },
+    customerName: { type: String, required: true, trim: true, maxlength: 35, validate: nameRule },
+    customerPhone: { type: String, required: true, trim: true, validate: mobileRule },
     mode: { type: String, enum: ['salon', 'home'], default: 'salon' },
     address: { type: String, default: '', maxlength: 300 }, // sirf home service me
     note: { type: String, default: '', maxlength: 300 },
@@ -344,8 +356,8 @@ const customerPackageSchema = new Schema(
     packageId: { type: Schema.Types.ObjectId, ref: 'Package', required: true },
     packageName: { type: String, required: true },
     customerId: { type: Schema.Types.ObjectId, ref: 'Customer', default: null },
-    customerPhone: { type: String, required: true },
-    customerName: { type: String, required: true, trim: true, maxlength: 100 },
+    customerPhone: { type: String, required: true, trim: true, validate: mobileRule },
+    customerName: { type: String, required: true, trim: true, maxlength: 35, validate: nameRule },
     // Kharidne ke waqt ki copy: baad me package edit ho to ye nahi badalta
     items: [
       new Schema(
@@ -432,8 +444,8 @@ const customerMembershipSchema = new Schema(
     planId: { type: Schema.Types.ObjectId, ref: 'MembershipPlan', required: true },
     planName: { type: String, required: true },
     customerId: { type: Schema.Types.ObjectId, ref: 'Customer', default: null },
-    customerPhone: { type: String, required: true },
-    customerName: { type: String, required: true, trim: true, maxlength: 100 },
+    customerPhone: { type: String, required: true, trim: true, validate: mobileRule },
+    customerName: { type: String, required: true, trim: true, maxlength: 35, validate: nameRule },
     discountType: { type: String, enum: ['percent', 'flat'], required: true },
     discountValue: { type: Number, required: true, min: 1 },
     serviceIds: [{ type: Schema.Types.ObjectId }],
@@ -485,8 +497,8 @@ const invoiceSchema = new Schema(
     invoiceNumber: { type: String, required: true }, // jaise GLM-2026-000001, salon ke andar unique
     bookingId: { type: Schema.Types.ObjectId, ref: 'Booking', default: null },
     customerId: { type: Schema.Types.ObjectId, ref: 'Customer', default: null },
-    customerPhone: { type: String, required: true },
-    customerName: { type: String, required: true, trim: true, maxlength: 100 },
+    customerPhone: { type: String, required: true, trim: true, validate: mobileRule },
+    customerName: { type: String, required: true, trim: true, maxlength: 35, validate: nameRule },
     // Bill ke waqt ki copy (naam/price baad me badle to bill na badle)
     lines: [
       new Schema(
@@ -592,7 +604,7 @@ const reviewSchema = new Schema(
     salonId: { type: Schema.Types.ObjectId, ref: 'Salon', required: true },
     bookingId: { type: Schema.Types.ObjectId, ref: 'Booking', required: true },
     customerId: { type: Schema.Types.ObjectId, ref: 'Customer', required: true },
-    customerName: { type: String, required: true, trim: true, maxlength: 100 }, // copy: baad me naam badle to bhi review me wahi dikhe
+    customerName: { type: String, required: true, trim: true, maxlength: 35, validate: nameRule }, // copy: baad me naam badle to bhi review me wahi dikhe
     rating: { type: Number, required: true, min: 1, max: 5, validate: [Number.isInteger, 'Rating must be a whole number.'] },
     comment: { type: String, default: '', trim: true, maxlength: 1000 },
     images: { type: [{ type: String, maxlength: 300 }], default: [], validate: [(v) => v.length <= 3, 'A review can have at most 3 photos.'] },
@@ -645,9 +657,9 @@ customerNotificationSchema.index({ createdAt: 1 }, { expireAfterSeconds: 90 * 24
 // ---------- contactInquiries: website ke Contact Us form se aaye sawaal. Salon se nahi jude (platform level), sirf Super Admin dekhta hai ----------
 const contactInquirySchema = new Schema(
   {
-    name: { type: String, required: true, trim: true, maxlength: 100 },
-    email: { type: String, required: true, trim: true, lowercase: true, maxlength: 254 },
-    phone: { type: String, required: true, trim: true, maxlength: 20 },
+    name: { type: String, required: true, trim: true, minlength: 2, maxlength: 35, validate: nameRule },
+    email: { type: String, required: true, trim: true, lowercase: true, maxlength: 254, validate: emailRule },
+    phone: { type: String, required: true, trim: true, validate: mobileRule },
     message: { type: String, required: true, trim: true, maxlength: 2000 },
     status: { type: String, enum: INQUIRY_STATUSES, default: 'new' },
     // Admin ke andar ke notes (customer ko kabhi nahi dikhte). Naam copy hota hai, admin hatne par bhi dikhe.

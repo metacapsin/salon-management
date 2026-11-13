@@ -2,7 +2,7 @@ const express = require('express')
 const ApiError = require('../../utils/apiError')
 const { sendSuccess } = require('../../utils/response')
 const { withTransaction } = require('../../utils/transaction')
-const { z, personName } = require('../../utils/schemas')
+const { z, personName, businessName, mobile, optionalMobile, isoDate, addressText, pincode } = require('../../utils/schemas')
 const { validate } = require('../../middleware/common')
 const { authenticate, requireSalon, can } = require('../../middleware/auth')
 const { Salon, Branch, Membership, Service } = require('../../models')
@@ -33,13 +33,12 @@ const timezone = z.string().refine((tz) => {
   }
 }, 'Choose a valid timezone.')
 
-const phone = z.string().trim().regex(/^\+?[0-9 -]{7,20}$/, 'Enter a valid phone number.')
 const address = z.strictObject({
-  line1: z.string().trim().max(200).default(''),
-  city: z.string().trim().max(100).default(''),
-  area: z.string().trim().max(100).default(''),
-  state: z.string().trim().max(100).default(''),
-  pincode: z.string().trim().max(10).default(''),
+  line1: addressText(200).default(''),
+  city: addressText(100).default(''),
+  area: addressText(100).default(''),
+  state: addressText(100).default(''),
+  pincode: pincode.default(''),
 })
 
 const FACILITIES = ['ac', 'parking', 'wifi', 'wheelchair', 'card-payment', 'waiting-area', 'tea-coffee', 'bridal-room']
@@ -70,10 +69,10 @@ const dayIntervals = z.array(interval).max(6).superRefine((list, ctx) => {
 })
 
 const createSalonBody = z.strictObject({
-  name: personName.min(2, 'Salon name must be at least 2 characters.'),
+  name: businessName(100, 'Salon name'),
   slug,
   timezone: timezone.default('Asia/Kolkata'),
-  phone: phone.optional(),
+  phone: mobile.optional(),
   address: address.optional(),
   ownerName: profileFields.ownerName.optional(),
   about: profileFields.about.optional(),
@@ -84,10 +83,10 @@ const createSalonBody = z.strictObject({
 
 const updateSalonBody = z
   .strictObject({
-    name: personName.min(2),
+    name: businessName(100, 'Salon name'),
     slug,
     timezone,
-    phone: phone.or(z.literal('')),
+    phone: optionalMobile,
     address,
     publicBookingEnabled: z.boolean(),
     ...profileFields,
@@ -101,7 +100,7 @@ const hoursBody = z.strictObject({
   holidays: z
     .array(
       z.strictObject({
-        date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, 'Use YYYY-MM-DD.').refine((d) => !Number.isNaN(Date.parse(d)), 'Invalid date.'),
+        date: isoDate,
         name: z.string().trim().max(100).default(''),
       }),
     )

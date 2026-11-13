@@ -10,6 +10,7 @@ import { Card, Screen } from '../../components/Screen'
 import TextField from '../../components/TextField'
 import { COLORS } from '../../config/theme'
 import { hoursSummary } from './StaffScreen'
+import { cleanName, nameError, phoneError } from '../../utils/validators'
 
 // Add a staff member (no params) or edit one (params.staff). Only Owner/Manager can reach this screen.
 // Working hours are shown but not edited here yet: a new member follows the salon hours until hours are set on the website.
@@ -46,11 +47,12 @@ export default function StaffFormScreen({ navigation, route }) {
   function submit() {
     setFormError('')
     const found = {}
-    if (name.trim().length < 2) found.name = 'Name must be at least 2 characters.'
+    if (nameError(name)) found.name = nameError(name)
+    if (phoneError(phone, { required: false })) found.phone = phoneError(phone, { required: false })
     setErrors(found)
     if (Object.keys(found).length) return
     save.mutate({
-      name: name.trim(),
+      name: cleanName(name),
       title: title.trim(),
       phone: phone.trim(),
       skills: skills.split(',').map((s) => s.trim()).filter(Boolean),
@@ -62,9 +64,9 @@ export default function StaffFormScreen({ navigation, route }) {
     <Screen>
       <Card>
         {formError ? <Text style={styles.banner}>{formError}</Text> : null}
-        <TextField label="Name" value={name} onChangeText={setName} error={errors.name} placeholder="e.g. Meera Joshi" maxLength={100} />
+        <TextField label="Name" value={name} onChangeText={setName} error={errors.name} placeholder="e.g. Meera Joshi" maxLength={35} />
         <TextField label="Title (optional)" value={title} onChangeText={setTitle} error={errors.title} placeholder="e.g. Senior stylist" maxLength={60} />
-        <TextField label="Phone (optional)" value={phone} onChangeText={setPhone} error={errors.phone} keyboardType="phone-pad" maxLength={20} />
+        <TextField label="Phone (optional)" value={phone} onChangeText={setPhone} error={errors.phone} keyboardType="phone-pad" maxLength={15} />
         <TextField label="Skills (optional, separate with commas)" value={skills} onChangeText={setSkills} error={errors.skills} placeholder="Haircut, Colour" />
 
         {services.isLoading ? <Text style={styles.muted}>Loading services…</Text> : null}

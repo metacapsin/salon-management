@@ -3,12 +3,9 @@ import { Alert, Box, Button, TextField, Typography } from '@mui/material'
 import { ApiError, fieldErrorsOf, friendlyError } from '../../api/client'
 import { requestOtp, verifyOtp } from '../../api/customerApi'
 import { useCustomer } from '../../customer/CustomerAuthContext'
-
-const PHONE = /^(91)?[6-9]\d{9}$/
-const EMAIL = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
-const NAME = /^\p{L}[\p{L} .'-]*$/u
+import { cleanName, emailError, nameError, phoneError } from '../../utils/validators'
 const onlyDigits = (v, max) => v.replace(/\D/g, '').slice(0, max)
-const onlyNameChars = (v) => v.replace(/[^\p{L} .'-]/gu, '').replace(/^[^\p{L}]+/u, '').slice(0, 60)
+const onlyNameChars = (v) => v.replace(/[^\p{L} .'-]/gu, '').replace(/^[^\p{L}]+/u, '').slice(0, 35)
 // Galat akshar key dabate hi rok do (paste ke liye onChange me bhi safai hoti hai)
 const blockKey = (allowed) => (e) => {
   if (e.ctrlKey || e.metaKey || e.altKey || e.key.length !== 1) return
@@ -51,12 +48,14 @@ export default function CustomerLoginForm({ onDone, intro }) {
     event?.preventDefault()
     setErrors({})
     setFormError('')
-    if (!PHONE.test(phone)) {
-      setErrors({ phone: 'Enter a 10 digit mobile number (or 12 digits with 91).' })
+    const phoneProblem = phoneError(phone)
+    if (phoneProblem) {
+      setErrors({ phone: phoneProblem })
       return
     }
-    if (!EMAIL.test(email.trim())) {
-      setErrors({ email: 'Enter a valid email address. We will send the code there.' })
+    const emailProblem = emailError(email)
+    if (emailProblem) {
+      setErrors({ email: emailProblem })
       return
     }
     setBusy(true)
@@ -79,16 +78,16 @@ export default function CustomerLoginForm({ onDone, intro }) {
     setErrors({})
     setFormError('')
     if (!/^\d{6}$/.test(otp)) {
-      setErrors({ otp: 'Enter the 6 digit code.' })
+      setErrors({ otp: 'Please enter the 6-digit code.' })
       return
     }
-    if (step === 'name' && (name.trim().length < 2 || !NAME.test(name.trim()))) {
-      setErrors({ name: 'Enter your name using letters only.' })
+    if (step === 'name' && nameError(name)) {
+      setErrors({ name: nameError(name) })
       return
     }
     setBusy(true)
     try {
-      const result = await verifyOtp({ phone, otp, ...(step === 'name' ? { name: name.trim() } : {}) })
+      const result = await verifyOtp({ phone, otp, ...(step === 'name' ? { name: cleanName(name) } : {}) })
       if (result.needsName) {
         setStep('name')
         return
@@ -129,7 +128,7 @@ export default function CustomerLoginForm({ onDone, intro }) {
             onChange={(e) => setPhone(onlyDigits(e.target.value, 12))}
             onKeyDown={blockNonDigits}
             error={Boolean(errors.phone)}
-            helperText={errors.phone ?? '10 digits (or 12 with 91).'}
+            helperText={errors.phone ?? 'Enter your 10-digit mobile number.'}
             autoComplete="tel-national"
             slotProps={{ htmlInput: { inputMode: 'numeric' } }}
           />

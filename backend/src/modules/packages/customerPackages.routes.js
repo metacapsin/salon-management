@@ -3,7 +3,7 @@
 const express = require('express')
 const ApiError = require('../../utils/apiError')
 const { sendSuccess } = require('../../utils/response')
-const { z, objectId } = require('../../utils/schemas')
+const { z, isoDate, objectId, mobile, personName } = require('../../utils/schemas')
 const { validate } = require('../../middleware/common')
 const { authenticate, requireSalon, can } = require('../../middleware/auth')
 const { Package, CustomerPackage, PackageLedger, Customer, Booking } = require('../../models')
@@ -14,15 +14,15 @@ const { todayIn, addDays, presentCustomerPackage } = require('./util')
 const router = express.Router()
 router.use(authenticate, requireSalon)
 
-const day = z.string().regex(/^\d{4}-\d{2}-\d{2}$/, 'Use a date like 2026-11-01.')
-const phone = z.string().trim().regex(/^\d{10}$/, 'Enter a 10-digit mobile number.')
+const day = isoDate
+const phone = mobile
 const method = z.enum(['cash', 'upi', 'card', 'other'])
 const idParams = z.object({ id: objectId })
 
 const assignBody = z.strictObject({
   packageId: objectId,
   customerPhone: phone,
-  customerName: z.string().trim().min(1, 'Enter the customer name.').max(100),
+  customerName: personName,
   requestKey: z.string().trim().min(8).max(80), // frontend har "Assign" dialog khulne par naya banata hai
   paymentStatus: z.enum(['paid', 'pending']).default('paid'),
   paymentMethod: method.default('cash'),

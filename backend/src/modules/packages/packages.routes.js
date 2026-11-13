@@ -2,7 +2,7 @@
 const express = require('express')
 const ApiError = require('../../utils/apiError')
 const { sendSuccess } = require('../../utils/response')
-const { z, objectId } = require('../../utils/schemas')
+const { z, isoDate, objectId } = require('../../utils/schemas')
 const { validate } = require('../../middleware/common')
 const { authenticate, requireSalon, can } = require('../../middleware/auth')
 const { Package, Service } = require('../../models')
@@ -12,7 +12,7 @@ const { presentPackage, todayIn } = require('./util')
 const router = express.Router()
 router.use(authenticate, requireSalon)
 
-const day = z.string().regex(/^\d{4}-\d{2}-\d{2}$/, 'Use a date like 2026-11-01.')
+const day = isoDate
 const money = z.number({ error: 'Enter an amount.' }).int('Use whole rupees.').min(0, 'Amount cannot be negative.').max(10_000_000)
 
 // Frontend se sirf serviceId + sessions aate hain. Service ka price server khud dekhta hai.

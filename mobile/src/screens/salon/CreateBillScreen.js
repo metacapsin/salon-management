@@ -14,8 +14,8 @@ import { todayString } from '../../utils/dates'
 import { formatPaise } from '../../utils/formatPaise'
 import { formatDate } from '../../utils/formatMoney'
 import { newRequestKey } from '../../utils/money'
+import { cleanName, isValidPhone, nameError } from '../../utils/validators'
 
-const PHONE_OK = /^\d{10}$/
 
 const offerText = (o) => (o.discountType === 'percent' ? `${o.discountValue}% off` : `₹${o.discountValue} off`)
 
@@ -50,7 +50,7 @@ export default function CreateBillScreen({ navigation }) {
   const [applyMembership, setApplyMembership] = useState(true)
   const [submitError, setSubmitError] = useState('')
 
-  const phoneValid = PHONE_OK.test(phone)
+  const phoneValid = isValidPhone(phone)
 
   const services = useQuery({ queryKey: ['services', activeSalonId, false], queryFn: () => fetchServices({ includeInactive: false }), staleTime: 0 })
   const offers = useQuery({ queryKey: ['offers', activeSalonId], queryFn: fetchOffers, staleTime: 0 })
@@ -70,14 +70,14 @@ export default function CreateBillScreen({ navigation }) {
     if (bookingId) b.bookingId = bookingId
     else {
       b.customerPhone = phone
-      b.customerName = name.trim()
+      b.customerName = cleanName(name)
     }
     if (offerId) b.offerId = offerId
     return b
   }, [applyMembership, lines, bookingId, phone, name, offerId])
   const bodyKey = JSON.stringify(body)
 
-  const ready = lines.length > 0 && (bookingId || (phoneValid && name.trim().length > 0))
+  const ready = lines.length > 0 && (bookingId || (phoneValid && !nameError(name)))
   const quote = useQuery({
     queryKey: ['bill-preview', activeSalonId, bodyKey],
     queryFn: () => previewInvoice(body),
@@ -101,7 +101,7 @@ export default function CreateBillScreen({ navigation }) {
   })
 
   function changePhone(value) {
-    setPhone(value.replace(/\D/g, '').slice(0, 10))
+    setPhone(value.replace(/\D/g, '').slice(0, 12))
     setBookingId('')
     setLines([])
     setOfferId('')
@@ -126,8 +126,8 @@ export default function CreateBillScreen({ navigation }) {
   return (
     <Screen>
       <Card>
-        <TextField label="Customer mobile (10 digits)" value={phone} onChangeText={changePhone} keyboardType="number-pad" maxLength={10} placeholder="9876543210" />
-        <TextField label="Customer name" value={name} onChangeText={setName} editable={!bookingId} placeholder="Name" maxLength={100} />
+        <TextField label="Customer mobile (10 digits)" value={phone} onChangeText={changePhone} keyboardType="number-pad" maxLength={12} placeholder="9876543210" />
+        <TextField label="Customer name" value={name} onChangeText={setName} editable={!bookingId} placeholder="Name" maxLength={35} />
       </Card>
 
       {phoneValid ? (

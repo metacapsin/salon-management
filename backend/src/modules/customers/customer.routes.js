@@ -8,7 +8,7 @@ const { sendSuccess } = require('../../utils/response')
 const { hashToken } = require('../../utils/crypto')
 const { sendSms, startVerification, checkVerification } = require('../../utils/sms')
 const { sendMail } = require('../../utils/mailer')
-const { z, email: emailRule } = require('../../utils/schemas')
+const { z, email: emailRule, mobile: phone, personName: customerName } = require('../../utils/schemas')
 const { validate, limiter, requireAllowedOrigin } = require('../../middleware/common')
 const { authenticateCustomer, signCustomerToken, setCustomerCookie, clearCustomerCookie } = require('../../middleware/customerAuth')
 const { Customer, CustomerOtp } = require('../../models')
@@ -20,18 +20,6 @@ const OTP_RESEND_MS = 30 * 1000
 const OTP_MAX_ATTEMPTS = 5
 const OTP_MAX_PER_HOUR = 5
 
-// 10 digit (6-9 se shuru) ya 12 digit (91 ke saath). Andar hamesha 10 digit rakhte hain.
-const phone = z
-  .string()
-  .trim()
-  .regex(/^(91)?[6-9]\d{9}$/, 'Enter a 10 digit mobile number (or 12 digits with 91).')
-  .transform((v) => v.slice(-10))
-const customerName = z
-  .string()
-  .trim()
-  .min(2, 'Enter your name.')
-  .max(100)
-  .regex(/^\p{L}[\p{L} .'-]*$/u, 'Use letters only in the name.')
 
 const presentCustomer = (c) => ({ id: c._id, name: c.name, phone: c.phone })
 // "kavya@gmail.com" -> "k***@gmail.com" (screen par poora email nahi dikhate)

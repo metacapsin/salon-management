@@ -32,7 +32,7 @@ import { createStaff, deleteStaff, listServices, listStaff, updateStaff } from '
 import { useAuth } from '../auth/AuthContext'
 import { roleCan } from '../auth/permissions'
 import QueryState from '../components/QueryState'
-import { NAME_ERROR, NAME_PATTERN, PHONE_ERROR, isValidPhone } from '../utils/validators'
+import { nameError, phoneError } from '../utils/validators'
 import ResponsiveTable from '../components/ResponsiveTable'
 import EditIcon from '@mui/icons-material/EditOutlined'
 
@@ -74,9 +74,8 @@ function StaffDialog({ staff, services, onClose, onSaved }) {
 
   // Name/phone ki galti field ke neeche dikhti hai (blur ya save ke baad)
   const fieldErrors = {}
-  if (name.trim().length < 2) fieldErrors.name = 'Name must be at least 2 characters.'
-  else if (!NAME_PATTERN.test(name.trim())) fieldErrors.name = NAME_ERROR
-  if (phone.trim() && !isValidPhone(phone)) fieldErrors.phone = PHONE_ERROR
+  if (nameError(name)) fieldErrors.name = nameError(name)
+  if (phoneError(phone, { required: false })) fieldErrors.phone = phoneError(phone, { required: false })
   const touch = (key) => setTouched((t) => ({ ...t, [key]: true }))
   const fieldProps = (key) => ({ onBlur: () => touch(key), error: Boolean(touched[key] && fieldErrors[key]), helperText: touched[key] ? fieldErrors[key] : undefined })
 
@@ -129,10 +128,10 @@ function StaffDialog({ staff, services, onClose, onSaved }) {
             ))}
           </Alert>
         )}
-        <TextField size="small" label="Name" value={name} autoFocus onChange={(e) => setName(e.target.value)} {...fieldProps('name')} slotProps={{ htmlInput: { maxLength: 100 } }} />
+        <TextField size="small" label="Name" value={name} autoFocus onChange={(e) => setName(e.target.value)} {...fieldProps('name')} slotProps={{ htmlInput: { maxLength: 35 } }} />
         <Box sx={{ display: 'grid', gap: 2, gridTemplateColumns: { xs: '1fr', sm: '1fr 1fr' } }}>
           <TextField size="small" label="Role (e.g. Senior Stylist)" value={title} onChange={(e) => setTitle(e.target.value)} slotProps={{ htmlInput: { maxLength: 60 } }} />
-          <TextField size="small" label="Phone (optional)" value={phone} onChange={(e) => setPhone(e.target.value)} {...fieldProps('phone')} slotProps={{ htmlInput: { maxLength: 20, inputMode: 'tel' } }} />
+          <TextField size="small" label="Phone (optional)" value={phone} onChange={(e) => setPhone(e.target.value)} {...fieldProps('phone')} slotProps={{ htmlInput: { maxLength: 15, inputMode: 'tel' } }} />
         </Box>
         <Autocomplete
           multiple

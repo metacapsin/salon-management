@@ -9,17 +9,10 @@ import { canRememberLogin } from '../../auth/tokenStore'
 import { COLORS, FONT, RADIUS } from '../../config/theme'
 import { ErrorBanner } from '../../components/States'
 import CustomerLoginForm from './CustomerLoginForm'
-
-const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+import { validateLogin, emailError, newPasswordError } from '../../utils/validators'
 
 // Same rules as the website/backend: valid email, password not empty.
-function validate({ email, password }) {
-  const errors = {}
-  if (!email.trim()) errors.email = 'Enter your email.'
-  else if (!EMAIL_PATTERN.test(email.trim())) errors.email = 'Enter a valid email address.'
-  if (!password) errors.password = 'Enter your password.'
-  return errors
-}
+const validate = validateLogin
 
 // Salon team (owner, manager, receptionist, staff, Super Admin): email + password, with a "forgot password" step.
 function TeamLoginForm({ onSubmit }) {
@@ -52,7 +45,7 @@ function TeamLoginForm({ onSubmit }) {
 
   async function sendReset() {
     setFormError('')
-    if (!EMAIL_PATTERN.test(email.trim())) return setErrors({ email: 'Enter a valid email address.' })
+    if (emailError(email)) return setErrors({ email: emailError(email) })
     setErrors({})
     setLoading(true)
     try {
@@ -68,8 +61,8 @@ function TeamLoginForm({ onSubmit }) {
   async function changePassword() {
     setFormError('')
     const found = {}
-    if (!/^\d{6}$/.test(otp.trim())) found.otp = 'Enter the 6 digit code.'
-    if (newPassword.length < 12) found.newPassword = 'Password must be at least 12 characters.'
+    if (!/^\d{6}$/.test(otp.trim())) found.otp = 'Please enter the 6-digit code.'
+    if (newPasswordError(newPassword)) found.newPassword = newPasswordError(newPassword)
     setErrors(found)
     if (Object.keys(found).length > 0) return
     setLoading(true)
@@ -117,7 +110,7 @@ function TeamLoginForm({ onSubmit }) {
         {resetSent ? (
           <>
             <TextField label="6 digit code" icon="key-outline" value={otp} onChangeText={setOtp} error={errors.otp} placeholder="123456" keyboardType="number-pad" maxLength={6} autoComplete="one-time-code" />
-            <TextField label="New password" icon="lock-closed-outline" value={newPassword} onChangeText={setNewPassword} error={errors.newPassword} placeholder="At least 12 characters" secureTextEntry autoCapitalize="none" autoComplete="new-password" autoCorrect={false} returnKeyType="go" onSubmitEditing={changePassword} />
+            <TextField label="New password" icon="lock-closed-outline" value={newPassword} onChangeText={setNewPassword} error={errors.newPassword} placeholder="12 to 20 characters" maxLength={20} secureTextEntry autoCapitalize="none" autoComplete="new-password" autoCorrect={false} returnKeyType="go" onSubmitEditing={changePassword} />
             <Button title="Change password" onPress={changePassword} loading={loading} />
             <Pressable onPress={sendReset} accessibilityRole="button" style={styles.link}>
               <Text style={styles.linkText}>Send the code again</Text>
@@ -160,6 +153,7 @@ function TeamLoginForm({ onSubmit }) {
         onChangeText={setPassword}
         error={errors.password}
         placeholder="Your password"
+        maxLength={20}
         secureTextEntry
         autoCapitalize="none"
         autoComplete="password"

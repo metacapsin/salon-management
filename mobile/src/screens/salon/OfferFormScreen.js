@@ -10,9 +10,9 @@ import { Card, Screen } from '../../components/Screen'
 import TextField from '../../components/TextField'
 import { COLORS } from '../../config/theme'
 import { todayString } from '../../utils/dates'
+import { dateError } from '../../utils/validators'
 
 const TYPES = { 'Percent (%)': 'percent', 'Flat (₹)': 'flat' }
-const DATE_OK = /^\d{4}-\d{2}-\d{2}$/
 
 // Same date, N days later, as YYYY-MM-DD (noon avoids daylight-saving edge cases).
 function plusDays(day, n) {
@@ -64,9 +64,9 @@ export default function OfferFormScreen({ navigation, route }) {
     if (title.trim().length < 2) found.title = 'Title must be at least 2 characters.'
     if (value.trim() === '' || !Number.isInteger(discountValue) || discountValue < 1) found.discountValue = 'Enter a whole number, at least 1.'
     else if (discountType === 'percent' && discountValue > 100) found.discountValue = 'Percentage cannot be more than 100.'
-    if (!DATE_OK.test(startsOn)) found.startsOn = 'Use a date like 2026-11-01.'
-    if (!DATE_OK.test(endsOn)) found.endsOn = 'Use a date like 2026-11-30.'
-    else if (DATE_OK.test(startsOn) && endsOn < startsOn) found.endsOn = 'End date cannot be before the start date.'
+    if (dateError(startsOn)) found.startsOn = dateError(startsOn)
+    if (dateError(endsOn)) found.endsOn = dateError(endsOn)
+    else if (!dateError(startsOn) && endsOn < startsOn) found.endsOn = 'End date cannot be before the start date.'
     setErrors(found)
     if (Object.keys(found).length) return
     save.mutate({ title: title.trim(), description: description.trim(), discountType, discountValue, serviceIds, startsOn, endsOn, oncePerCustomer })

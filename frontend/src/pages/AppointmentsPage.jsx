@@ -68,6 +68,7 @@ export default function AppointmentsPage() {
     mutationFn: ({ id, to }) => setBookingStatus(id, to),
     onSuccess: async (_, { to, booking }) => {
       setActionError('')
+      setShowCreated(false) // "waiting for confirmation" purana ho gaya, ab koi action hua
       queryClient.invalidateQueries({ queryKey: ['salon', activeSalonId] })
       // "Done" karte hi, agar customer ke paas lagne layak package/membership hai to turant dikhao
       if (to === 'completed' && canBenefits) {
@@ -135,19 +136,19 @@ export default function AppointmentsPage() {
         {isMobile ? (
           <AppointmentsMobileList bookings={bookings} statusStyle={STATUS_STYLE} actions={ACTIONS} canWrite={canWrite} canBenefits={canBenefits} busy={change.isPending} onChange={change.mutate} onBenefits={setBenefitsFor} />
         ) : (
-        <TableContainer component={Paper}>
+        <TableContainer component={Paper} sx={{ '& .MuiTableCell-root': { px: { xs: 1.25, lg: 2 } } }}>
           <ResponsiveTable
             size="medium"
             aria-label="Appointments"
           >
             <TableHead>
               <TableRow>
-                <TableCell sx={{ width: 150 }}>When</TableCell>
-                <TableCell sx={{ width: 200 }}>Customer</TableCell>
+                <TableCell sx={{ width: 130 }}>When</TableCell>
+                <TableCell sx={{ width: 150 }}>Customer</TableCell>
                 <TableCell>Services</TableCell>
-                <TableCell sx={{ width: 90 }}>Staff</TableCell>
-                <TableCell align="right" sx={{ width: 140 }}>Total</TableCell>
-                <TableCell sx={{ width: 120 }}>Status</TableCell>
+                <TableCell sx={{ width: 70 }}>Staff</TableCell>
+                <TableCell align="right" sx={{ width: 90 }}>Total</TableCell>
+                <TableCell sx={{ width: 110 }}>Status</TableCell>
                 {canWrite && <TableCell align="right" sx={{ width: { xs: 150, lg: 250 } }}>Actions</TableCell>}
               </TableRow>
             </TableHead>
@@ -158,7 +159,7 @@ export default function AppointmentsPage() {
                 return (
                 <TableRow key={b.id}>
                   <TableCell sx={{ whiteSpace: 'nowrap' }}>
-                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5, textAlign: 'left' }}>
+                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, textAlign: 'left' }}>
                       <Box sx={{ width: 38, height: 40, flex: 'none', borderRadius: '10px', background: 'linear-gradient(180deg,#f3e7c9,#fbf3de)', border: '1px solid #ead9a8', display: 'grid', placeItems: 'center', textAlign: 'center', lineHeight: 1.1 }}>
                         <Box>
                           <Typography component="span" sx={{ display: 'block', fontSize: '0.58rem', fontWeight: 700, letterSpacing: '0.08em', textTransform: 'uppercase', color: '#8a6a1f' }}>
@@ -180,7 +181,7 @@ export default function AppointmentsPage() {
                     </Box>
                   </TableCell>
                   <TableCell>
-                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5, textAlign: 'left' }}>
+                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, textAlign: 'left' }}>
                       <Avatar sx={{ width: 32, height: 32, flex: 'none', bgcolor: 'primary.main', fontSize: '0.85rem', fontWeight: 700 }}>{b.customerName.trim().charAt(0).toUpperCase()}</Avatar>
                       <Box sx={{ minWidth: 0, maxWidth: { md: 150 } }}>
                         <Typography variant="body2" noWrap sx={{ fontWeight: 700, textTransform: 'capitalize' }}>

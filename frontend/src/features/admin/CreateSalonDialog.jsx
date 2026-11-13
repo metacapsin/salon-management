@@ -4,6 +4,7 @@ import { Alert, Box, Button, Dialog, DialogActions, DialogContent, DialogTitle, 
 import { fieldErrorsOf, friendlyError } from '../../api/client'
 import { createPlatformSalon, uploadSalonImage } from '../../api/platformApi'
 import DialogCloseButton from '../../components/DialogCloseButton'
+import { emailError, nameError, newPasswordError, phoneError } from '../../utils/validators'
 
 const MAX_PHOTOS = 5
 const MAX_PHOTO_BYTES = 3 * 1024 * 1024
@@ -16,13 +17,13 @@ const toSlug = (text) => text.toLowerCase().trim().replace(/[^a-z0-9]+/g, '-').r
 // Server jaise hi rules, taaki galti submit se pehle hi dikh jaye
 function validate(form) {
   const errors = {}
-  if (form.ownerName.trim().length < 2) errors.ownerName = 'Enter the owner name (at least 2 letters).'
-  if (!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(form.ownerEmail.trim())) errors.ownerEmail = 'Enter a valid email address.'
-  if (form.password.length < 12) errors.password = 'Password must be at least 12 characters.'
+  if (nameError(form.ownerName)) errors.ownerName = nameError(form.ownerName)
+  if (emailError(form.ownerEmail)) errors.ownerEmail = emailError(form.ownerEmail)
+  if (newPasswordError(form.password)) errors.password = newPasswordError(form.password)
   if (form.name.trim().length < 2) errors.name = 'Salon name must be at least 2 characters.'
   const slug = form.slug.replace(/-+$/, '')
   if (!/^[a-z0-9-]{3,50}$/.test(slug)) errors.slug = 'Use 3 to 50 lowercase letters, digits or hyphens.'
-  if (form.phone.trim() && !/^\+?[0-9 -]{7,20}$/.test(form.phone.trim())) errors.phone = 'Enter a valid phone number.'
+  if (phoneError(form.phone, { required: false })) errors.phone = phoneError(form.phone, { required: false })
   return errors
 }
 
@@ -138,9 +139,9 @@ export default function CreateSalonDialog({ onClose, onCreated }) {
           <Typography variant="overline" color="text.secondary" sx={{ gridColumn: '1 / -1', lineHeight: 1.5 }}>
             Owner account
           </Typography>
-          <TextField required label="Owner name" value={form.ownerName} onChange={set('ownerName')} error={Boolean(errors.ownerName)} helperText={errors.ownerName} autoComplete="off" />
+          <TextField required label="Owner name" value={form.ownerName} onChange={set('ownerName')} error={Boolean(errors.ownerName)} helperText={errors.ownerName} autoComplete="off" slotProps={{ htmlInput: { maxLength: 35 } }} />
           <TextField required label="Owner email" type="email" value={form.ownerEmail} onChange={set('ownerEmail')} error={Boolean(errors.ownerEmail)} helperText={errors.ownerEmail} autoComplete="off" />
-          <TextField sx={{ gridColumn: '1 / -1' }} required label="Password" type="password" value={form.password} onChange={set('password')} error={Boolean(errors.password)} helperText={errors.password || 'At least 12 characters. Share it with the owner safely.'} autoComplete="new-password" />
+          <TextField sx={{ gridColumn: '1 / -1' }} required label="Password" type="password" value={form.password} onChange={set('password')} error={Boolean(errors.password)} helperText={errors.password || '12 to 20 characters. Share it with the owner safely.'} autoComplete="new-password" slotProps={{ htmlInput: { maxLength: 20 } }} />
           <Typography variant="overline" color="text.secondary" sx={{ gridColumn: '1 / -1', lineHeight: 1.5, mt: 1 }}>
             Salon
           </Typography>

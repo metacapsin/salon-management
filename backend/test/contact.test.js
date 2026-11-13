@@ -11,7 +11,7 @@ after(h.disconnect)
 const valid = (over = {}) => ({
   name: 'Asha Verma',
   email: 'Asha@Example.com',
-  phone: '+91 98100 12345',
+  phone: '9810012345',
   message: 'I own two salons in Jaipur and want to join Galora.',
   ...over,
 })

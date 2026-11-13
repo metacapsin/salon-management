@@ -115,7 +115,7 @@ export default function SalonForm({ initial, onSubmit, submitLabel, readOnly = f
         helperText={errors.slug?.message ?? 'Lowercase letters, digits and hyphens. Used in your public booking link.'}
         slotProps={{ htmlInput: { autoCapitalize: 'none', spellCheck: false } }}
       />
-      <TextField size="small" label="Owner name" data-section="info" disabled={readOnly} {...field(register, errors, 'ownerName')} />
+      <TextField size="small" label="Owner name" data-section="info" disabled={readOnly} {...field(register, errors, 'ownerName')} slotProps={{ htmlInput: { maxLength: 35 } }} />
       <TextField size="small" label="Contact number" type="tel" data-section="info" disabled={readOnly} {...field(register, errors, 'phone')} />
       <TextField
         size="small"

@@ -69,7 +69,7 @@ export default function ForgotPasswordPage() {
           <FormAlert>{formError}</FormAlert>
           <FormAlert tone="ok">{info}</FormAlert>
           <AuthField label="6 digit code" inputMode="numeric" autoComplete="one-time-code" maxLength={6} error={formState.errors.otp?.message} {...register('otp')} />
-          <AuthPasswordField label="New password" autoComplete="new-password" hint="At least 12 characters." error={formState.errors.password?.message} {...register('password')} />
+          <AuthPasswordField label="New password" autoComplete="new-password" maxLength={20} hint="12 to 20 characters." error={formState.errors.password?.message} {...register('password')} />
           <button type="submit" className="login-form__submit" disabled={formState.isSubmitting} aria-busy={formState.isSubmitting}>
             {formState.isSubmitting ? 'Saving…' : 'Change password'}
           </button>

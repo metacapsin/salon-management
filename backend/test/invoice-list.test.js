@@ -62,9 +62,9 @@ test('summary: billed, received, pending; refunds reduce received; void bills ig
   const empty = await get(s.auth, '/invoices/summary')
   assert.deepEqual({ ...empty.body.data.summary }, { invoices: 0, billed: 0, received: 0, pending: 0, refunded: 0, tax: 0, pendingCount: 0 })
 
-  const a = await bill(s, '9810000001', 'A')
-  const b = await bill(s, '9810000002', 'B')
-  const v = await bill(s, '9810000003', 'V')
+  const a = await bill(s, '9810000001', 'Asha')
+  const b = await bill(s, '9810000002', 'Bina')
+  const v = await bill(s, '9810000003', 'Vani')
   await pay(s, a, 100000)
   await pay(s, b, 40000)
   await post(s.auth, `/invoices/${a.id}/refunds`, { requestKey: key(), method: 'cash', amount: 10000, note: 'discount given later' })

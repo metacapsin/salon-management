@@ -12,11 +12,10 @@ import { COLORS } from '../../config/theme'
 import { todayString } from '../../utils/dates'
 import { formatMoney } from '../../utils/formatMoney'
 import { newRequestKey } from '../../utils/money'
+import { dateError, nameError, phoneError } from '../../utils/validators'
 
 const PAYMENT = { Paid: 'paid', 'Pay later': 'pending' }
 const METHODS = { Cash: 'cash', UPI: 'upi', Card: 'card', Other: 'other' }
-const PHONE_OK = /^\d{10}$/
-const DATE_OK = /^\d{4}-\d{2}-\d{2}$/
 
 // Sell a package to a customer. The server decides the price, expiry and session balance; we send only
 // which package, to whom, and how it was paid. A retry or double tap uses the same key, so it is sold once.
@@ -59,7 +58,7 @@ export default function SellPackageScreen({ navigation }) {
   })
 
   function changePhone(value) {
-    setPhone(value.replace(/\D/g, '').slice(0, 10))
+    setPhone(value.replace(/\D/g, '').slice(0, 12))
     setDuplicate(false)
     setConfirmDuplicate(false)
   }
@@ -68,9 +67,9 @@ export default function SellPackageScreen({ navigation }) {
     setFormError('')
     const found = {}
     if (!packageId) found.packageId = 'Choose a package.'
-    if (!PHONE_OK.test(phone)) found.customerPhone = 'Enter a 10-digit mobile number.'
-    if (name.trim().length < 1) found.customerName = 'Enter the customer name.'
-    if (!DATE_OK.test(startsOn)) found.startsOn = 'Use a date like 2026-11-01.'
+    if (phoneError(phone)) found.customerPhone = phoneError(phone)
+    if (nameError(name)) found.customerName = nameError(name)
+    if (dateError(startsOn)) found.startsOn = dateError(startsOn)
     setErrors(found)
     if (Object.keys(found).length) return
     sell.mutate({
@@ -103,8 +102,8 @@ export default function SellPackageScreen({ navigation }) {
 
       <Card style={{ marginTop: 12 }}>
         {formError ? <Text style={styles.banner}>{formError}</Text> : null}
-        <TextField label="Customer mobile (10 digits)" value={phone} onChangeText={changePhone} error={errors.customerPhone} keyboardType="number-pad" maxLength={10} placeholder="9876543210" />
-        <TextField label="Customer name" value={name} onChangeText={setName} error={errors.customerName} maxLength={100} />
+        <TextField label="Customer mobile (10 digits)" value={phone} onChangeText={changePhone} error={errors.customerPhone} keyboardType="number-pad" maxLength={12} placeholder="9876543210" />
+        <TextField label="Customer name" value={name} onChangeText={setName} error={errors.customerName} maxLength={35} />
         <ChoiceChips label="Payment" options={Object.keys(PAYMENT)} value={paymentLabel} onChange={setPaymentLabel} error={errors.paymentStatus} />
         {paymentLabel === 'Paid' ? <ChoiceChips label="Paid by" options={Object.keys(METHODS)} value={methodLabel} onChange={setMethodLabel} error={errors.paymentMethod} /> : null}
         <TextField label="Starts on (YYYY-MM-DD)" value={startsOn} onChangeText={setStartsOn} error={errors.startsOn} autoCapitalize="none" maxLength={10} />

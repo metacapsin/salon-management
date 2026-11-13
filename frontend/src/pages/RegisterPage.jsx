@@ -48,9 +48,9 @@ export default function RegisterPage() {
     >
       <form className="login-form" onSubmit={handleSubmit(onSubmit)} noValidate>
         <FormAlert>{formError}</FormAlert>
-        <AuthField label="Your name" autoComplete="name" error={errors.name?.message} {...register('name')} />
+        <AuthField label="Your name" autoComplete="name" maxLength={35} error={errors.name?.message} {...register('name')} />
         <AuthField label="Email" type="email" autoComplete="username" inputMode="email" placeholder="you@example.com" error={errors.email?.message} {...register('email')} />
-        <AuthPasswordField label="Password" autoComplete="new-password" hint="At least 12 characters. A password manager is welcome." error={errors.password?.message} {...register('password')} />
+        <AuthPasswordField label="Password" autoComplete="new-password" maxLength={20} hint="12 to 20 characters. A password manager is welcome." error={errors.password?.message} {...register('password')} />
         <button type="submit" className="login-form__submit" disabled={isSubmitting} aria-busy={isSubmitting}>
           {isSubmitting ? 'Sending request…' : 'Create account'}
         </button>
