@@ -10,7 +10,7 @@ import StatusPill from '../../components/admin/StatusPill'
 import Icon from '../../components/Icon'
 
 const STAT_CARDS = [
-  { key: 'total', label: 'Registered salons', icon: 'store', hint: 'All salons on Galora', to: '/admin/salons' },
+  { key: 'total', label: 'Registered salons', icon: 'store', hint: 'All salons on Glamora', to: '/admin/salons' },
   { key: 'active', label: 'Active', icon: 'check', tone: 'success', hint: 'Open for business' },
   { key: 'suspended', label: 'Suspended', icon: 'close', tone: 'warning', hint: 'Read-only for the team' },
   { key: 'published', label: 'Booking page published', icon: 'calendar', tone: 'gold', hint: 'Visible to customers' },
@@ -34,7 +34,7 @@ export default function AdminDashboard() {
     <>
       <PageHeader
         title={name ? `Welcome back, ${name}` : 'Platform overview'}
-        subtitle="A live summary of every salon on Galora."
+        subtitle="A live summary of every salon on Glamora."
         actions={
           <Button component={RouterLink} to="/admin/salons" variant="contained">
             Manage salons

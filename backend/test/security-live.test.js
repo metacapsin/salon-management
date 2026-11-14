@@ -1,4 +1,4 @@
-// Live API security checks. Tests galora_test database me chalte hain (asli data safe).
+// Live API security checks. Tests glamora_test database me chalte hain (asli data safe).
 // Covers: har protected route bina token ke, nakli/expired/tampered token, customer<->staff token mixing,
 // NoSQL injection, mass assignment, role escalation, security headers.
 const { test, before, after } = require('node:test')

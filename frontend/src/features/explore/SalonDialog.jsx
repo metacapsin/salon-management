@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom'
 import { useQuery } from '@tanstack/react-query'
 import { Avatar, Box, Button, Chip, Dialog, IconButton, Link, Typography, useMediaQuery } from '@mui/material'
 import { getSalonDetail, recordSalonView } from '../../api/publicApi'
+import { useCustomer } from '../../customer/CustomerAuthContext'
 import QueryState from '../../components/QueryState'
 import { formatMoney } from '../../utils/formatMoney'
 import SalonReviews from '../reviews/SalonReviews'
@@ -11,7 +12,7 @@ import SalonCover from './SalonCover'
 import SalonMap from './SalonMap'
 
 // Beech wale hisse ka upar wala bhaag: owner ka naam aur phone. Ye scroll nahi hota (jagah par tika rehta hai).
-function Header({ detail }) {
+function Header({ detail, loggedIn }) {
   const phoneDigits = detail.owner.phone.replace(/[^\d+]/g, '')
   return (
     <Box sx={{ display: 'grid', gap: 2 }}>
@@ -28,7 +29,7 @@ function Header({ detail }) {
             </Link>
           ) : (
             <Typography variant="body2" color="text.secondary">
-              Phone number not added
+              {loggedIn ? 'Phone number not added' : 'Log in to see the phone number'}
             </Typography>
           )}
         </Box>
@@ -134,17 +135,19 @@ function LocationSide({ detail, onBook }) {
 
 // Customer ke liye salon ka popup (screen se thoda chhota): photo | owner + services | map + book.
 // Book dabane par alag "Book appointment" page khulta hai. Khulte hi owner ko "customer dekh raha hai" notification jaati hai.
-export default function SalonDialog({ salon, onClose }) {
+export default function SalonDialog({ salon, onClose, onBook }) {
   const navigate = useNavigate()
   const small = useMediaQuery('(max-width:899.95px)')
 
+  const { status } = useCustomer()
+  // Owner ko khabar sirf tab jaati hai jab customer logged in ho
   useEffect(() => {
-    recordSalonView(salon.id)
-  }, [salon.id])
+    if (status === 'authenticated') recordSalonView(salon.id)
+  }, [salon.id, status])
 
   const query = useQuery({ queryKey: ['public', 'salon', salon.id], queryFn: () => getSalonDetail(salon.id) })
   const detail = query.data
-  const book = () => navigate(`/book/${salon.id}`)
+  const book = () => (onBook ? onBook(salon) : navigate(`/book/${salon.id}`))
 
   return (
     <Dialog
@@ -180,7 +183,7 @@ export default function SalonDialog({ salon, onClose }) {
             {detail && (
               <>
                 <Box sx={{ flexShrink: 0, p: { xs: 2, md: 3 }, pb: { md: 2 }, borderBottom: { md: '1px solid #eadfd3' } }}>
-                  <Header detail={detail} />
+                  <Header detail={detail} loggedIn={status === 'authenticated'} />
                 </Box>
                 <Box sx={{ flex: 1, minHeight: 0, overflowY: { md: 'auto' }, p: { xs: 2, md: 3 }, pt: { md: 2 } }}>
                   <Services detail={detail} />

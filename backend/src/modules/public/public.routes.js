@@ -6,7 +6,7 @@ const { z, objectId, isoDate, addressText } = require('../../utils/schemas')
 const ApiError = require('../../utils/apiError')
 const { publicUrl } = require('../../utils/uploads')
 const { validate, limiter } = require('../../middleware/common')
-const { authenticateCustomer } = require('../../middleware/customerAuth')
+const { authenticateCustomer, optionalCustomer } = require('../../middleware/customerAuth')
 const { Salon, Service, Notification, Branch, Booking, Offer, Review } = require('../../models')
 const { buildSlots, dateInRange } = require('../bookings/slots')
 const { placeKey } = require('../../utils/placeKey')
@@ -229,7 +229,7 @@ const idParams = z.object({ id: objectId })
 const publishedFilter = (id) => ({ _id: id, ...baseFilter })
 
 // GET /public/salons/:id -> owner ka naam, phone, address aur services ki price list
-router.get('/salons/:id', authenticateCustomer, validate({ params: idParams }), async (req, res) => {
+router.get('/salons/:id', optionalCustomer, validate({ params: idParams }), async (req, res) => {
   const salon = await Salon.findOne(publishedFilter(req.valid.params.id)).lean()
   if (!salon) throw new ApiError(404, 'NOT_FOUND', 'Salon not found.')
   const services = await Service.find({ salonId: salon._id, active: true }).sort({ category: 1, name: 1 }).lean()
@@ -251,7 +251,7 @@ router.get('/salons/:id', authenticateCustomer, validate({ params: idParams }), 
         endsOn: o.endsOn,
         oncePerCustomer: o.oncePerCustomer,
       })),
-      owner: { name: salon.ownerContact?.name ?? '', phone: salon.ownerContact?.phone ?? '' },
+      owner: { name: salon.ownerContact?.name ?? '', phone: req.customer ? salon.ownerContact?.phone ?? '' : '' }, // owner ka phone sirf logged-in customer ko
       address: [a.line1, a.area, a.city, a.state, a.pincode].filter(Boolean).join(', '),
       location: typeof a.location?.lat === 'number' && typeof a.location?.lng === 'number' ? { lat: a.location.lat, lng: a.location.lng } : null,
       services: services.map((s) => ({
@@ -279,7 +279,7 @@ router.post('/salons/:id/view', authenticateCustomer, viewLimit, validate({ para
   // Ek hi step me "dhundho, na mile to banao": do requests ek saath aayein to bhi ek hi notification banti hai
   const result = await Notification.updateOne(
     { salonId: salon._id, type: 'salon_viewed', viewerKey: viewerId, createdAt: { $gt: since } },
-    { $setOnInsert: { title: 'A customer is looking at your salon', body: `${req.customer.name} (+91 ${req.customer.phone}) just opened your salon page on Galora.` } },
+    { $setOnInsert: { title: 'A customer is looking at your salon', body: `${req.customer.name} (+91 ${req.customer.phone}) just opened your salon page on Glamora.` } },
     { upsert: true },
   )
   sendSuccess(req, res, { counted: result.upsertedCount > 0 })

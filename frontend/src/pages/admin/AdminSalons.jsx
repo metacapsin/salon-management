@@ -11,7 +11,7 @@ import TablePager from '../../components/admin/TablePager'
 import ResponsiveTable from '../../components/ResponsiveTable'
 import CreateSalonDialog from '../../features/admin/CreateSalonDialog'
 
-// Galora par registered saare salons. Search aur status filter server par chalta he.
+// Glamora par registered saare salons. Search aur status filter server par chalta he.
 export default function AdminSalons() {
   const [page, setPage] = useState(1)
   const [text, setText] = useState('')
@@ -28,7 +28,7 @@ export default function AdminSalons() {
     <>
       <PageHeader
         title="Salons"
-        subtitle={query.data ? `${total} salon${total === 1 ? '' : 's'} on the platform` : 'Every salon registered on Galora.'}
+        subtitle={query.data ? `${total} salon${total === 1 ? '' : 's'} on the platform` : 'Every salon registered on Glamora.'}
         actions={
           <Button variant="contained" onClick={() => setCreating(true)}>
             Create salon

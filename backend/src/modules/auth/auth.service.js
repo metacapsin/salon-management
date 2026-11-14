@@ -11,7 +11,7 @@ const BCRYPT_COST = 12
 // User na milne par bhi bcrypt chalate hain, taaki jawab ka time dekhkar koi email ka andaza na laga sake.
 const DUMMY_HASH = bcrypt.hashSync('not-a-real-password', BCRYPT_COST)
 
-const REFRESH_COOKIE = 'galora_rt'
+const REFRESH_COOKIE = 'glamora_rt'
 const COOKIE_PATH = '/api/v1/auth'
 
 function hashPassword(password) {
@@ -123,8 +123,8 @@ function sendVerificationEmail(user, token) {
   const link = `${env.PUBLIC_APP_URL}/verify-email?token=${token}`
   return sendMail({
     to: user.email,
-    subject: 'Verify your Galora email',
-    text: `Hi ${user.name},\n\nPlease confirm your email address to finish creating your Galora account:\n${link}\n\nThis link works once and expires in 24 hours.`,
+    subject: 'Verify your Glamora email',
+    text: `Hi ${user.name},\n\nPlease confirm your email address to finish creating your Glamora account:\n${link}\n\nThis link works once and expires in 24 hours.`,
   })
 }
 
@@ -138,8 +138,8 @@ function sendApprovalEmail(user, { adminCreated = false, salonName = '' } = {}) 
   const name = user.name
   const passwordLine = adminCreated ? 'the one our team set for you (they will share it with you separately)' : 'the one you chose when you registered'
   const lead = adminCreated
-    ? `Your Galora owner account${salonName ? ` and your salon "${salonName}"` : ''} ${salonName ? 'have' : 'has'} been created by our team. You can sign in now.`
-    : 'Good news! Your Galora owner account has been approved. You can sign in now.'
+    ? `Your Glamora owner account${salonName ? ` and your salon "${salonName}"` : ''} ${salonName ? 'have' : 'has'} been created by our team. You can sign in now.`
+    : 'Good news! Your Glamora owner account has been approved. You can sign in now.'
 
   const text = [
     `Hi ${name},`,
@@ -157,17 +157,17 @@ function sendApprovalEmail(user, { adminCreated = false, salonName = '' } = {}) 
     '',
     'Once you are in, you can set up your salon, add services and staff, and start taking bookings.',
     '',
-    'If you did not request a Galora account, you can safely ignore this email.',
+    'If you did not request a Glamora account, you can safely ignore this email.',
     '',
     'Warm regards,',
-    'Team Galora',
+    'Team Glamora',
   ].join('\n')
 
   const html = `<!doctype html>
 <html><body style="margin:0;padding:24px;background:#faf6f1;font-family:Arial,Helvetica,sans-serif;color:#3b2a1f;">
   <table role="presentation" width="100%" cellpadding="0" cellspacing="0"><tr><td align="center">
     <table role="presentation" width="560" cellpadding="0" cellspacing="0" style="max-width:560px;background:#ffffff;border-radius:12px;overflow:hidden;">
-      <tr><td style="background:#8a5a3b;padding:20px 28px;color:#ffffff;font-size:22px;font-weight:bold;">Galora</td></tr>
+      <tr><td style="background:#8a5a3b;padding:20px 28px;color:#ffffff;font-size:22px;font-weight:bold;">Glamora</td></tr>
       <tr><td style="padding:28px;">
         <p style="margin:0 0 12px;font-size:18px;font-weight:bold;">Hi ${escapeHtml(name)}, ${adminCreated ? 'your account is ready' : 'your account is approved'} 🎉</p>
         <p style="margin:0 0 20px;line-height:1.6;">${escapeHtml(lead)}</p>
@@ -176,26 +176,26 @@ function sendApprovalEmail(user, { adminCreated = false, salonName = '' } = {}) 
           <strong>Password:</strong> ${escapeHtml(passwordLine)}<br>
           <span style="font-size:12px;color:#8b7767;">(For your safety, we never send passwords by email.)</span>
         </td></tr></table>
-        <p style="margin:0 0 24px;"><a href="${loginLink}" style="display:inline-block;background:#8a5a3b;color:#ffffff;text-decoration:none;padding:12px 24px;border-radius:8px;font-weight:bold;">Sign in to Galora</a></p>
+        <p style="margin:0 0 24px;"><a href="${loginLink}" style="display:inline-block;background:#8a5a3b;color:#ffffff;text-decoration:none;padding:12px 24px;border-radius:8px;font-weight:bold;">Sign in to Glamora</a></p>
         <p style="margin:0 0 6px;line-height:1.6;font-size:14px;color:#6b5646;">If the button does not work, copy this link into your browser:</p>
         <p style="margin:0 0 16px;font-size:13px;word-break:break-all;"><a href="${loginLink}" style="color:#8a5a3b;">${loginLink}</a></p>
         <p style="margin:0 0 24px;font-size:14px;">Forgot your password? <a href="${forgotLink}" style="color:#8a5a3b;font-weight:bold;">Reset it here</a>.</p>
         <p style="margin:0;line-height:1.6;">Then you can set up your salon, add services and staff, and start taking bookings.</p>
       </td></tr>
-      <tr><td style="padding:16px 28px;background:#faf6f1;font-size:12px;color:#8b7767;">If you did not request a Galora account, you can safely ignore this email.</td></tr>
+      <tr><td style="padding:16px 28px;background:#faf6f1;font-size:12px;color:#8b7767;">If you did not request a Glamora account, you can safely ignore this email.</td></tr>
     </table>
   </td></tr></table>
 </body></html>`
 
-  return sendMail({ to: user.email, subject: adminCreated ? 'Your Galora account is ready' : 'Your Galora account is approved', text, html })
+  return sendMail({ to: user.email, subject: adminCreated ? 'Your Glamora account is ready' : 'Your Glamora account is approved', text, html })
 }
 
-// Forgot password: 6 digit OTP wali email (same Galora look as the approval email).
+// Forgot password: 6 digit OTP wali email (same Glamora look as the approval email).
 function sendPasswordResetEmail(user, code, minutes) {
   const text = [
     `Hi ${user.name},`,
     '',
-    `Your Galora password reset code is ${code}.`,
+    `Your Glamora password reset code is ${code}.`,
     '',
     `Enter this code on the reset page to choose a new password. It is valid for ${minutes} minutes and works only once.`,
     'Please do not share this code with anyone. Our team will never ask for it.',
@@ -203,7 +203,7 @@ function sendPasswordResetEmail(user, code, minutes) {
     'If you did not ask for this, you can safely ignore this email. Your password will not change.',
     '',
     'Warm regards,',
-    'Team Galora',
+    'Team Glamora',
   ].join('\n')
 
   const digits = String(code)
@@ -215,10 +215,10 @@ function sendPasswordResetEmail(user, code, minutes) {
 <html><body style="margin:0;padding:24px;background:#faf6f1;font-family:Arial,Helvetica,sans-serif;color:#3b2a1f;">
   <table role="presentation" width="100%" cellpadding="0" cellspacing="0"><tr><td align="center">
     <table role="presentation" width="560" cellpadding="0" cellspacing="0" style="max-width:560px;background:#ffffff;border-radius:12px;overflow:hidden;">
-      <tr><td style="background:#8a5a3b;padding:20px 28px;color:#ffffff;font-size:22px;font-weight:bold;">Galora</td></tr>
+      <tr><td style="background:#8a5a3b;padding:20px 28px;color:#ffffff;font-size:22px;font-weight:bold;">Glamora</td></tr>
       <tr><td style="padding:28px;">
         <p style="margin:0 0 12px;font-size:18px;font-weight:bold;">Hi ${escapeHtml(user.name)}, reset your password</p>
-        <p style="margin:0 0 22px;line-height:1.6;">We got a request to reset your Galora password. Use this code to continue:</p>
+        <p style="margin:0 0 22px;line-height:1.6;">We got a request to reset your Glamora password. Use this code to continue:</p>
         <table role="presentation" cellpadding="0" cellspacing="0" align="center" style="margin:0 auto 22px;"><tr>${digits}</tr></table>
         <p style="margin:0 0 20px;line-height:1.6;font-size:14px;text-align:center;color:#6b5646;">This code is valid for <strong>${minutes} minutes</strong> and works only once.</p>
         <p style="margin:0;line-height:1.6;font-size:14px;color:#6b5646;">For your safety, never share this code with anyone. Our team will never ask for it.</p>
@@ -228,7 +228,7 @@ function sendPasswordResetEmail(user, code, minutes) {
   </td></tr></table>
 </body></html>`
 
-  return sendMail({ to: user.email, subject: `${code} is your Galora password reset code`, text, html })
+  return sendMail({ to: user.email, subject: `${code} is your Glamora password reset code`, text, html })
 }
 
 module.exports = {

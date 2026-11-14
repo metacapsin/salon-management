@@ -92,13 +92,14 @@ test('wrong code: 5 tries and then locked; a new code cannot be asked within 30 
 
 test('a salon owner token does not work as a customer login, and the customer cookie is httpOnly', async () => {
   const owner = await h.ownerWithSalon('cu1@x.com', 'cu-one')
-  const res = await h.request(h.app).get(api(`/public/salons/${owner.salonId}`)).set('Authorization', `Bearer ${owner.token}`)
+  // booking/slots ke liye customer login zaroori; owner token se nahi chalta
+  const res = await h.request(h.app).get(api(`/public/salons/${owner.salonId}/slots?date=2026-01-01&duration=30`)).set('Authorization', `Bearer ${owner.token}`)
   assert.equal(res.status, 401)
 
   const agent = h.request.agent(h.app)
   const asked = await askOtp(agent, '9810020007')
   const done = await verify(agent, { phone: '9810020007', otp: asked.body.data.devOtp, name: 'Tara Das' })
-  const cookie = done.headers['set-cookie'].find((c) => c.startsWith('galora_ct='))
+  const cookie = done.headers['set-cookie'].find((c) => c.startsWith('glamora_ct='))
   assert.match(cookie, /HttpOnly/i)
   assert.match(cookie, /SameSite=Lax/i)
 })

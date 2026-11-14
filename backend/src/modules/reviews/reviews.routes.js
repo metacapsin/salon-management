@@ -5,7 +5,7 @@ const { sendSuccess } = require('../../utils/response')
 const { z, objectId } = require('../../utils/schemas')
 const ApiError = require('../../utils/apiError')
 const { validate, limiter } = require('../../middleware/common')
-const { authenticateCustomer } = require('../../middleware/customerAuth')
+const { authenticateCustomer, optionalCustomer } = require('../../middleware/customerAuth')
 const { Booking, Review, ReviewHelpful, Salon, CustomerNotification } = require('../../models')
 const { ownsBooking, ensureReviewRequests, ratingSummary, recalcSalonRating, presentReview, notifyReviewSubmitted, isDuplicate } = require('./reviews.service')
 
@@ -32,13 +32,15 @@ const pageQuery = z.object({ page: z.coerce.number().int().min(1).default(1), pa
 
 // GET /public/salons/:id/reviews -> salon ki public profile ke liye: asli rating summary (average, total, 5..1 breakdown) + reviews.
 // Sirf wahi salon jo customer ko dikhta he (active + public booking). Customer ka phone/id kabhi nahi jata.
-router.get('/salons/:id/reviews', authenticateCustomer, validate({ params: idParams, query: pageQuery }), async (req, res) => {
+router.get('/salons/:id/reviews', optionalCustomer, validate({ params: idParams, query: pageQuery }), async (req, res) => {
   const salon = await Salon.findOne({ _id: req.valid.params.id, status: 'active', publicBookingEnabled: true }).select('_id').lean()
   if (!salon) throw new ApiError(404, 'NOT_FOUND', 'Salon not found.')
   const { page, pageSize } = req.valid.query
   const [summary, rows] = await Promise.all([ratingSummary(salon._id), Review.find({ salonId: salon._id }).sort({ createdAt: -1, _id: -1 }).skip((page - 1) * pageSize).limit(pageSize)])
-  const mine = rows.filter((r) => String(r.customerId) === String(req.customer._id)).map((r) => String(r._id))
-  const helped = new Set((await ReviewHelpful.find({ reviewId: { $in: rows.map((r) => r._id) }, customerId: req.customer._id }).select('reviewId').lean()).map((h) => String(h.reviewId)))
+  // Login nahi hai to reviews dikhte hain, par "mera review" / "helpful" nishan nahi
+  const me = req.customer?._id
+  const mine = me ? rows.filter((r) => String(r.customerId) === String(me)).map((r) => String(r._id)) : []
+  const helped = new Set(me ? (await ReviewHelpful.find({ reviewId: { $in: rows.map((r) => r._id) }, customerId: me }).select('reviewId').lean()).map((h) => String(h.reviewId)) : [])
   sendSuccess(req, res, { summary, reviews: rows.map((r) => ({ ...present(req, r), isMine: mine.includes(String(r._id)), isHelpful: helped.has(String(r._id)) })), page, pageSize, total: summary.count })
 })
 

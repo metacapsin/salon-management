@@ -143,7 +143,7 @@ test('customer login: a new customer name is validated the same way', async () =
 })
 
 test('contact form: only a valid 10-digit mobile number and a real name are accepted', async () => {
-  const valid = { name: 'Asha Verma', email: 'asha@example.com', phone: '9810012345', message: 'I own two salons and want to join Galora.' }
+  const valid = { name: 'Asha Verma', email: 'asha@example.com', phone: '9810012345', message: 'I own two salons and want to join Glamora.' }
   for (const phone of ['981001234', '98100123456', '5810012345', '+91 98100 12345', 'abcdefghij']) {
     assertRejected(await post('/contact', { ...valid, phone }), 'phone', MOBILE_MESSAGE)
   }

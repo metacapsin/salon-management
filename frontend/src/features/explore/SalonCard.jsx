@@ -5,7 +5,7 @@ const AUDIENCE_LABEL = { women: 'Women', men: 'Men', unisex: 'Unisex' }
 const MAX_TAGS = 3
 
 // Ek salon ka card: photo, naam, rating + asli review count, doori, services, kam se kam price, aur do buttons.
-// "View Details" popup kholta hai (services, map, owner); "Book Now" seedha booking page par le jaata hai. Dono me login chahiye.
+// "View Details" popup kholta hai (services, map, owner); "Book Now" booking page par le jaata hai (login nahi to pehle login page). View Details me login nahi chahiye.
 export default function SalonCard({ salon, onOpen, onBook }) {
   const { average, count } = salon.rating
   const extraTags = salon.tags.length - MAX_TAGS

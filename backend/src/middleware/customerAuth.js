@@ -4,7 +4,7 @@ const env = require('../config/env')
 const ApiError = require('../utils/apiError')
 const { Customer } = require('../models')
 
-const CUSTOMER_COOKIE = 'galora_ct'
+const CUSTOMER_COOKIE = 'glamora_ct'
 const CUSTOMER_SESSION_MS = 30 * 24 * 60 * 60 * 1000
 // Cookie sirf /api/v1 par jaati hai. SameSite=Lax: dusri site se POST ke saath cookie nahi jaati (CSRF se bachav).
 const cookieOptions = { httpOnly: true, secure: env.cookieSecure, sameSite: 'lax', path: '/api/v1' }
@@ -49,4 +49,18 @@ async function authenticateCustomer(req, res, next) {
   next()
 }
 
-module.exports = { authenticateCustomer, signCustomerToken, setCustomerCookie, clearCustomerCookie, CUSTOMER_COOKIE }
+// Login ho to req.customer set hota hai, na ho to bhi request aage chalti hai (public page dekhne ke liye).
+async function optionalCustomer(req, res, next) {
+  try {
+    const token = readCustomerToken(req)
+    if (token) {
+      const claims = jwt.verify(token, env.JWT_ACCESS_SECRET, { algorithms: ['HS256'] })
+      if (claims.typ === 'customer' && mongoose.isValidObjectId(claims.sub)) req.customer = (await Customer.findById(claims.sub)) || undefined
+    }
+  } catch {
+    // kharab ya purana token: anonymous maano
+  }
+  next()
+}
+
+module.exports = { authenticateCustomer, optionalCustomer, signCustomerToken, setCustomerCookie, clearCustomerCookie, CUSTOMER_COOKIE }

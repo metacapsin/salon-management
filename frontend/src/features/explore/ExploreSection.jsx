@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react'
 import { useNavigate, useSearchParams } from 'react-router-dom'
 import { keepPreviousData, useQuery } from '@tanstack/react-query'
 import { useCustomer } from '../../customer/CustomerAuthContext'
+import LoginDialog from './LoginDialog'
 import { getPosition, locationErrorMessage, nearMeNotice, nearestCity } from '../../utils/geo'
 import { getLocations, reversePlace, searchSalons } from '../../api/publicApi'
 import QueryState from '../../components/QueryState'
@@ -13,7 +14,6 @@ import ResultsState from './ResultsState'
 import { priceRange } from './filterOptions'
 import SalonCard from './SalonCard'
 import SalonDialog from './SalonDialog'
-import LoginDialog from './LoginDialog'
 import '../../styles/explore.css'
 
 // Landing page ke andar ka hissa "Find a salon near you": city/area chuno, salons dekho (Zomato jaisa). Salon ki list bina login ke dikhti hai;
@@ -132,17 +132,11 @@ export default function ExploreSection() {
   })
 
   const [openSalon, setOpenSalon] = useState(null)
-  const [loginFor, setLoginFor] = useState(null) // login ke baad jo salon kholni hai
-  // Login hai to salon seedha khulti hai (aur owner ko khabar jaati hai); nahi to pehle isi page par login ka popup
-  const [loginThen, setLoginThen] = useState('view') // login ke baad: 'view' = popup kholo, 'book' = seedha booking page
-  const openSalonOrLogin = (salon) => {
-    if (status === 'authenticated') return setOpenSalon(salon)
-    setLoginThen('view')
-    setLoginFor(salon)
-  }
+  // View Details: bina login ke seedha khulta hai. Book Now: login nahi hai to isi page par login ka popup, login ke baad seedha booking page.
+  const [loginFor, setLoginFor] = useState(null) // login ke baad jis salon ki booking kholni hai
+  const openSalonOrLogin = (salon) => setOpenSalon(salon)
   const bookSalonOrLogin = (salon) => {
     if (status === 'authenticated') return navigate(`/book/${salon.id}`)
-    setLoginThen('book')
     setLoginFor(salon)
   }
   const total = results.data?.meta?.total ?? 0
@@ -153,7 +147,7 @@ export default function ExploreSection() {
       <main className="lp-container ex-main">
         <div className="ex-hero">
           <div className="ex-hero__text">
-            <p className="ex-hero__eyebrow">Galora</p>
+            <p className="ex-hero__eyebrow">Glamora</p>
             <h2>Find Your Perfect Salon</h2>
             <p>Discover the best beauty and grooming services near you.</p>
           </div>
@@ -213,13 +207,12 @@ export default function ExploreSection() {
           salon={loginFor}
           onClose={() => setLoginFor(null)}
           onDone={() => {
-            if (loginThen === 'book') navigate(`/book/${loginFor.id}`)
-            else setOpenSalon(loginFor)
+            navigate(`/book/${loginFor.id}`)
             setLoginFor(null)
           }}
         />
       )}
-      {openSalon && <SalonDialog salon={openSalon} onClose={() => setOpenSalon(null)} />}
+      {openSalon && <SalonDialog salon={openSalon} onClose={() => setOpenSalon(null)} onBook={(salon) => { setOpenSalon(null); bookSalonOrLogin(salon) }} />}
     </section>
   )
 }

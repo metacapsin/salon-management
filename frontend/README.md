@@ -1,4 +1,4 @@
-# Galora Frontend
+# Glamora Frontend
 
 React + JavaScript + Vite.
 

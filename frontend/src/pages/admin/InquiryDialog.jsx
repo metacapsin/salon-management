@@ -55,7 +55,7 @@ export default function InquiryDialog({ id, onClose }) {
                   {inquiry.phone}
                 </Typography>
                 <Stack direction="row" spacing={1}>
-                  <Button size="small" variant="outlined" component="a" href={`mailto:${inquiry.email}?subject=${encodeURIComponent('Your message to Galora')}`}>
+                  <Button size="small" variant="outlined" component="a" href={`mailto:${inquiry.email}?subject=${encodeURIComponent('Your message to Glamora')}`}>
                     Email customer
                   </Button>
                   <Button size="small" variant="outlined" component="a" href={`tel:${inquiry.phone.replace(/[^\d+]/g, '')}`}>

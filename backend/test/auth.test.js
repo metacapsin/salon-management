@@ -4,7 +4,7 @@ const h = require('./helpers')
 
 const api = (path) => `/api/v1${path}`
 const otpFromMail = (to) => h.lastMailTo(to).text.match(/code is (\d{6})/)[1]
-const cookieOf = (res) => (res.headers['set-cookie'] || []).find((c) => c.startsWith('galora_rt='))
+const cookieOf = (res) => (res.headers['set-cookie'] || []).find((c) => c.startsWith('glamora_rt='))
 
 before(h.connect)
 after(h.disconnect)

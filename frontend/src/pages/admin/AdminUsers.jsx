@@ -21,7 +21,7 @@ export default function AdminUsers() {
 
   return (
     <>
-      <PageHeader title="Team & roles" subtitle={query.data ? `${total} user${total === 1 ? '' : 's'} and the salons they work in` : 'Everyone who can sign in to Galora.'} />
+      <PageHeader title="Team & roles" subtitle={query.data ? `${total} user${total === 1 ? '' : 's'} and the salons they work in` : 'Everyone who can sign in to Glamora.'} />
       <form
         role="search"
         className="ad-toolbar"

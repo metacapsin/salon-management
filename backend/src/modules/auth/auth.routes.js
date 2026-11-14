@@ -48,7 +48,7 @@ router.post(
     } else {
       await sendMail({
         to: existing.email,
-        subject: 'You already have a Galora account',
+        subject: 'You already have a Glamora account',
         text: `Someone tried to register with this email. If it was you, just sign in or reset your password at ${env.PUBLIC_APP_URL}/forgot-password.`,
       })
     }

@@ -12,7 +12,7 @@ const valid = (over = {}) => ({
   name: 'Asha Verma',
   email: 'Asha@Example.com',
   phone: '9810012345',
-  message: 'I own two salons in Jaipur and want to join Galora.',
+  message: 'I own two salons in Jaipur and want to join Glamora.',
   ...over,
 })
 
