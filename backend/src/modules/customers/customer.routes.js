@@ -32,6 +32,19 @@ const verifyLimit = limiter({ windowMs: 10 * 60_000, limit: 30 })
 // POST /customer/auth/request-otp
 router.post('/auth/request-otp', requireAllowedOrigin, requestLimit, validate({ body: z.strictObject({ phone, email: emailRule.optional() }) }), async (req, res) => {
   const { phone: mobile, email: givenEmail } = req.valid.body
+  // Sirf logging: kaun sa raasta (email / Twilio Verify / SMS) chala aur kahan fail hua. Error chhupaya nahi jaata, wahi aage jaata he.
+  const route = givenEmail ? 'email(SMTP)' : env.verifyConfigured ? 'twilio-verify' : env.smsConfigured ? 'twilio-sms' : 'dev-sink'
+  console.log(`[otp] ${req.id} request-otp start via=${route} phone=***${mobile.slice(-3)}`)
+  try {
+    await handleRequestOtp(req, res, mobile, givenEmail)
+  } catch (error) {
+    console.error(`[otp] ${req.id} request-otp FAILED via=${route} status=${error.status ?? '-'} code=${error.code ?? error.name} message=${error.message}`)
+    if (error.stack && !(error instanceof ApiError)) console.error(error.stack)
+    throw error
+  }
+})
+
+async function handleRequestOtp(req, res, mobile, givenEmail) {
   const now = Date.now()
 
   // Email diya ho to code email par jaata he. Purane customer ka email pehle se juda he to code usi par jaata he
@@ -75,8 +88,9 @@ router.post('/auth/request-otp', requireAllowedOrigin, requestLimit, validate({ 
   // Email bheja ho ya email provider (SMTP) set ho to code response me nahi aata. Sirf bina provider ke development me aata he.
   const providerSet = emailTo ? env.smtpConfigured : env.smsConfigured || env.verifyConfigured
   if (!env.isProduction && !providerSet) body.devOtp = code
+  console.log(`[otp] ${req.id} request-otp OK via=${emailTo ? 'email(SMTP)' : env.verifyConfigured ? 'twilio-verify' : env.smsConfigured ? 'twilio-sms' : 'dev-sink'}`)
   sendSuccess(req, res, body)
-})
+}
 
 // POST /customer/auth/verify-otp  { phone, otp, name? }
 // Naya customer ho aur naam na diya ho to { needsName: true } milta hai (code sahi hone par hi, aur code kharch nahi hota).

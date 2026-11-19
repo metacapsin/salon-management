@@ -6,6 +6,7 @@ import { createBooking, listBookingSlots, listServices, listStaff } from '../../
 import { useAuth } from '../../auth/AuthContext'
 import SelectBox from '../../components/SelectBox'
 import { nameError, phoneError } from '../../utils/validators'
+import { formatDuration } from '../../utils/duration'
 
 // Aaj ki tarikh "YYYY-MM-DD" (local). toISOString UTC deta hai, isliye khud banate hain.
 function dateISO(offsetDays = 0) {
@@ -143,7 +144,7 @@ export default function NewAppointmentPage() {
               onChange={(e) => setField('serviceId', e.target.value)}
               disabled={services.isPending}
               error={Boolean(errors.serviceId)}
-              options={[{ value: '', label: services.isPending ? 'Loading services...' : 'Select a service' }, ...serviceList.map((s) => ({ value: s.id, label: `${s.name} · ${s.durationMin} min · ₹${s.price}` }))]}
+              options={[{ value: '', label: services.isPending ? 'Loading services...' : 'Select a service' }, ...serviceList.map((s) => ({ value: s.id, label: `${s.name} · ${formatDuration(s.durationMin)} · ₹${s.price}` }))]}
             />
             {!services.isPending && serviceList.length === 0 && <p className="gl-field__hint">No active services yet. Add one on the Services page first.</p>}
             {(errors.serviceId || errors.serviceIds) && <p className="gl-field__error">{errors.serviceId || errors.serviceIds}</p>}

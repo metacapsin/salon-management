@@ -8,6 +8,7 @@ import { confirmPasswordReset, friendlyError, requestPasswordReset } from '../..
 import { canRememberLogin } from '../../auth/tokenStore'
 import { COLORS, FONT, RADIUS } from '../../config/theme'
 import { ErrorBanner } from '../../components/States'
+import { BrandLogo, GoldDivider } from '../../components/Brand'
 import CustomerLoginForm from './CustomerLoginForm'
 import { validateLogin, emailError, newPasswordError } from '../../utils/validators'
 
@@ -181,6 +182,8 @@ export default function LoginScreen({ onSubmit, onRequestOtp, onVerifyOtp, initi
 
   return (
     <KeyboardAvoidingView style={styles.screen} behavior={Platform.OS === 'ios' ? 'padding' : 'height'}>
+      <View style={styles.ringA} pointerEvents="none" />
+      <View style={styles.ringB} pointerEvents="none" />
       <ScrollView contentContainerStyle={[styles.scroll, { paddingTop: 24 + insets.top, paddingBottom: 24 + insets.bottom }]} keyboardShouldPersistTaps="handled" showsVerticalScrollIndicator={false}>
         {onBack ? (
           <Pressable onPress={onBack} accessibilityRole="button" accessibilityLabel="Back to salons" style={styles.back}>
@@ -189,10 +192,8 @@ export default function LoginScreen({ onSubmit, onRequestOtp, onVerifyOtp, initi
           </Pressable>
         ) : null}
         <View style={styles.header}>
-          <View style={styles.logo}>
-            <Ionicons name="sparkles" size={28} color={COLORS.espresso} />
-          </View>
-          <Text style={styles.brand}>Glamora</Text>
+          <BrandLogo size={64} />
+          <GoldDivider style={{ marginTop: 14, marginBottom: 10 }} />
           <Text style={styles.tag}>Beauty & salon, beautifully simple</Text>
         </View>
 
@@ -223,17 +224,19 @@ export default function LoginScreen({ onSubmit, onRequestOtp, onVerifyOtp, initi
 }
 
 const styles = StyleSheet.create({
-  screen: { flex: 1, backgroundColor: COLORS.espresso },
+  screen: { flex: 1, backgroundColor: COLORS.espresso, overflow: 'hidden' },
   scroll: { flexGrow: 1, justifyContent: 'center', paddingHorizontal: 20 },
   back: { flexDirection: 'row', alignItems: 'center', gap: 8, minHeight: 44, alignSelf: 'flex-start', marginBottom: 8 },
   backText: { color: COLORS.gold, fontSize: 15, fontWeight: '600' },
   header: { alignItems: 'center', marginBottom: 24 },
   logo: { width: 64, height: 64, borderRadius: 32, backgroundColor: COLORS.gold, alignItems: 'center', justifyContent: 'center', marginBottom: 12 },
   brand: { fontSize: 36, fontWeight: '700', color: COLORS.gold, fontFamily: FONT.heading },
-  tag: { marginTop: 4, fontSize: 14, color: COLORS.goldSoft, textAlign: 'center' },
-  card: { width: '100%', maxWidth: 440, alignSelf: 'center', backgroundColor: COLORS.cream, borderRadius: RADIUS.xl, padding: 20 },
-  title: { fontSize: 24, fontWeight: '700', color: COLORS.ink, fontFamily: FONT.heading },
-  tabs: { flexDirection: 'row', marginTop: 14, marginBottom: 16, backgroundColor: '#efe6db', borderRadius: RADIUS.md, padding: 4 },
+  tag: { fontSize: 12, color: COLORS.goldSoft, textAlign: 'center', letterSpacing: 2, textTransform: 'uppercase' },
+  ringA: { position: 'absolute', top: -120, right: -120, width: 320, height: 320, borderRadius: 160, borderWidth: 1, borderColor: 'rgba(230,199,103,0.16)' },
+  ringB: { position: 'absolute', bottom: -140, left: -140, width: 360, height: 360, borderRadius: 180, borderWidth: 1, borderColor: 'rgba(230,199,103,0.12)' },
+  card: { width: '100%', maxWidth: 440, alignSelf: 'center', backgroundColor: COLORS.cream, borderRadius: RADIUS.xl, padding: 22, borderWidth: 1, borderColor: COLORS.gold, shadowColor: '#000', shadowOpacity: 0.35, shadowRadius: 18, shadowOffset: { width: 0, height: 8 }, elevation: 10 },
+  title: { fontSize: 26, fontWeight: '700', color: COLORS.espresso, fontFamily: FONT.heading },
+  tabs: { flexDirection: 'row', marginTop: 14, marginBottom: 16, backgroundColor: COLORS.creamDeep, borderRadius: RADIUS.lg, padding: 4, borderWidth: 1, borderColor: COLORS.line },
   tab: { flex: 1, minHeight: 44, alignItems: 'center', justifyContent: 'center', borderRadius: RADIUS.sm },
   tabOn: { backgroundColor: COLORS.espresso },
   tabText: { fontSize: 14, fontWeight: '600', color: COLORS.muted },

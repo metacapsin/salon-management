@@ -6,3 +6,10 @@ export function field(register, errors, name) {
   const message = errors[name]?.message
   return { ...rest, inputRef: ref, error: Boolean(message), helperText: message }
 }
+
+// Uncontrolled (register) field me value code se aaye (setValue/reset) to MUI ko pata nahi chalta aur label value ke upar chhap jaata he.
+// watch('name') ki value yahan do: value ho to label upar rahe, warna MUI apne aap sambhale.
+//   <TextField label="State" {...field(register, errors, 'state')} slotProps={labelShrink(values.state)} />
+export function labelShrink(value) {
+  return { inputLabel: { shrink: Boolean(value) || undefined } }
+}

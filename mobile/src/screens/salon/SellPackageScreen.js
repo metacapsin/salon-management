@@ -151,6 +151,6 @@ const styles = StyleSheet.create({
   pickTitle: { fontSize: 15, fontWeight: '600', color: COLORS.ink },
   warn: { backgroundColor: COLORS.goldSoft, borderRadius: 10, padding: 12, marginTop: 8 },
   warnText: { fontSize: 14, color: COLORS.ink, marginBottom: 8 },
-  warnBtn: { minHeight: 44, borderRadius: 10, backgroundColor: COLORS.brown, alignItems: 'center', justifyContent: 'center' },
-  warnBtnText: { color: '#fff', fontWeight: '600' },
+  warnBtn: { minHeight: 44, borderRadius: 10, backgroundColor: COLORS.espresso, alignItems: 'center', justifyContent: 'center' },
+  warnBtnText: { color: COLORS.gold, fontWeight: '700' },
 })

@@ -47,6 +47,9 @@ async function verifyRequest(path, params) {
     method: 'POST',
     headers: { Authorization: `Basic ${auth}`, 'Content-Type': 'application/x-www-form-urlencoded' },
     body: new URLSearchParams(params),
+  }).catch((error) => {
+    console.error('[sms] Twilio Verify network error:', error.cause?.code ?? error.name, error.message)
+    throw new ApiError(502, 'SMS_FAILED', 'Could not send the SMS right now. Please try again.')
   })
   const data = await res.json().catch(() => ({}))
   return { ok: res.ok, status: res.status, data }

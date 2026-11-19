@@ -32,7 +32,7 @@ async function sendMail({ to, subject, text, html }) {
     try {
       await getTransporter().sendMail({ from: env.MAIL_FROM || env.SMTP_USER, to, subject, text, html })
     } catch (error) {
-      console.error('[mail] send failed:', error.message)
+      console.error(`[mail] send failed: code=${error.code ?? '-'} responseCode=${error.responseCode ?? '-'} command=${error.command ?? '-'} message=${error.message}`)
       throw new ApiError(503, 'MAIL_SEND_FAILED', 'Could not send the email right now. Please try again later.')
     }
     return

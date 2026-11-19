@@ -11,7 +11,7 @@ import { ChoiceChips } from '../../components/Form'
 import { Card, ErrorNote, Screen, SectionTitle } from '../../components/Screen'
 import { LoadingState } from '../../components/States'
 import TextField from '../../components/TextField'
-import { COLORS } from '../../config/theme'
+import { COLORS, FONT } from '../../config/theme'
 import { newRequestKey, paiseToRupeesText, rupeesTextToPaise } from '../../utils/money'
 import { formatPaise } from '../../utils/formatPaise'
 import { dateOf, invoiceBadge } from './BillingScreen'
@@ -232,7 +232,7 @@ export default function InvoiceDetailScreen({ route }) {
 const styles = StyleSheet.create({
   titleRow: { flexDirection: 'row', alignItems: 'center', gap: 10 },
   title: { flex: 1, fontSize: 22, fontWeight: '700', color: COLORS.ink, fontFamily: 'serif' },
-  name: { fontSize: 16, fontWeight: '600', color: COLORS.ink },
+  name: { fontSize: 16, fontWeight: '600', color: COLORS.espresso, fontFamily: FONT.heading },
   muted: { fontSize: 13, color: COLORS.muted, marginTop: 2, marginBottom: 6 },
   voidNote: { fontSize: 13, color: COLORS.error, marginTop: 6 },
   line: { flexDirection: 'row', justifyContent: 'space-between', gap: 12, paddingVertical: 6 },

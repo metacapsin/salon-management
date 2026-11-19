@@ -15,6 +15,6 @@ export default function ComingSoonScreen({ route }) {
 }
 
 const styles = StyleSheet.create({
-  title: { fontSize: 20, fontWeight: '700', color: COLORS.ink, fontFamily: 'serif', marginBottom: 6 },
+  title: { fontSize: 20, fontWeight: '700', color: COLORS.espresso, fontFamily: 'serif', marginBottom: 6 },
   text: { fontSize: 14, color: COLORS.muted },
 })

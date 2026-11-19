@@ -7,7 +7,7 @@ import { friendlyError } from '../../api/client'
 import Button from '../../components/Button'
 import { StatusBadge } from '../../components/Chips'
 import { EmptyState, ErrorState, LoadingState } from '../../components/States'
-import { COLORS, FONT, RADIUS } from '../../config/theme'
+import { COLORS, FONT, RADIUS, SOFT_SHADOW } from '../../config/theme'
 import { formatDate, formatMoney } from '../../utils/formatMoney'
 
 // Customer-friendly wording for the status (the server's status names stay the same).
@@ -99,7 +99,7 @@ export default function MyBookingsScreen({ navigation }) {
 const styles = StyleSheet.create({
   screen: { flex: 1, backgroundColor: COLORS.cream },
   content: { padding: 16, paddingBottom: 32 },
-  card: { backgroundColor: COLORS.surface, borderRadius: RADIUS.lg, borderWidth: 1, borderColor: COLORS.line, padding: 14, marginBottom: 12, gap: 6 },
+  card: { backgroundColor: COLORS.surface, borderRadius: RADIUS.lg, borderWidth: 1, borderColor: COLORS.line, padding: 14, marginBottom: 12, gap: 6, ...SOFT_SHADOW },
   head: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', gap: 8 },
   salon: { flex: 1, fontSize: 17, fontWeight: '700', color: COLORS.ink, fontFamily: FONT.heading },
   row: { flexDirection: 'row', alignItems: 'center', gap: 8 },

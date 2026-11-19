@@ -107,10 +107,11 @@ export const serviceSchema = z
     description: z.string().trim().max(500, 'At most 500 characters.'),
     price: z.coerce.number({ error: 'Enter a price.' }).int('Use whole rupees.').min(0, 'Price cannot be negative.').max(1000000, 'Price is too high.'),
     durationMin: z.coerce
-      .number({ error: 'Enter the duration in minutes.' })
+      .number({ error: 'Enter a valid duration.' })
       .int('Use whole minutes.')
+      .positive('Duration must be more than 0.')
       .min(5, 'At least 5 minutes.')
-      .max(480, 'At most 480 minutes (8 hours).')
+      .max(480, 'At most 8 hours.')
       .refine((v) => v % 5 === 0, 'Use 5 minute steps, like 30 or 45.'),
     atSalon: z.boolean(),
     atHome: z.boolean(),

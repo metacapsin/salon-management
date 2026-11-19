@@ -9,6 +9,7 @@ import { ApiError, friendlyError } from '../../api/client'
 import { useAuth } from '../../auth/AuthContext'
 import { EmptyState, ErrorState, LoadingState } from '../../components/States'
 import { COLORS, FONT, RADIUS, SHADOW } from '../../config/theme'
+import { BrandMark } from '../../components/Brand'
 import { formatDate } from '../../utils/formatMoney'
 import { todayString } from '../../utils/dates'
 import SalonCard from './SalonCard'
@@ -156,8 +157,9 @@ export default function FindSalonScreen({ navigation }) {
   const header = (
     <View>
       <View style={[styles.hero, { paddingTop: 14 + insets.top }]}>
+        <View style={styles.heroRing} pointerEvents="none" />
         <View style={styles.heroTop}>
-          <Text style={styles.brand}>Glamora</Text>
+          <BrandMark size={38} />
           <View style={styles.heroActions}>
             <Pressable onPress={() => setSheet(true)} accessibilityRole="button" accessibilityLabel={`Location: ${placeLabel}`} style={styles.place}>
               <Ionicons name="location" size={14} color={COLORS.gold} />
@@ -244,7 +246,7 @@ export default function FindSalonScreen({ navigation }) {
   else if (nearMe) empty = <EmptyState icon="location-outline" title="No salons near you yet" text="Pick a city to see salons there." actionTitle="Choose a city" onAction={() => setSheet(true)} />
   else if (cities.length === 0) empty = <EmptyState icon="storefront-outline" title="No salons yet" text="Salons open for booking will appear here." />
   else if (q || category) empty = <EmptyState icon="search-outline" title="No salons found" text="Try another name or category." actionTitle="Clear filters" onAction={() => { setText(''); setCategory(null) }} />
-  else empty = <EmptyState icon="storefront-outline" title="No salons here yet" text="Try another city." actionTitle="Choose a city" onAction={() => setSheet(true)} />
+  else empty = <EmptyState icon="storefront-outline" title={`No salons found in ${activeCity}`} text="Try another city." actionTitle="Choose a city" onAction={() => setSheet(true)} />
 
   return (
     <>
@@ -271,19 +273,20 @@ export default function FindSalonScreen({ navigation }) {
 const styles = StyleSheet.create({
   screen: { flex: 1, backgroundColor: COLORS.cream },
   pad: { paddingHorizontal: 16 },
-  hero: { backgroundColor: COLORS.espresso, paddingHorizontal: 16, paddingBottom: 24, borderBottomLeftRadius: RADIUS.xl, borderBottomRightRadius: RADIUS.xl },
+  hero: { backgroundColor: COLORS.espresso, paddingHorizontal: 16, paddingBottom: 26, borderBottomLeftRadius: 32, borderBottomRightRadius: 32, overflow: 'hidden', borderBottomWidth: 2, borderColor: COLORS.gold },
+  heroRing: { position: 'absolute', top: -90, right: -70, width: 260, height: 260, borderRadius: 130, borderWidth: 1, borderColor: 'rgba(230,199,103,0.2)' },
   heroTop: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginBottom: 18 },
   brand: { fontSize: 26, fontWeight: '700', color: COLORS.gold, fontFamily: FONT.heading },
-  heroActions: { flexDirection: 'row', alignItems: 'center', gap: 10, flexShrink: 1 },
-  salonBtn: { flexDirection: 'row', alignItems: 'center', gap: 6, minHeight: 36, paddingHorizontal: 12, borderRadius: RADIUS.pill, backgroundColor: COLORS.gold },
+  heroActions: { flexDirection: 'row', alignItems: 'center', gap: 8, flexShrink: 1 },
+  salonBtn: { flexDirection: 'row', alignItems: 'center', gap: 5, minHeight: 36, paddingHorizontal: 10, borderRadius: RADIUS.pill, backgroundColor: COLORS.gold },
   salonBtnText: { color: COLORS.espresso, fontSize: 12, fontWeight: '800' },
-  place: { flexDirection: 'row', alignItems: 'center', gap: 4, maxWidth: 120, minHeight: 36, paddingHorizontal: 12, borderRadius: RADIUS.pill, borderWidth: 1, borderColor: 'rgba(230,199,103,0.5)' },
+  place: { flexDirection: 'row', alignItems: 'center', gap: 4, maxWidth: 104, minHeight: 36, paddingHorizontal: 10, borderRadius: RADIUS.pill, borderWidth: 1, borderColor: 'rgba(230,199,103,0.5)' },
   placeText: { color: COLORS.cream, fontSize: 13, fontWeight: '600', flexShrink: 1 },
   avatar: { width: 40, height: 40, borderRadius: 20, backgroundColor: COLORS.gold, alignItems: 'center', justifyContent: 'center' },
   avatarText: { color: COLORS.espresso, fontWeight: '800', fontSize: 16 },
-  welcome: { color: COLORS.goldSoft, fontSize: 14 },
-  headline: { color: COLORS.cream, fontSize: 28, fontWeight: '700', fontFamily: FONT.heading, marginTop: 2, marginBottom: 16 },
-  search: { flexDirection: 'row', alignItems: 'center', gap: 10, minHeight: 50, backgroundColor: COLORS.surface, borderRadius: RADIUS.md, paddingHorizontal: 14 },
+  welcome: { color: COLORS.gold, fontSize: 12, letterSpacing: 3, textTransform: 'uppercase' },
+  headline: { color: COLORS.cream, fontSize: 30, fontWeight: '700', fontFamily: FONT.heading, marginTop: 2, marginBottom: 16 },
+  search: { flexDirection: 'row', alignItems: 'center', gap: 10, minHeight: 52, backgroundColor: COLORS.ivory, borderRadius: RADIUS.pill, paddingHorizontal: 18, ...SHADOW },
   searchInput: { flex: 1, minHeight: 48, fontSize: 16, color: COLORS.ink, paddingVertical: 0, outlineStyle: 'none' },
   suggest: { flexDirection: 'row', alignItems: 'center', gap: 8, minHeight: 44, marginTop: 14, paddingHorizontal: 14, backgroundColor: COLORS.goldSoft, borderRadius: RADIUS.md },
   suggestText: { color: COLORS.ink, fontWeight: '600' },
@@ -292,17 +295,17 @@ const styles = StyleSheet.create({
   nextLabel: { color: COLORS.goldSoft, fontSize: 12 },
   nextTitle: { color: COLORS.cream, fontSize: 16, fontWeight: '700', fontFamily: FONT.heading },
   nextWhen: { color: COLORS.gold, fontSize: 13, fontWeight: '600' },
-  section: { fontSize: 18, fontWeight: '700', color: COLORS.ink, fontFamily: FONT.heading, marginTop: 22, marginBottom: 12 },
+  section: { fontSize: 20, fontWeight: '700', color: COLORS.espresso, fontFamily: FONT.heading, marginTop: 22, marginBottom: 12 },
   cats: { gap: 14, paddingRight: 16 },
   cat: { alignItems: 'center', width: 68 },
-  catIcon: { width: 56, height: 56, borderRadius: 28, backgroundColor: COLORS.surface, borderWidth: 1, borderColor: COLORS.line, alignItems: 'center', justifyContent: 'center' },
-  catIconOn: { backgroundColor: COLORS.espresso, borderColor: COLORS.espresso },
+  catIcon: { width: 58, height: 58, borderRadius: 29, backgroundColor: COLORS.goldSoft, borderWidth: 1, borderColor: COLORS.goldLine, alignItems: 'center', justifyContent: 'center' },
+  catIconOn: { backgroundColor: COLORS.espresso, borderColor: COLORS.gold },
   catLabel: { marginTop: 6, fontSize: 12, color: COLORS.muted, fontWeight: '600' },
   catLabelOn: { color: COLORS.ink, fontWeight: '800' },
   error: { color: COLORS.error, fontSize: 13, marginTop: 10 },
   backdrop: { flex: 1, backgroundColor: 'rgba(46,27,15,0.5)' },
-  sheet: { backgroundColor: COLORS.cream, borderTopLeftRadius: RADIUS.xl, borderTopRightRadius: RADIUS.xl, padding: 20 },
-  grab: { alignSelf: 'center', width: 44, height: 4, borderRadius: 2, backgroundColor: COLORS.line, marginBottom: 14 },
+  sheet: { backgroundColor: COLORS.cream, borderTopLeftRadius: 28, borderTopRightRadius: 28, padding: 20, borderTopWidth: 2, borderColor: COLORS.gold },
+  grab: { alignSelf: 'center', width: 44, height: 4, borderRadius: 2, backgroundColor: COLORS.goldDeep, marginBottom: 14 },
   sheetTitle: { fontSize: 20, fontWeight: '700', color: COLORS.ink, fontFamily: FONT.heading, marginBottom: 8 },
   sheetRow: { minHeight: 52, flexDirection: 'row', alignItems: 'center', gap: 12, borderBottomWidth: 1, borderBottomColor: COLORS.line },
   sheetText: { flex: 1, fontSize: 16, color: COLORS.ink },

@@ -1,6 +1,6 @@
 import { Box, Button, Typography } from '@mui/material'
 
-// Salon ki location: chhota map (OpenStreetMap, free, API key nahi chahiye) + "Get directions" button (Google Maps khulta hai).
+// Salon ki location: chhota map (OpenStreetMap, free, API key nahi chahiye; Google ka embed bina key ke band he) + "Get directions" button (Google Maps khulta hai).
 // Coordinates na hon to sirf address se Google Maps ka link dete hain.
 export default function SalonMap({ name, address, location, height = 180 }) {
   const query = location ? `${location.lat},${location.lng}` : encodeURIComponent(`${name}, ${address}`)

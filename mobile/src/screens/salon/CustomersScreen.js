@@ -9,7 +9,7 @@ import { FilterChips, StatusBadge } from '../../components/Chips'
 import { Card, ErrorNote } from '../../components/Screen'
 import { SearchBox, SummaryPanel } from '../../components/Summary'
 import { EmptyState, LoadingState } from '../../components/States'
-import { COLORS } from '../../config/theme'
+import { COLORS, FONT } from '../../config/theme'
 import { formatDate, formatMoney } from '../../utils/formatMoney'
 
 const SEGMENTS = [
@@ -114,9 +114,9 @@ const styles = StyleSheet.create({
   screen: { flex: 1, backgroundColor: COLORS.cream },
   list: { padding: 16, paddingBottom: 24 },
   top: { flexDirection: 'row', alignItems: 'center', gap: 12 },
-  avatar: { width: 42, height: 42, borderRadius: 21, backgroundColor: COLORS.goldSoft, alignItems: 'center', justifyContent: 'center' },
-  avatarText: { color: COLORS.brownDark, fontSize: 17, fontWeight: '800' },
-  name: { fontSize: 16, fontWeight: '700', color: COLORS.ink },
+  avatar: { width: 44, height: 44, borderRadius: 22, backgroundColor: COLORS.espresso, borderWidth: 1, borderColor: COLORS.gold, alignItems: 'center', justifyContent: 'center' },
+  avatarText: { color: COLORS.gold, fontSize: 17, fontWeight: '700', fontFamily: FONT.heading },
+  name: { fontSize: 16, fontWeight: '700', color: COLORS.espresso, fontFamily: FONT.heading },
   muted: { fontSize: 13, color: COLORS.muted, marginTop: 1 },
   facts: { flexDirection: 'row', flexWrap: 'wrap', gap: 14, marginTop: 12, paddingTop: 12, borderTopWidth: 1, borderTopColor: COLORS.line },
   fact: { flexDirection: 'row', alignItems: 'center', gap: 5 },

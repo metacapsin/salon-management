@@ -7,7 +7,7 @@ import { ApiError, friendlyError } from '../../api/client'
 import Button from '../../components/Button'
 import { Ionicons } from '@expo/vector-icons'
 import { ErrorBanner } from '../../components/States'
-import { COLORS, FONT, RADIUS } from '../../config/theme'
+import { COLORS, FONT, RADIUS, SOFT_SHADOW } from '../../config/theme'
 import { formatDate, formatMoney } from '../../utils/formatMoney'
 import { todayString } from '../../utils/dates'
 import { offerText } from './SalonDetailScreen'
@@ -189,8 +189,8 @@ const styles = StyleSheet.create({
   chipOff: { opacity: 0.4 },
   chipText: { fontSize: 14, color: COLORS.brown, fontWeight: '600' },
   chipTextOn: { color: COLORS.gold },
-  input: { minHeight: 48, borderWidth: 1, borderColor: COLORS.line, borderRadius: 10, backgroundColor: '#fff', paddingHorizontal: 14, paddingVertical: 10, fontSize: 16, color: COLORS.ink, marginTop: 8 },
-  summary: { marginVertical: 20, backgroundColor: COLORS.surface, borderRadius: RADIUS.lg, borderWidth: 1, borderColor: COLORS.line, padding: 14, gap: 4 },
+  input: { minHeight: 48, borderWidth: 1, borderColor: COLORS.line, borderRadius: 16, backgroundColor: COLORS.ivory, paddingHorizontal: 14, paddingVertical: 10, fontSize: 16, color: COLORS.ink, marginTop: 8 },
+  summary: { marginVertical: 20, backgroundColor: COLORS.surface, borderRadius: RADIUS.lg, borderWidth: 1, borderColor: COLORS.line, padding: 14, gap: 4, ...SOFT_SHADOW },
   sumLine: { fontSize: 14, color: COLORS.ink },
   sumTotal: { fontSize: 18, fontWeight: '700', color: COLORS.ink },
   banner: { backgroundColor: '#fdecea', borderWidth: 1, borderColor: COLORS.error, borderRadius: 10, padding: 12, marginBottom: 12 },

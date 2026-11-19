@@ -8,7 +8,11 @@ export const COLORS = {
   goldDeep: '#9a7424', // gold-ish text that must be readable on cream/white
   goldSoft: '#f6ecd0', // soft highlight background
   cream: '#faf5ef', // screen background
-  surface: '#ffffff', // cards
+  ivory: '#fffcf6', // cards and inputs (warmer than pure white)
+  creamDeep: '#f1e7d9', // tracks, segmented background, soft dividers
+  surface: '#fffcf6', // cards
+  goldLine: 'rgba(230,199,103,0.45)', // thin gold outline on dark brown
+  espressoSoft: '#4a2f1d', // pressed dark brown / raised dark surface
   line: '#eadfd3', // card and input borders
   ink: '#3a2415', // dark brown text
   muted: '#6d5846', // secondary text
@@ -24,6 +28,7 @@ export const COLORS = {
 
 export const SPACING = { xs: 4, sm: 8, md: 12, lg: 16, xl: 24, xxl: 32 }
 export const RADIUS = { sm: 8, md: 12, lg: 16, xl: 24, pill: 999 }
+export const SOFT_SHADOW = { shadowColor: '#2e1b0f', shadowOpacity: 0.08, shadowRadius: 12, shadowOffset: { width: 0, height: 4 }, elevation: 2 }
 
 // One serif for headings (brand feel), the system font for everything else.
 export const FONT = { heading: 'serif' }

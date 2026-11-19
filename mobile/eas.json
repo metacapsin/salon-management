@@ -8,7 +8,7 @@
       "distribution": "internal",
       "android": { "buildType": "apk" },
       "env": {
-        "EXPO_PUBLIC_API_URL": "http://192.168.1.24:3000"
+        "EXPO_PUBLIC_API_URL": "http://192.168.29.216:3000"
       }
     }
   }

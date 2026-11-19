@@ -48,7 +48,8 @@ const server = http
         up.pipe(res)
       },
     )
-    upstream.on('error', () => {
+    upstream.on('error', (error) => {
+      console.error(`[proxy] ${req.method} ${req.url} -> backend error: ${error.code ?? error.name} ${error.message}`)
       res.writeHead(502, { 'Content-Type': 'application/json', ...corsHeaders(origin) })
       res.end(JSON.stringify({ error: { code: 'PROXY_ERROR', message: 'Backend not reachable.' } }))
     })

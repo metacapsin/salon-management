@@ -1,22 +1,21 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { StatusBar } from 'expo-status-bar'
-import { ActivityIndicator, View } from 'react-native'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { SafeAreaProvider } from 'react-native-safe-area-context'
 import { ApiError } from './src/api/client'
 import { AuthProvider, useAuth } from './src/auth/AuthContext'
-import { COLORS } from './src/config/theme'
 import RootNavigator, { GuestNavigator } from './src/navigation/RootNavigator'
+import SplashScreen from './src/screens/SplashScreen'
 
 function Root() {
   const { status } = useAuth()
-  if (status === 'loading') {
-    return (
-      <View style={{ flex: 1, backgroundColor: COLORS.espresso, alignItems: 'center', justifyContent: 'center' }}>
-        <ActivityIndicator color={COLORS.gold} size="large" />
-      </View>
-    )
-  }
+  // Show the brand splash for at least 1.8 s (and as long as the saved sign-in is still being checked).
+  const [splashDone, setSplashDone] = useState(false)
+  useEffect(() => {
+    const id = setTimeout(() => setSplashDone(true), 1800)
+    return () => clearTimeout(id)
+  }, [])
+  if (status === 'loading' || !splashDone) return <SplashScreen />
   // Not signed in: the first page is Find a Salon. Login is asked only when a salon is opened, or from the "Salon login" button.
   if (status === 'anonymous') return <GuestNavigator />
   return <RootNavigator />

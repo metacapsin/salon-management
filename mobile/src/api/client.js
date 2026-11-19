@@ -1,7 +1,7 @@
 // The one place that talks to the backend. Same response shapes as the website:
 // success { data, meta, requestId }, error { error: { code, message, fieldErrors } }.
 // The access token stays in memory only; the refresh token is kept by tokenStore.
-import { API_BASE } from '../config/env'
+import { API_BASE, API_URL } from '../config/env'
 import { clearCustomerToken, clearRefreshToken, getCustomerToken, getRefreshToken, saveCustomerToken, saveRefreshToken } from '../auth/tokenStore'
 
 // status 0 = the request never reached the server (no internet / server off).
@@ -40,18 +40,28 @@ async function send(path, { method = 'GET', body, auth = true, salon = true, tok
   else if (auth && accessToken) headers.Authorization = `Bearer ${accessToken}`
   if (salon && activeSalonId) headers['X-Salon-Id'] = activeSalonId
 
+  // React Native's fetch has no timeout of its own: if the phone cannot really reach the server (blocked port, wrong Wi-Fi,
+  // server asleep) the request just hangs and the screen shows a spinner forever. We stop it ourselves, so the screen can
+  // show its error message and "Try again" button. Photo uploads get more time.
+  const controller = new AbortController()
+  const timer = setTimeout(() => controller.abort(), isFile ? 60_000 : 15_000)
   let response
-  try {
-    response = await fetch(`${API_BASE}${path}`, { method, headers, body: body === undefined ? undefined : isFile ? body : JSON.stringify(body) })
-  } catch {
-    throw new ApiError(0, 'NETWORK_ERROR', 'Could not reach the server.')
-  }
-
   let json = null
   try {
-    json = await response.json()
-  } catch {
-    json = null
+    try {
+      response = await fetch(`${API_BASE}${path}`, { method, headers, signal: controller.signal, body: body === undefined ? undefined : isFile ? body : JSON.stringify(body) })
+    } catch (cause) {
+      // Say WHY: our own 15s timer fired (phone cannot really reach the server: firewall, wrong Wi-Fi) or the connection was refused straight away.
+      const timedOut = controller.signal.aborted
+      throw new ApiError(0, timedOut ? 'NETWORK_TIMEOUT' : 'NETWORK_ERROR', `Could not reach the server at ${API_URL || '(no API address set)'}${timedOut ? ' (timed out)' : ''}.`, { details: { url: API_URL, timedOut, reason: cause?.message } })
+    }
+    try {
+      json = await response.json()
+    } catch {
+      json = null
+    }
+  } finally {
+    clearTimeout(timer)
   }
 
   if (!response.ok) {
@@ -164,7 +174,11 @@ export async function logoutRequest() {
 
 export function friendlyError(error, fallback = 'Something went wrong. Please try again.') {
   if (!(error instanceof ApiError)) return fallback
-  if (error.status === 0) return 'Could not reach the server. Check your connection and try again.'
+  if (error.status === 0) {
+    // A production (https) address is not shown to customers; a development http address is, so a wrong IP or a blocked port is easy to spot.
+    const where = API_URL.startsWith('https://') ? '' : ` Tried: ${API_URL || '(no API address set)'}${error.code === 'NETWORK_TIMEOUT' ? ' - no answer (check Wi-Fi, firewall, backend running)' : ' - connection refused'}.`
+    return `Could not reach the server. Check your connection and try again.${where}`
+  }
   if (error.status === 429) return 'Too many attempts. Please wait a few minutes and try again.'
   // The server itself says why it could not do this (for example the login code email could not be sent).
   if (error.code === 'MAIL_SEND_FAILED' || error.code === 'SMS_FAILED' || error.code === 'PROVIDER_NOT_CONFIGURED') return error.message || fallback

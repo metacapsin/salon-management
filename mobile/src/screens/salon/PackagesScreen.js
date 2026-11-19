@@ -8,7 +8,7 @@ import { roleCan } from '../../auth/permissions'
 import { FilterChips, Segmented, StatusBadge } from '../../components/Chips'
 import { Card, ErrorNote } from '../../components/Screen'
 import { EmptyState, LoadingState } from '../../components/States'
-import { COLORS, TOUCH_MIN } from '../../config/theme'
+import { COLORS, TOUCH_MIN, FONT } from '../../config/theme'
 import { MembersTab, PlansTab } from './MembershipTabs'
 import { formatDate, formatMoney } from '../../utils/formatMoney'
 
@@ -194,10 +194,10 @@ const styles = StyleSheet.create({
   empty: { textAlign: 'center', color: COLORS.muted, marginTop: 32 },
   add: { minHeight: 44, minWidth: 44, justifyContent: 'center', paddingHorizontal: 12 },
   addText: { color: COLORS.gold, fontSize: 16, fontWeight: '700' },
-  search: { minHeight: TOUCH_MIN, borderWidth: 1, borderColor: COLORS.line, borderRadius: 10, backgroundColor: '#fff', paddingHorizontal: 14, fontSize: 16, color: COLORS.ink },
+  search: { minHeight: TOUCH_MIN, borderWidth: 1, borderColor: COLORS.line, borderRadius: 16, backgroundColor: COLORS.ivory, paddingHorizontal: 14, fontSize: 16, color: COLORS.ink },
   stopped: { opacity: 0.65 },
   top: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', gap: 8 },
-  title: { flex: 1, fontSize: 16, fontWeight: '600', color: COLORS.ink },
+  title: { flex: 1, fontSize: 16, fontWeight: '600', color: COLORS.espresso, fontFamily: FONT.heading },
   name: { fontSize: 15, color: COLORS.ink, marginTop: 4 },
   muted: { fontSize: 13, color: COLORS.muted, marginTop: 2 },
   desc: { fontSize: 13, color: COLORS.ink, marginTop: 6 },

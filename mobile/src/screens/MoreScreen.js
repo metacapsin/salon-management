@@ -4,7 +4,7 @@ import { useAuth } from '../auth/AuthContext'
 import { ROLE_LABELS } from '../auth/permissions'
 import Button from '../components/Button'
 import { Screen, SectionTitle } from '../components/Screen'
-import { COLORS, FONT, RADIUS } from '../config/theme'
+import { COLORS, FONT, RADIUS, SOFT_SHADOW } from '../config/theme'
 
 // Account page: who is signed in, the sections that did not fit in the tab bar (only the ones this role may open),
 // a salon switcher when the user belongs to more than one salon, and Sign out.
@@ -33,7 +33,7 @@ export default function MoreScreen({ navigation, items = [] }) {
             {items.map((item, i) => (
               <Pressable key={item.name} accessibilityRole="button" accessibilityLabel={item.label} style={[styles.row, i === items.length - 1 && styles.rowLast]} onPress={() => navigation.navigate(item.name)}>
                 <View style={styles.rowIcon}>
-                  <Ionicons name={item.icon} size={20} color={COLORS.brown} />
+                  <Ionicons name={item.icon} size={18} color={COLORS.gold} />
                 </View>
                 <Text style={styles.rowText}>{item.label}</Text>
                 <Ionicons name="chevron-forward" size={20} color={COLORS.muted} />
@@ -67,17 +67,17 @@ export default function MoreScreen({ navigation, items = [] }) {
 }
 
 const styles = StyleSheet.create({
-  profile: { flexDirection: 'row', alignItems: 'center', gap: 14, backgroundColor: COLORS.espresso, borderRadius: RADIUS.xl, padding: 18 },
-  avatar: { width: 60, height: 60, borderRadius: 30, backgroundColor: COLORS.gold, alignItems: 'center', justifyContent: 'center' },
+  profile: { flexDirection: 'row', alignItems: 'center', gap: 14, backgroundColor: COLORS.espresso, borderRadius: RADIUS.xl, padding: 18, borderWidth: 1, borderColor: COLORS.goldLine },
+  avatar: { width: 62, height: 62, borderRadius: 31, borderWidth: 2, borderColor: '#f6e3a1', backgroundColor: COLORS.gold, alignItems: 'center', justifyContent: 'center' },
   avatarText: { color: COLORS.espresso, fontSize: 24, fontWeight: '800' },
   name: { fontSize: 20, fontWeight: '700', color: COLORS.cream, fontFamily: FONT.heading },
   email: { fontSize: 13, color: COLORS.goldSoft, marginTop: 2 },
   pill: { alignSelf: 'flex-start', marginTop: 8, paddingHorizontal: 10, paddingVertical: 3, borderRadius: RADIUS.pill, borderWidth: 1, borderColor: 'rgba(230,199,103,0.5)' },
   pillText: { color: COLORS.gold, fontSize: 12, fontWeight: '700' },
-  list: { backgroundColor: COLORS.surface, borderRadius: RADIUS.lg, borderWidth: 1, borderColor: COLORS.line, overflow: 'hidden' },
+  list: { backgroundColor: COLORS.surface, borderRadius: RADIUS.lg, borderWidth: 1, borderColor: COLORS.line, overflow: 'hidden', ...SOFT_SHADOW },
   row: { minHeight: 56, flexDirection: 'row', alignItems: 'center', gap: 12, paddingHorizontal: 16, borderBottomWidth: 1, borderBottomColor: COLORS.line },
   rowLast: { borderBottomWidth: 0 },
-  rowIcon: { width: 34, height: 34, borderRadius: 10, backgroundColor: COLORS.goldSoft, alignItems: 'center', justifyContent: 'center' },
-  rowText: { flex: 1, fontSize: 16, color: COLORS.ink },
+  rowIcon: { width: 36, height: 36, borderRadius: 18, backgroundColor: COLORS.espresso, alignItems: 'center', justifyContent: 'center' },
+  rowText: { flex: 1, fontSize: 16, fontWeight: '600', color: COLORS.ink },
   signOut: { marginTop: 24 },
 })

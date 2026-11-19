@@ -4,7 +4,7 @@ import { fetchMyNotifications, markAllNotificationsRead, markNotificationRead } 
 import { friendlyError } from '../../api/client'
 import Button from '../../components/Button'
 import { EmptyState, ErrorState, LoadingState } from '../../components/States'
-import { COLORS, FONT, RADIUS } from '../../config/theme'
+import { COLORS, FONT, RADIUS, SOFT_SHADOW } from '../../config/theme'
 
 export const NOTIFICATIONS_KEY = ['public', 'notifications']
 
@@ -74,7 +74,7 @@ const styles = StyleSheet.create({
   screen: { flex: 1, backgroundColor: COLORS.cream },
   content: { padding: 16, paddingBottom: 32 },
   markAll: { marginBottom: 12 },
-  card: { backgroundColor: COLORS.surface, borderRadius: RADIUS.lg, borderWidth: 1, borderColor: COLORS.line, padding: 14, marginBottom: 12, gap: 6 },
+  card: { backgroundColor: COLORS.surface, borderRadius: RADIUS.lg, borderWidth: 1, borderColor: COLORS.line, padding: 14, marginBottom: 12, gap: 6, ...SOFT_SHADOW },
   unread: { backgroundColor: '#fff8e6', borderColor: COLORS.gold },
   head: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', gap: 8 },
   title: { flex: 1, fontSize: 16, fontWeight: '700', color: COLORS.ink, fontFamily: FONT.heading },

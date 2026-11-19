@@ -7,7 +7,7 @@ import Button from '../../components/Button'
 import { FilterChips, StatusBadge } from '../../components/Chips'
 import { Card, ErrorNote } from '../../components/Screen'
 import { EmptyState, LoadingState } from '../../components/States'
-import { COLORS } from '../../config/theme'
+import { COLORS, FONT } from '../../config/theme'
 import { formatDate } from '../../utils/formatMoney'
 
 const STATUSES = [
@@ -120,7 +120,7 @@ const styles = StyleSheet.create({
   loader: { marginTop: 24 },
   empty: { textAlign: 'center', color: COLORS.muted, marginTop: 32 },
   top: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', gap: 8, marginBottom: 4 },
-  name: { flex: 1, fontSize: 16, fontWeight: '600', color: COLORS.ink },
+  name: { flex: 1, fontSize: 16, fontWeight: '600', color: COLORS.espresso, fontFamily: FONT.heading },
   muted: { fontSize: 13, color: COLORS.muted, marginTop: 2 },
   error: { color: COLORS.error, fontSize: 13, marginTop: 8 },
   actions: { marginTop: 12, gap: 8 },

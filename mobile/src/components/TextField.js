@@ -14,7 +14,7 @@ const TextField = forwardRef(function TextField({ label, error, style, icon, sec
     <View style={styles.wrap}>
       {label ? <Text style={styles.label}>{label}</Text> : null}
       <View style={[styles.box, focused && styles.boxFocused, error && styles.boxError, multiline && styles.boxMulti]}>
-        {icon ? <Ionicons name={icon} size={20} color={COLORS.muted} style={styles.icon} /> : null}
+        {icon ? <Ionicons name={icon} size={20} color={focused ? COLORS.goldDeep : COLORS.muted} style={styles.icon} /> : null}
         <TextInput
           ref={ref}
           accessibilityLabel={label}
@@ -47,18 +47,18 @@ export default TextField
 
 const styles = StyleSheet.create({
   wrap: { marginBottom: 16 },
-  label: { fontSize: 14, fontWeight: '600', color: COLORS.ink, marginBottom: 6 },
+  label: { fontSize: 13, fontWeight: '700', color: COLORS.espresso, marginBottom: 6, letterSpacing: 0.4 },
   box: {
     minHeight: TOUCH_MIN,
     flexDirection: 'row',
     alignItems: 'center',
     borderWidth: 1,
     borderColor: COLORS.line,
-    borderRadius: RADIUS.md,
-    backgroundColor: COLORS.surface,
+    borderRadius: RADIUS.lg,
+    backgroundColor: COLORS.ivory,
     paddingHorizontal: 14,
   },
-  boxFocused: { borderColor: COLORS.brown },
+  boxFocused: { borderColor: COLORS.goldDeep, borderWidth: 1.5, backgroundColor: '#fff' },
   boxError: { borderColor: COLORS.error },
   boxMulti: { alignItems: 'flex-start', paddingVertical: 4 },
   icon: { marginRight: 10 },

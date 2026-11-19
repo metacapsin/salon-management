@@ -7,8 +7,9 @@ import { friendlyError } from '../../api/client'
 import { useAuth } from '../../auth/AuthContext'
 import { ROLE_LABELS, roleCan } from '../../auth/permissions'
 import { Stars } from '../../components/Reviews'
+import { BrandMark } from '../../components/Brand'
 import { Card, ErrorNote, Screen, SectionTitle, StatCard } from '../../components/Screen'
-import { COLORS, FONT, RADIUS, SHADOW } from '../../config/theme'
+import { COLORS, FONT, RADIUS, SHADOW, SOFT_SHADOW } from '../../config/theme'
 import { formatPaise } from '../../utils/formatPaise'
 
 // Local date as YYYY-MM-DD (the server reads it in the salon's own timezone).
@@ -22,7 +23,7 @@ function QuickAction({ icon, label, onPress }) {
   return (
     <Pressable onPress={onPress} accessibilityRole="button" accessibilityLabel={label} style={({ pressed }) => [styles.action, pressed && { opacity: 0.85 }]}>
       <View style={styles.actionIcon}>
-        <Ionicons name={icon} size={20} color={COLORS.espresso} />
+        <Ionicons name={icon} size={19} color={COLORS.gold} />
       </View>
       <Text style={styles.actionText}>{label}</Text>
     </Pressable>
@@ -70,6 +71,10 @@ export default function DashboardScreen({ navigation }) {
   return (
     <Screen onRefresh={refetchAll} refreshing={refreshing}>
       <View style={styles.hero}>
+        <View style={styles.heroRing} pointerEvents="none" />
+        <View style={styles.heroMark}>
+          <BrandMark size={40} />
+        </View>
         <Text style={styles.heroHello}>Hello, {user?.name?.split(' ')[0]}</Text>
         <Text style={styles.heroSalon} numberOfLines={2}>{activeSalon?.salonName}</Text>
         <View style={styles.rolePill}>
@@ -148,16 +153,18 @@ export default function DashboardScreen({ navigation }) {
 }
 
 const styles = StyleSheet.create({
-  hero: { backgroundColor: COLORS.espresso, borderRadius: RADIUS.xl, padding: 20, marginBottom: 16, ...SHADOW },
-  heroHello: { color: COLORS.goldSoft, fontSize: 14 },
-  heroSalon: { color: COLORS.cream, fontSize: 24, fontWeight: '700', fontFamily: FONT.heading, marginTop: 2 },
+  hero: { backgroundColor: COLORS.espresso, borderRadius: RADIUS.xl, padding: 20, marginBottom: 16, borderWidth: 1, borderColor: COLORS.goldLine, overflow: 'hidden', ...SHADOW },
+  heroRing: { position: 'absolute', top: -70, right: -60, width: 220, height: 220, borderRadius: 110, borderWidth: 1, borderColor: 'rgba(230,199,103,0.22)' },
+  heroMark: { position: 'absolute', top: 18, right: 18 },
+  heroHello: { color: COLORS.gold, fontSize: 12, letterSpacing: 3, textTransform: 'uppercase' },
+  heroSalon: { color: COLORS.cream, fontSize: 26, paddingRight: 56, fontWeight: '700', fontFamily: FONT.heading, marginTop: 2 },
   rolePill: { flexDirection: 'row', alignItems: 'center', gap: 6, alignSelf: 'flex-start', marginTop: 12, paddingHorizontal: 12, paddingVertical: 5, borderRadius: RADIUS.pill, borderWidth: 1, borderColor: 'rgba(230,199,103,0.5)' },
   roleText: { color: COLORS.gold, fontSize: 13, fontWeight: '600' },
   quick: { flexDirection: 'row', gap: 12, marginBottom: 4 },
-  reviews: { flexDirection: 'row', alignItems: 'center', gap: 12, minHeight: 64, backgroundColor: COLORS.surface, borderRadius: RADIUS.lg, borderWidth: 1, borderColor: COLORS.line, padding: 14 },
+  reviews: { flexDirection: 'row', alignItems: 'center', gap: 12, minHeight: 64, backgroundColor: COLORS.surface, borderRadius: RADIUS.lg, borderWidth: 1, borderColor: COLORS.line, padding: 14, ...SOFT_SHADOW },
   reviewAvg: { fontSize: 30, fontWeight: '700', color: COLORS.espresso, fontFamily: FONT.heading },
-  action: { flex: 1, flexDirection: 'row', alignItems: 'center', gap: 8, minHeight: 56, backgroundColor: COLORS.surface, borderRadius: RADIUS.lg, borderWidth: 1, borderColor: COLORS.line, padding: 10 },
-  actionIcon: { width: 36, height: 36, borderRadius: 12, backgroundColor: COLORS.gold, alignItems: 'center', justifyContent: 'center' },
+  action: { flex: 1, flexDirection: 'row', alignItems: 'center', gap: 8, minHeight: 56, backgroundColor: COLORS.surface, borderRadius: RADIUS.lg, borderWidth: 1, borderColor: COLORS.line, padding: 10, ...SOFT_SHADOW },
+  actionIcon: { width: 38, height: 38, borderRadius: 19, backgroundColor: COLORS.espresso, alignItems: 'center', justifyContent: 'center' },
   actionText: { flex: 1, fontSize: 13, fontWeight: '700', color: COLORS.ink },
   muted: { fontSize: 14, color: COLORS.muted, marginBottom: 8 },
   grid: { flexDirection: 'row', flexWrap: 'wrap', gap: 12 },

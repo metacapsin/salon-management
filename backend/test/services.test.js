@@ -39,6 +39,28 @@ test('validation: bad duration, negative price, no place, duplicate name', async
   assert.equal(dup.body.error.code, 'SERVICE_EXISTS')
 })
 
+test('duration: hour-based values stay integer minutes; zero, negative, decimal, text are rejected', async () => {
+  const o = await h.ownerWithSalon('svc-dur@x.com', 'svc-dur')
+  const auth = h.bearer(o.token, o.salonId)
+  const post = (body) => h.request(h.app).post(api('/services')).set(auth).send(body)
+
+  for (const [i, min] of [15, 60, 90, 150, 180, 480].entries()) {
+    const res = await post({ ...haircut, name: `Dur ${i}`, durationMin: min })
+    assert.equal(res.status, 201)
+    assert.equal(res.body.data.service.durationMin, min)
+  }
+  for (const bad of [0, -30, 4, 485, 32.5, '90', null]) {
+    assert.equal((await post({ ...haircut, name: 'Bad dur', durationMin: bad })).status, 400, `should reject ${bad}`)
+  }
+  // update path
+  const id = (await post({ ...haircut, name: 'Upd dur' })).body.data.service.id
+  const put = (body) => h.request(h.app).patch(api(`/services/${id}`)).set(auth).send(body)
+  const ok = await put({ durationMin: 150 })
+  assert.equal(ok.status, 200)
+  assert.equal(ok.body.data.service.durationMin, 150)
+  assert.equal((await put({ durationMin: 0 })).status, 400)
+})
+
 test('deactivating hides the service and a deactivated name can be reused', async () => {
   const o = await h.ownerWithSalon('svc3@x.com', 'svc-three')
   const auth = h.bearer(o.token, o.salonId)

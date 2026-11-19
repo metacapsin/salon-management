@@ -6,6 +6,7 @@ import { getSalonDetail, recordSalonView } from '../../api/publicApi'
 import { useCustomer } from '../../customer/CustomerAuthContext'
 import QueryState from '../../components/QueryState'
 import { formatMoney } from '../../utils/formatMoney'
+import { formatDuration } from '../../utils/duration'
 import SalonReviews from '../reviews/SalonReviews'
 import OfferList from './OfferList'
 import SalonCover from './SalonCover'
@@ -74,7 +75,7 @@ function Services({ detail }) {
                     <Typography sx={{ fontWeight: 600 }}>{s.name}</Typography>
                     <Box sx={{ display: 'flex', gap: 0.75, alignItems: 'center', flexWrap: 'wrap' }}>
                       <Typography variant="caption" color="text.secondary">
-                        {s.durationMin} min
+                        {formatDuration(s.durationMin)}
                       </Typography>
                       {s.atSalon && <Chip size="small" label="At salon" />}
                       {s.atHome && <Chip size="small" color="secondary" label="Home" />}

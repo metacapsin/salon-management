@@ -123,7 +123,7 @@ const styles = StyleSheet.create({
   statusText: { fontSize: 16, fontWeight: '600' },
   confirmTitle: { fontSize: 17, fontWeight: '700', color: COLORS.ink },
   confirmText: { fontSize: 14, color: COLORS.muted, marginTop: 4, marginBottom: 12 },
-  reason: { minHeight: 72, borderWidth: 1, borderColor: COLORS.line, borderRadius: 10, backgroundColor: '#fff', padding: 12, fontSize: 15, color: COLORS.ink, textAlignVertical: 'top' },
+  reason: { minHeight: 72, borderWidth: 1, borderColor: COLORS.line, borderRadius: 16, backgroundColor: COLORS.ivory, padding: 12, fontSize: 15, color: COLORS.ink, textAlignVertical: 'top' },
   error: { color: COLORS.error, fontSize: 13, marginTop: 8 },
   gap: { height: 10 },
   keep: { minHeight: 44, alignItems: 'center', justifyContent: 'center' },

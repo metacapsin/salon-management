@@ -38,9 +38,9 @@ export default function ProfileScreen({ navigation }) {
 
 const styles = StyleSheet.create({
   top: { alignItems: 'center', paddingVertical: 24, gap: 4 },
-  avatar: { width: 84, height: 84, borderRadius: 42, backgroundColor: COLORS.espresso, alignItems: 'center', justifyContent: 'center', marginBottom: 8 },
-  avatarText: { color: COLORS.gold, fontSize: 34, fontWeight: '700', fontFamily: FONT.heading },
-  name: { fontSize: 22, fontWeight: '700', color: COLORS.ink, fontFamily: FONT.heading },
+  avatar: { width: 92, height: 92, borderRadius: 46, borderWidth: 2, borderColor: COLORS.gold, backgroundColor: COLORS.espresso, alignItems: 'center', justifyContent: 'center', marginBottom: 8 },
+  avatarText: { color: COLORS.gold, fontSize: 38, fontWeight: '700', fontFamily: FONT.heading },
+  name: { fontSize: 24, fontWeight: '700', color: COLORS.espresso, fontFamily: FONT.heading },
   muted: { fontSize: 14, color: COLORS.muted },
   menu: { padding: 0, overflow: 'hidden', borderRadius: RADIUS.lg, marginVertical: 12 },
   row: { minHeight: 56, flexDirection: 'row', alignItems: 'center', gap: 14, paddingHorizontal: 16, borderBottomWidth: 1, borderBottomColor: COLORS.line },

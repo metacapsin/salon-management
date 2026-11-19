@@ -19,5 +19,5 @@ export default function NoSalonScreen() {
 
 const styles = StyleSheet.create({
   screen: { flex: 1, backgroundColor: COLORS.espresso, justifyContent: 'center', padding: 20 },
-  card: { backgroundColor: COLORS.cream, borderRadius: RADIUS.xl, padding: 20, width: '100%', maxWidth: 440, alignSelf: 'center' },
+  card: { backgroundColor: COLORS.cream, borderRadius: RADIUS.xl, padding: 20, width: '100%', maxWidth: 440, alignSelf: 'center', borderWidth: 1, borderColor: COLORS.gold },
 })

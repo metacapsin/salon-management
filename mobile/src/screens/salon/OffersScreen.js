@@ -8,7 +8,7 @@ import { roleCan } from '../../auth/permissions'
 import { StatusBadge } from '../../components/Chips'
 import { Card, ErrorNote } from '../../components/Screen'
 import { EmptyState, LoadingState } from '../../components/States'
-import { COLORS } from '../../config/theme'
+import { COLORS, FONT } from '../../config/theme'
 import { todayString } from '../../utils/dates'
 import { formatDate } from '../../utils/formatMoney'
 
@@ -93,7 +93,7 @@ const styles = StyleSheet.create({
   add: { minHeight: 44, minWidth: 44, justifyContent: 'center', paddingHorizontal: 12 },
   addText: { color: COLORS.gold, fontSize: 16, fontWeight: '700' },
   top: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', gap: 8 },
-  title: { flex: 1, fontSize: 16, fontWeight: '600', color: COLORS.ink },
+  title: { flex: 1, fontSize: 16, fontWeight: '600', color: COLORS.espresso, fontFamily: FONT.heading },
   discount: { fontSize: 20, fontWeight: '700', color: COLORS.brown, marginTop: 4 },
   muted: { fontSize: 13, color: COLORS.muted, marginTop: 2 },
   desc: { fontSize: 13, color: COLORS.ink, marginTop: 6 },

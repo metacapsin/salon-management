@@ -8,7 +8,7 @@ import Button from '../../components/Button'
 import PhotoGallery from '../../components/PhotoGallery'
 import { Ionicons } from '@expo/vector-icons'
 import { ErrorState, LoadingState } from '../../components/States'
-import { COLORS, FONT, RADIUS } from '../../config/theme'
+import { COLORS, FONT, RADIUS, SOFT_SHADOW } from '../../config/theme'
 import { formatDate, formatMoney } from '../../utils/formatMoney'
 import SalonReviews from './SalonReviews'
 
@@ -115,7 +115,7 @@ export default function SalonDetailScreen({ route, navigation }) {
                   const on = picked.includes(s.id)
                   return (
                     <Pressable key={s.id} onPress={() => toggle(s.id)} accessibilityRole="checkbox" accessibilityState={{ checked: on }} accessibilityLabel={`${s.name}, ${formatMoney(s.price)}`} style={[styles.service, on && styles.serviceOn]}>
-                      <Ionicons name={on ? 'checkbox' : 'square-outline'} size={24} color={on ? COLORS.brown : COLORS.muted} />
+                      <Ionicons name={on ? 'checkbox' : 'square-outline'} size={24} color={on ? COLORS.espresso : COLORS.muted} />
                       <View style={{ flex: 1 }}>
                         <Text style={styles.serviceName}>{s.name}</Text>
                         <Text style={styles.muted}>{s.durationMin} min{s.atHome && !s.atSalon ? ' · at home' : s.atHome ? ' · salon or home' : ''}</Text>
@@ -134,7 +134,7 @@ export default function SalonDetailScreen({ route, navigation }) {
 
       <View style={[styles.bar, { paddingBottom: 12 + insets.bottom }]}>
         <Text style={styles.barText}>{chosen.length === 0 ? 'Choose services to book' : `${chosen.length} selected · ${minutes} min · ${formatMoney(total)}`}</Text>
-        <Button title="Book appointment" icon="calendar-outline" disabled={chosen.length === 0} onPress={() => navigation.navigate('Book', { salon: data, serviceIds: picked })} />
+        <Button title="Book appointment" icon="calendar-outline" variant="gold" disabled={chosen.length === 0} onPress={() => navigation.navigate('Book', { salon: data, serviceIds: picked })} />
       </View>
     </View>
   )
@@ -147,8 +147,8 @@ const styles = StyleSheet.create({
   cover: { width: '100%', height: 220, backgroundColor: COLORS.espresso },
   placeholder: { alignItems: 'center', justifyContent: 'center' },
   initial: { fontSize: 56, fontWeight: '700', color: COLORS.gold, fontFamily: FONT.heading },
-  pad: { padding: 16, marginTop: -20, backgroundColor: COLORS.cream, borderTopLeftRadius: RADIUS.xl, borderTopRightRadius: RADIUS.xl },
-  name: { fontSize: 24, fontWeight: '700', color: COLORS.ink, fontFamily: FONT.heading },
+  pad: { padding: 18, marginTop: -26, backgroundColor: COLORS.cream, borderTopLeftRadius: 30, borderTopRightRadius: 30, borderTopWidth: 2, borderColor: COLORS.gold },
+  name: { fontSize: 27, fontWeight: '700', color: COLORS.espresso, fontFamily: FONT.heading, letterSpacing: 0.3 },
   ratingRow: { flexDirection: 'row', alignItems: 'center', gap: 6, marginTop: 6 },
   rating: { fontSize: 14, fontWeight: '600', color: COLORS.ink },
   dirBtn: { marginTop: 12 },
@@ -157,17 +157,17 @@ const styles = StyleSheet.create({
   about: { marginTop: 10, fontSize: 14, color: COLORS.muted },
   line: { flex: 1, fontSize: 14, color: COLORS.ink },
   block: { marginTop: 22 },
-  section: { fontSize: 18, fontWeight: '700', color: COLORS.ink, fontFamily: FONT.heading, marginBottom: 8 },
-  category: { marginTop: 10, marginBottom: 6, fontSize: 13, fontWeight: '700', color: COLORS.brown, textTransform: 'uppercase' },
+  section: { fontSize: 20, fontWeight: '700', color: COLORS.espresso, fontFamily: FONT.heading, marginBottom: 10, paddingLeft: 10, borderLeftWidth: 4, borderLeftColor: COLORS.gold },
+  category: { marginTop: 12, marginBottom: 8, fontSize: 12, fontWeight: '800', color: COLORS.goldDeep, textTransform: 'uppercase', letterSpacing: 2 },
   muted: { fontSize: 13, color: COLORS.muted },
-  offer: { flexDirection: 'row', alignItems: 'center', gap: 12, backgroundColor: COLORS.goldSoft, borderRadius: RADIUS.md, padding: 12, marginBottom: 8 },
-  offerBadge: { backgroundColor: COLORS.gold, color: COLORS.espresso, fontWeight: '700', fontSize: 12, borderRadius: 6, paddingHorizontal: 8, paddingVertical: 4, overflow: 'hidden' },
+  offer: { flexDirection: 'row', alignItems: 'center', gap: 12, backgroundColor: COLORS.goldSoft, borderRadius: RADIUS.lg, borderWidth: 1, borderColor: COLORS.goldLine, padding: 12, marginBottom: 8 },
+  offerBadge: { backgroundColor: COLORS.espresso, color: COLORS.gold, fontWeight: '700', fontSize: 12, borderRadius: 6, paddingHorizontal: 8, paddingVertical: 4, overflow: 'hidden' },
   offerTitle: { fontSize: 14, fontWeight: '600', color: COLORS.ink },
-  service: { flexDirection: 'row', alignItems: 'center', gap: 12, minHeight: 56, backgroundColor: COLORS.surface, borderRadius: RADIUS.md, borderWidth: 1, borderColor: COLORS.line, padding: 12, marginBottom: 8 },
-  serviceOn: { borderColor: COLORS.brown, backgroundColor: COLORS.goldSoft },
+  service: { flexDirection: 'row', alignItems: 'center', gap: 12, minHeight: 60, backgroundColor: COLORS.surface, borderRadius: RADIUS.lg, borderWidth: 1, borderColor: COLORS.line, padding: 12, marginBottom: 8, ...SOFT_SHADOW },
+  serviceOn: { borderColor: COLORS.espresso, borderWidth: 1.5, backgroundColor: COLORS.goldSoft },
   check: { fontSize: 22, color: COLORS.brown },
-  serviceName: { fontSize: 15, fontWeight: '600', color: COLORS.ink },
-  price: { fontSize: 15, fontWeight: '700', color: COLORS.ink },
-  bar: { position: 'absolute', left: 0, right: 0, bottom: 0, backgroundColor: COLORS.cream, borderTopWidth: 1, borderTopColor: COLORS.line, padding: 12, gap: 8 },
-  barText: { fontSize: 13, color: COLORS.muted, textAlign: 'center' },
+  serviceName: { fontSize: 15, fontWeight: '600', color: COLORS.espresso, fontFamily: FONT.heading },
+  price: { fontSize: 16, fontWeight: '700', color: COLORS.goldDeep, fontFamily: FONT.heading },
+  bar: { position: 'absolute', left: 0, right: 0, bottom: 0, backgroundColor: COLORS.espresso, borderTopWidth: 1, borderTopColor: COLORS.gold, padding: 12, gap: 8 },
+  barText: { fontSize: 13, color: COLORS.goldSoft, textAlign: 'center' },
 })

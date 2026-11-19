@@ -5,7 +5,7 @@ import { Alert, Box, Button, Chip, MenuItem, Snackbar, TextField, Typography } f
 import { fieldErrorsOf, friendlyError } from '../../api/client'
 import CityAutocomplete from '../../components/CityAutocomplete'
 import { stateOfCity } from '../../data/indianCities'
-import { field } from '../../utils/muiForm'
+import { field, labelShrink } from '../../utils/muiForm'
 import { getPosition } from '../../utils/geo'
 import { applyServerFieldErrors, FACILITIES, salonSchema, slugify } from '../../utils/formSchemas'
 
@@ -75,6 +75,7 @@ export default function SalonForm({ initial, onSubmit, submitLabel, readOnly = f
     }
   }
 
+  const values = watch() // code se badli value (setValue/reset) par label sahi upar rahe, isliye
   const nameField = field(register, errors, 'name')
   const [locating, setLocating] = useState(false)
 
@@ -100,6 +101,7 @@ export default function SalonForm({ initial, onSubmit, submitLabel, readOnly = f
         data-section="info"
         disabled={readOnly}
         {...nameField}
+        slotProps={labelShrink(values.name)}
         onChange={(e) => {
           nameField.onChange(e)
           // Slug tabhi apne aap badlo jab user ne use khud na chheda ho
@@ -113,10 +115,10 @@ export default function SalonForm({ initial, onSubmit, submitLabel, readOnly = f
         disabled={readOnly}
         {...field(register, errors, 'slug')}
         helperText={errors.slug?.message ?? 'Lowercase letters, digits and hyphens. Used in your public booking link.'}
-        slotProps={{ htmlInput: { autoCapitalize: 'none', spellCheck: false } }}
+        slotProps={{ ...labelShrink(values.slug), htmlInput: { autoCapitalize: 'none', spellCheck: false } }}
       />
-      <TextField size="small" label="Owner name" data-section="info" disabled={readOnly} {...field(register, errors, 'ownerName')} slotProps={{ htmlInput: { maxLength: 35 } }} />
-      <TextField size="small" label="Contact number" type="tel" data-section="info" disabled={readOnly} {...field(register, errors, 'phone')} />
+      <TextField size="small" label="Owner name" data-section="info" disabled={readOnly} {...field(register, errors, 'ownerName')} slotProps={{ ...labelShrink(values.ownerName), htmlInput: { maxLength: 35 } }} />
+      <TextField size="small" label="Contact number" type="tel" data-section="info" disabled={readOnly} {...field(register, errors, 'phone')} slotProps={labelShrink(values.phone)} />
       <TextField
         size="small"
         className="full"
@@ -126,6 +128,7 @@ export default function SalonForm({ initial, onSubmit, submitLabel, readOnly = f
         minRows={2}
         disabled={readOnly}
         {...field(register, errors, 'about')}
+        slotProps={labelShrink(values.about)}
         helperText={errors.about?.message ?? 'A short line customers see on your salon card (up to 500 characters).'}
       />
       <Controller
@@ -145,9 +148,10 @@ export default function SalonForm({ initial, onSubmit, submitLabel, readOnly = f
         data-section="address"
         disabled={readOnly}
         {...field(register, errors, 'area')}
+        slotProps={labelShrink(values.area)}
         helperText={errors.area?.message ?? 'For example Rohini or Bandra West. Customers find your salon by this.'}
       />
-      <TextField size="small" className="full" label="Address" data-section="address" disabled={readOnly} {...field(register, errors, 'line1')} />
+      <TextField size="small" className="full" label="Address" data-section="address" disabled={readOnly} {...field(register, errors, 'line1')} slotProps={labelShrink(values.line1)} />
       <Box className="full" data-section="address" sx={{ display: 'grid', gap: 1.5, gridTemplateColumns: { xs: '1fr', sm: '1fr 1fr 1fr' } }}>
         <Controller
           name="city"
@@ -170,8 +174,8 @@ export default function SalonForm({ initial, onSubmit, submitLabel, readOnly = f
             />
           )}
         />
-        <TextField size="small" label="State" disabled={readOnly} {...field(register, errors, 'state')} />
-        <TextField size="small" label="Pincode" disabled={readOnly} {...field(register, errors, 'pincode')} />
+        <TextField size="small" label="State" disabled={readOnly} {...field(register, errors, 'state')} slotProps={labelShrink(values.state)} />
+        <TextField size="small" label="Pincode" disabled={readOnly} {...field(register, errors, 'pincode')} slotProps={labelShrink(values.pincode)} />
       </Box>
       <Box className="full" data-section="address">
         <Typography variant="subtitle2" sx={{ mb: 1 }}>
@@ -179,8 +183,8 @@ export default function SalonForm({ initial, onSubmit, submitLabel, readOnly = f
         </Typography>
         <Box sx={{ display: 'grid', gap: 2, gridTemplateColumns: { xs: '1fr', sm: '1fr 1fr auto' }, alignItems: 'start' }}>
           {/* shrink: button se value set hone par label value ke upar na chadhe */}
-          <TextField size="small" label="Latitude" disabled={readOnly} {...field(register, errors, 'lat')} slotProps={{ inputLabel: { shrink: Boolean(watch('lat')) || undefined } }} />
-          <TextField size="small" label="Longitude" disabled={readOnly} {...field(register, errors, 'lng')} slotProps={{ inputLabel: { shrink: Boolean(watch('lng')) || undefined } }} />
+          <TextField size="small" label="Latitude" disabled={readOnly} {...field(register, errors, 'lat')} slotProps={labelShrink(values.lat)} />
+          <TextField size="small" label="Longitude" disabled={readOnly} {...field(register, errors, 'lng')} slotProps={labelShrink(values.lng)} />
           {!readOnly && (
             <Button variant="outlined" onClick={useMyLocation} disabled={locating} sx={{ height: 40 }}>
               {locating ? 'Locating…' : 'Use my location'}

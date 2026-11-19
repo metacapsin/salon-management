@@ -11,7 +11,7 @@ import { ChoiceChips } from '../../components/Form'
 import { Card, ErrorNote, Screen, SectionTitle } from '../../components/Screen'
 import { LoadingState } from '../../components/States'
 import TextField from '../../components/TextField'
-import { COLORS } from '../../config/theme'
+import { COLORS, FONT } from '../../config/theme'
 import { formatDate, formatMoney } from '../../utils/formatMoney'
 
 const METHODS = { Cash: 'cash', UPI: 'upi', Card: 'card', Other: 'other' }
@@ -161,7 +161,7 @@ export default function CustomerPackageDetailScreen({ route }) {
 const styles = StyleSheet.create({
   titleRow: { flexDirection: 'row', alignItems: 'center', gap: 10, marginBottom: 12 },
   title: { flex: 1, fontSize: 22, fontWeight: '700', color: COLORS.ink, fontFamily: 'serif' },
-  name: { fontSize: 16, fontWeight: '600', color: COLORS.ink },
+  name: { fontSize: 16, fontWeight: '600', color: COLORS.espresso, fontFamily: FONT.heading },
   muted: { fontSize: 13, color: COLORS.muted, marginTop: 2, marginBottom: 6 },
   row: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', gap: 12, paddingVertical: 4 },
   rowLabel: { fontSize: 14, color: COLORS.muted },

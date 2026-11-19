@@ -19,7 +19,7 @@ function HelpfulButton({ review, salonId }) {
   return (
     <Pressable accessibilityRole="button" accessibilityLabel={on ? 'Helpful, tap to undo' : 'Mark as helpful'} accessibilityState={{ selected: on, busy: toggle.isPending }} onPress={() => !toggle.isPending && toggle.mutate()} style={[styles.helpful, on && styles.helpfulOn]}>
       <Ionicons name={on ? 'thumbs-up' : 'thumbs-up-outline'} size={16} color={on ? '#fff' : COLORS.brown} />
-      <Text style={[styles.helpfulText, on && { color: '#fff' }]}>Helpful{review.helpfulCount > 0 ? ` (${review.helpfulCount})` : ''}</Text>
+      <Text style={[styles.helpfulText, on && { color: COLORS.gold }]}>Helpful{review.helpfulCount > 0 ? ` (${review.helpfulCount})` : ''}</Text>
     </Pressable>
   )
 }
@@ -68,6 +68,6 @@ const styles = StyleSheet.create({
   muted: { fontSize: 13, color: COLORS.muted },
   empty: { backgroundColor: COLORS.goldSoft, borderRadius: RADIUS.md, padding: 12 },
   helpful: { flexDirection: 'row', alignItems: 'center', gap: 6, alignSelf: 'flex-start', minHeight: 44, paddingHorizontal: 14, borderRadius: RADIUS.pill, borderWidth: 1, borderColor: COLORS.brown, backgroundColor: COLORS.surface },
-  helpfulOn: { backgroundColor: COLORS.brown },
+  helpfulOn: { backgroundColor: COLORS.espresso },
   helpfulText: { fontSize: 14, fontWeight: '600', color: COLORS.brown },
 })

@@ -45,7 +45,7 @@ export function SearchBox(props) {
 }
 
 const styles = StyleSheet.create({
-  summary: { backgroundColor: COLORS.espresso, borderRadius: RADIUS.xl, padding: 18, marginBottom: 14, ...SHADOW },
+  summary: { backgroundColor: COLORS.espresso, borderRadius: RADIUS.xl, padding: 18, marginBottom: 14, borderWidth: 1, borderColor: COLORS.goldLine, overflow: 'hidden', ...SHADOW },
   top: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', gap: 12 },
   value: { color: COLORS.gold, fontSize: 36, fontWeight: '700', fontFamily: FONT.heading },
   label: { color: COLORS.goldSoft, fontSize: 14, marginTop: -2 },
@@ -56,6 +56,6 @@ const styles = StyleSheet.create({
   tileValue: { flexShrink: 1, color: COLORS.cream, fontSize: 18, fontWeight: '700' },
   tileLabel: { color: COLORS.goldSoft, fontSize: 12, marginTop: 2 },
   tileHint: { color: COLORS.gold, fontSize: 11, marginTop: 1 },
-  search: { flexDirection: 'row', alignItems: 'center', gap: 10, minHeight: TOUCH_MIN, borderWidth: 1, borderColor: COLORS.line, borderRadius: RADIUS.md, backgroundColor: COLORS.surface, paddingHorizontal: 14 },
+  search: { flexDirection: 'row', alignItems: 'center', gap: 10, minHeight: TOUCH_MIN, borderWidth: 1, borderColor: COLORS.line, borderRadius: RADIUS.lg, backgroundColor: COLORS.ivory, paddingHorizontal: 14 },
   searchInput: { flex: 1, minHeight: TOUCH_MIN - 2, fontSize: 16, color: COLORS.ink, paddingVertical: 0, outlineStyle: 'none' },
 })

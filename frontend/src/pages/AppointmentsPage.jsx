@@ -9,6 +9,7 @@ import { getBookingBenefits, listBookings, setBookingStatus } from '../api/salon
 import { useAuth } from '../auth/AuthContext'
 import { roleCan } from '../auth/permissions'
 import QueryState from '../components/QueryState'
+import { formatDuration } from '../utils/duration'
 import BenefitsDialog from '../features/appointments/BenefitsDialog'
 import { benefitsKey } from '../features/appointments/benefitsKey'
 import { formatMoney } from '../utils/formatMoney'
@@ -175,7 +176,7 @@ export default function AppointmentsPage() {
                           {d.weekday}
                         </Typography>
                         <Typography variant="caption" color="text.secondary">
-                          {b.startTime} · {b.durationMin} min
+                          {b.startTime} · {formatDuration(b.durationMin)}
                         </Typography>
                       </Box>
                     </Box>

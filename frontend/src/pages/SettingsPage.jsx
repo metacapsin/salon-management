@@ -11,6 +11,7 @@ import PublicOutlinedIcon from '@mui/icons-material/PublicOutlined'
 import StorefrontOutlinedIcon from '@mui/icons-material/StorefrontOutlined'
 import { ApiError } from '../api/client'
 import { formatMoney } from '../utils/formatMoney'
+import { formatDuration } from '../utils/duration'
 import { getCurrentSalon, listServices, saveHours, updateSalon } from '../api/salonApi'
 import { useAuth } from '../auth/AuthContext'
 import { roleCan } from '../auth/permissions'
@@ -183,7 +184,7 @@ export default function SettingsPage() {
                             <Box sx={{ flexGrow: 1 }}>
                               <Typography sx={{ fontWeight: 600 }}>{s.name}</Typography>
                               <Typography variant="body2" color="text.secondary">
-                                {s.category} · {s.durationMin} min
+                                {s.category} · {formatDuration(s.durationMin)}
                               </Typography>
                             </Box>
                             <Typography sx={{ fontWeight: 700 }}>{formatMoney(s.price)}</Typography>

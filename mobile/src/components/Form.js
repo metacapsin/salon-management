@@ -9,7 +9,7 @@ export function SwitchRow({ label, value, onValueChange, hint }) {
         <Text style={styles.rowLabel}>{label}</Text>
         {hint ? <Text style={styles.hint}>{hint}</Text> : null}
       </View>
-      <Switch value={value} onValueChange={onValueChange} trackColor={{ true: COLORS.espresso, false: COLORS.line }} thumbColor="#fff" />
+      <Switch value={value} onValueChange={onValueChange} trackColor={{ true: COLORS.espresso, false: COLORS.line }} thumbColor={value ? COLORS.gold : '#fff'} />
     </Pressable>
   )
 }
@@ -61,11 +61,11 @@ const styles = StyleSheet.create({
   rowLabel: { fontSize: 15, color: COLORS.ink },
   hint: { fontSize: 12, color: COLORS.muted, marginTop: 2 },
   block: { marginBottom: 16 },
-  label: { fontSize: 14, fontWeight: '600', color: COLORS.ink, marginBottom: 8 },
+  label: { fontSize: 13, fontWeight: '700', color: COLORS.espresso, marginBottom: 8, letterSpacing: 0.4 },
   wrap: { flexDirection: 'row', flexWrap: 'wrap', gap: 8 },
-  chip: { minHeight: 40, paddingHorizontal: 14, borderRadius: 20, borderWidth: 1, borderColor: COLORS.line, backgroundColor: '#fff', justifyContent: 'center' },
-  chipOn: { backgroundColor: COLORS.brown, borderColor: COLORS.brown },
+  chip: { minHeight: 40, paddingHorizontal: 14, borderRadius: 20, borderWidth: 1, borderColor: COLORS.line, backgroundColor: COLORS.ivory, justifyContent: 'center' },
+  chipOn: { backgroundColor: COLORS.espresso, borderColor: COLORS.gold },
   chipText: { fontSize: 14, color: COLORS.ink },
-  chipTextOn: { color: '#fff', fontWeight: '600' },
+  chipTextOn: { color: COLORS.gold, fontWeight: '700' },
   error: { marginTop: 6, fontSize: 13, color: COLORS.error },
 })

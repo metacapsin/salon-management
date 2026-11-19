@@ -101,7 +101,7 @@ function OfferDialog({ offer, services, onClose, onSaved }) {
             <TextField label="Offer title" autoFocus {...field(register, errors, 'title')} />
             <TextField label="Description (optional)" {...field(register, errors, 'description')} />
           </Box>
-          <Box sx={{ display: 'grid', gap: 2, gridTemplateColumns: '1fr 1fr' }}>
+          <Box sx={{ display: 'grid', gap: 2, gridTemplateColumns: { xs: '1fr', sm: '1fr 1fr' } }}>
             <Controller
               name="discountType"
               control={control}
@@ -147,7 +147,7 @@ function OfferDialog({ offer, services, onClose, onSaved }) {
               </TextField>
             )}
           />
-          <Box sx={{ display: 'grid', gap: 2, gridTemplateColumns: '1fr 1fr' }}>
+          <Box sx={{ display: 'grid', gap: 2, gridTemplateColumns: { xs: '1fr', sm: '1fr 1fr' } }}>
             <TextField label="Starts on" type="date" slotProps={{ inputLabel: { shrink: true } }} {...field(register, errors, 'startsOn')} />
             <TextField label="Ends on" type="date" slotProps={{ inputLabel: { shrink: true } }} {...field(register, errors, 'endsOn')} />
           </Box>

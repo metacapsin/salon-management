@@ -34,6 +34,8 @@ import { useAuth } from '../auth/AuthContext'
 import { roleCan } from '../auth/permissions'
 import QueryState from '../components/QueryState'
 import { SERVICE_CATEGORIES } from '../data/serviceCategories'
+import DurationField from '../components/DurationField'
+import { formatDuration } from '../utils/duration'
 import { formatMoney } from '../utils/formatMoney'
 import { applyServerFieldErrors, serviceSchema } from '../utils/formSchemas'
 import { field } from '../utils/muiForm'
@@ -99,15 +101,14 @@ function ServiceDialog({ service, onClose, onSaved }) {
               </TextField>
             )}
           />
-          <Box sx={{ display: 'grid', gap: 2, gridTemplateColumns: { xs: '1fr', sm: '1fr 1fr' } }}>
+          <Box sx={{ display: 'grid', gap: 2, gridTemplateColumns: '1fr' }}>
             <TextField label="Price (₹)" type="number" slotProps={{ htmlInput: { min: 0, step: 1 } }} {...field(register, errors, 'price')} />
-            <TextField
-              label="Duration (minutes)"
-              type="number"
-              slotProps={{ htmlInput: { min: 5, max: 480, step: 5 } }}
-              {...field(register, errors, 'durationMin')}
-            />
           </Box>
+          <Controller
+            name="durationMin"
+            control={control}
+            render={({ field: f }) => <DurationField value={f.value} onChange={f.onChange} error={errors.durationMin?.message} />}
+          />
           <TextField label="Description (optional)" multiline minRows={2} {...field(register, errors, 'description')} />
           <Box>
             <Typography variant="subtitle2">Where is this service given?</Typography>
@@ -214,7 +215,7 @@ export default function ServicesPage() {
                   </TableCell>
                   <TableCell>{s.category}</TableCell>
                   <TableCell align="right">{formatMoney(s.price)}</TableCell>
-                  <TableCell align="right">{s.durationMin} min</TableCell>
+                  <TableCell align="right">{formatDuration(s.durationMin)}</TableCell>
                   <TableCell>
                     {s.atSalon && <Chip size="small" label="Salon" sx={{ mr: 0.5 }} />}
                     {s.atHome && <Chip size="small" color="secondary" label="Home" />}

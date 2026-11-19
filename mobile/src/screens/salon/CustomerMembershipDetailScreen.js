@@ -11,7 +11,7 @@ import { ChoiceChips } from '../../components/Form'
 import { Card, ErrorNote, Screen, SectionTitle } from '../../components/Screen'
 import { LoadingState } from '../../components/States'
 import TextField from '../../components/TextField'
-import { COLORS } from '../../config/theme'
+import { COLORS, FONT } from '../../config/theme'
 import { formatDate, formatMoney } from '../../utils/formatMoney'
 import { discountText } from './MembershipTabs'
 
@@ -165,7 +165,7 @@ export default function CustomerMembershipDetailScreen({ route }) {
 const styles = StyleSheet.create({
   titleRow: { flexDirection: 'row', alignItems: 'center', gap: 10, marginBottom: 12 },
   title: { flex: 1, fontSize: 22, fontWeight: '700', color: COLORS.ink, fontFamily: 'serif' },
-  name: { fontSize: 16, fontWeight: '600', color: COLORS.ink },
+  name: { fontSize: 16, fontWeight: '600', color: COLORS.espresso, fontFamily: FONT.heading },
   muted: { fontSize: 13, color: COLORS.muted, marginTop: 2, marginBottom: 6 },
   okCard: { borderColor: COLORS.success },
   waitCard: { borderColor: COLORS.gold, backgroundColor: COLORS.goldSoft },

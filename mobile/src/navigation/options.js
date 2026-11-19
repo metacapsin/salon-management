@@ -11,17 +11,17 @@ export const navTheme = {
 export const stackOptions = {
   headerStyle: { backgroundColor: COLORS.espresso },
   headerTintColor: COLORS.gold,
-  headerTitleStyle: { fontFamily: FONT.heading, fontWeight: '700', color: COLORS.cream },
+  headerTitleStyle: { fontFamily: FONT.heading, fontWeight: '700', fontSize: 20, color: COLORS.cream, letterSpacing: 0.5 },
   headerShadowVisible: false,
   contentStyle: { backgroundColor: COLORS.cream },
 }
 
 export const tabOptions = {
   ...stackOptions,
-  tabBarActiveTintColor: COLORS.brown,
-  tabBarInactiveTintColor: COLORS.muted,
-  tabBarStyle: { backgroundColor: COLORS.surface, borderTopColor: COLORS.line, minHeight: 60, paddingTop: 4 },
-  tabBarLabelStyle: { fontSize: 11, fontWeight: '600' },
+  tabBarActiveTintColor: COLORS.gold,
+  tabBarInactiveTintColor: 'rgba(250,245,239,0.55)',
+  tabBarStyle: { backgroundColor: COLORS.espresso, borderTopColor: COLORS.goldLine, borderTopWidth: 1, minHeight: 62, paddingTop: 6 },
+  tabBarLabelStyle: { fontSize: 11, fontWeight: '700', letterSpacing: 0.3 },
   tabBarItemStyle: { paddingHorizontal: 0 },
 }
 

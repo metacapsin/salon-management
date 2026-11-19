@@ -5,6 +5,7 @@ import { ApiError, fieldErrorsOf, friendlyError } from '../../api/client'
 import { createBooking, getSlots } from '../../api/publicApi'
 import { useCustomer } from '../../customer/CustomerAuthContext'
 import { formatMoney } from '../../utils/formatMoney'
+import { formatDuration } from '../../utils/duration'
 import { addressError } from '../../utils/validators'
 import OfferList, { discountFor } from './OfferList'
 
@@ -114,7 +115,7 @@ export default function BookingForm({ salon, onBooked }) {
             label={
               <Box sx={{ display: 'flex', justifyContent: 'space-between', gap: 2 }}>
                 <span>
-                  {s.name} <Typography component="span" variant="caption" color="text.secondary">· {s.durationMin} min</Typography>
+                  {s.name} <Typography component="span" variant="caption" color="text.secondary">· {formatDuration(s.durationMin)}</Typography>
                 </span>
                 <strong>{formatMoney(s.price)}</strong>
               </Box>
@@ -204,7 +205,7 @@ export default function BookingForm({ salon, onBooked }) {
           )}
           <Typography sx={{ fontWeight: 800 }}>Total {formatMoney(total)}</Typography>
           <Typography variant="caption" color="text.secondary">
-            {duration > 0 ? `${duration} min` : 'No service chosen'} · pay at the salon
+            {duration > 0 ? `${formatDuration(duration)}` : 'No service chosen'} · pay at the salon
           </Typography>
         </Box>
         <Button type="submit" variant="contained" disabled={saving}>

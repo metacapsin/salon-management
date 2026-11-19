@@ -8,7 +8,7 @@ import { roleCan } from '../../auth/permissions'
 import { FilterChips, StatusBadge } from '../../components/Chips'
 import { Card, ErrorNote } from '../../components/Screen'
 import { EmptyState, LoadingState } from '../../components/States'
-import { COLORS } from '../../config/theme'
+import { COLORS, FONT } from '../../config/theme'
 
 const VIEWS = [
   { value: false, label: 'Active' },
@@ -109,7 +109,7 @@ const styles = StyleSheet.create({
   addText: { color: COLORS.gold, fontSize: 16, fontWeight: '700' },
   stopped: { opacity: 0.65 },
   top: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', gap: 8 },
-  name: { flex: 1, fontSize: 16, fontWeight: '600', color: COLORS.ink },
+  name: { flex: 1, fontSize: 16, fontWeight: '600', color: COLORS.espresso, fontFamily: FONT.heading },
   muted: { fontSize: 13, color: COLORS.muted, marginTop: 2 },
   skills: { fontSize: 13, color: COLORS.ink, marginTop: 6 },
   hours: { fontSize: 12, color: COLORS.muted, marginTop: 6 },

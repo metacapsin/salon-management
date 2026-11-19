@@ -6,7 +6,7 @@ import { friendlyError } from '../../api/client'
 import { FilterChips, StatusBadge } from '../../components/Chips'
 import { Card, ErrorNote } from '../../components/Screen'
 import { EmptyState, LoadingState } from '../../components/States'
-import { COLORS, TOUCH_MIN } from '../../config/theme'
+import { COLORS, TOUCH_MIN, FONT } from '../../config/theme'
 
 const STATUSES = [
   { value: undefined, label: 'All' },
@@ -93,11 +93,11 @@ export default function AdminSalonsScreen({ navigation }) {
 const styles = StyleSheet.create({
   screen: { flex: 1, backgroundColor: COLORS.cream },
   list: { padding: 16, paddingBottom: 24 },
-  search: { minHeight: TOUCH_MIN, borderWidth: 1, borderColor: COLORS.line, borderRadius: 10, backgroundColor: '#fff', paddingHorizontal: 14, fontSize: 16, color: COLORS.ink },
+  search: { minHeight: TOUCH_MIN, borderWidth: 1, borderColor: COLORS.line, borderRadius: 16, backgroundColor: COLORS.ivory, paddingHorizontal: 14, fontSize: 16, color: COLORS.ink },
   count: { fontSize: 13, color: COLORS.muted, marginBottom: 8 },
   loader: { marginTop: 24 },
   empty: { textAlign: 'center', color: COLORS.muted, marginTop: 32 },
   top: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', gap: 8, marginBottom: 4 },
-  name: { flex: 1, fontSize: 16, fontWeight: '600', color: COLORS.ink },
+  name: { flex: 1, fontSize: 16, fontWeight: '600', color: COLORS.espresso, fontFamily: FONT.heading },
   muted: { fontSize: 13, color: COLORS.muted, marginTop: 2 },
 })

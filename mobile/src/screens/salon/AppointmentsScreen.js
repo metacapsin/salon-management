@@ -9,7 +9,7 @@ import { FilterChips, StatusBadge } from '../../components/Chips'
 import { Card } from '../../components/Screen'
 import { EmptyState, ErrorState, LoadingState } from '../../components/States'
 import { Ionicons } from '@expo/vector-icons'
-import { COLORS } from '../../config/theme'
+import { COLORS, FONT } from '../../config/theme'
 import { formatDate, formatMoney } from '../../utils/formatMoney'
 
 const FILTERS = [
@@ -172,13 +172,13 @@ const styles = StyleSheet.create({
   top: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 6 },
   when: { flex: 1, fontSize: 14, fontWeight: '700', color: COLORS.brown },
   person: { flexDirection: 'row', alignItems: 'center', gap: 6 },
-  name: { flex: 1, fontSize: 16, fontWeight: '700', color: COLORS.ink },
+  name: { flex: 1, fontSize: 16, fontWeight: '700', color: COLORS.espresso, fontFamily: FONT.heading },
   muted: { fontSize: 13, color: COLORS.muted, marginTop: 2 },
   services: { fontSize: 14, color: COLORS.ink, marginTop: 6 },
   error: { color: COLORS.error, fontSize: 13, marginTop: 8 },
   actions: { flexDirection: 'row', gap: 8, marginTop: 12 },
-  action: { flex: 1, minHeight: 44, borderRadius: 12, backgroundColor: COLORS.brown, alignItems: 'center', justifyContent: 'center', paddingHorizontal: 8 },
-  actionDanger: { backgroundColor: COLORS.surface, borderWidth: 1, borderColor: COLORS.error },
-  actionText: { color: '#fff', fontWeight: '600', fontSize: 14 },
+  action: { flex: 1, minHeight: 44, borderRadius: 14, backgroundColor: COLORS.espresso, borderWidth: 1.5, borderColor: COLORS.gold, alignItems: 'center', justifyContent: 'center', paddingHorizontal: 8 },
+  actionDanger: { backgroundColor: COLORS.surface, borderWidth: 1.5, borderColor: COLORS.error },
+  actionText: { color: COLORS.gold, fontWeight: '700', fontSize: 14 },
   actionTextDanger: { color: COLORS.error },
 })

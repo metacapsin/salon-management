@@ -33,6 +33,7 @@ import { useAuth } from '../auth/AuthContext'
 import { roleCan } from '../auth/permissions'
 import QueryState from '../components/QueryState'
 import { nameError, phoneError } from '../utils/validators'
+import { formatDuration } from '../utils/duration'
 import ResponsiveTable from '../components/ResponsiveTable'
 import EditIcon from '@mui/icons-material/EditOutlined'
 
@@ -164,7 +165,7 @@ function StaffDialog({ staff, services, onClose, onSaved }) {
           ) : (
             <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', sm: '1fr 1fr' } }}>
               {services.map((s) => (
-                <FormControlLabel key={s.id} control={<Checkbox checked={serviceIds.includes(s.id)} onChange={() => toggleService(s.id)} />} label={`${s.name} (${s.durationMin} min)`} />
+                <FormControlLabel key={s.id} control={<Checkbox checked={serviceIds.includes(s.id)} onChange={() => toggleService(s.id)} />} label={`${s.name} (${formatDuration(s.durationMin)})`} />
               ))}
             </Box>
           )}
